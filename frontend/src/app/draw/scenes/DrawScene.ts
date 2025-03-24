@@ -13,6 +13,12 @@ interface CardData {
   health: number
 }
 
+const LAYOUT = {
+  CARD_Y: 250,
+  INSTRUCTION_TEXT_Y: 450,
+  REDRAW_BUTTON_Y: 520,
+} as const
+
 const drawData: CardData[] = [
   { element: 'FIRE', attack: 5, health: 3 },
   { element: 'WATER', attack: 3, health: 6 },
@@ -56,7 +62,7 @@ export class DrawScene extends Phaser.Scene {
     this.createCardAndPack()
 
     this.instructionText = this.add
-      .text(400, 500, 'Click the card pack!', {
+      .text(400, LAYOUT.INSTRUCTION_TEXT_Y, 'Click the card pack!', {
         fontSize: '24px',
         color: '#ffffff',
       })
@@ -79,7 +85,7 @@ export class DrawScene extends Phaser.Scene {
     this.card = new Card(
       this,
       400,
-      300,
+      LAYOUT.CARD_Y,
       drawData[this.drawsCount].element,
       drawData[this.drawsCount].attack,
       drawData[this.drawsCount].health,
@@ -91,7 +97,7 @@ export class DrawScene extends Phaser.Scene {
     this.card.stopIdleAnimation()
 
     this.card.setFaceDown(true)
-    this.cardPack = new CardPack(this, 400, 300, this.card)
+    this.cardPack = new CardPack(this, 400, LAYOUT.CARD_Y, this.card)
 
     this.cardPack.setOnReveal((card) => {
       if (!this.cardRevealed) {
@@ -143,7 +149,7 @@ export class DrawScene extends Phaser.Scene {
 
     if (this.cardPack) {
       this.card.x = 400
-      this.card.y = 300 + this.card.height / 2 - 30
+      this.card.y = LAYOUT.CARD_Y + this.card.height / 2 - 30
       this.card.angle = 0
       this.card.setAlpha(1)
       this.card.setDepth(0.9)
@@ -190,7 +196,7 @@ export class DrawScene extends Phaser.Scene {
           scaleX: { from: 0, to: 2 },
           scaleY: { from: 1.3, to: 2 },
           angle: 0,
-          y: { from: this.card!.y, to: 300 },
+          y: { from: this.card!.y, to: LAYOUT.CARD_Y },
           duration: 1200,
           ease: 'Back.easeOut',
           easeParams: [1.7],
@@ -265,7 +271,7 @@ export class DrawScene extends Phaser.Scene {
   createRedrawButton() {
     this.redrawButton = new Button(this, {
       x: 400,
-      y: 550,
+      y: LAYOUT.REDRAW_BUTTON_Y,
       width: 200,
       height: 50,
       text: `Redraw (${drawData.length - this.drawsCount} left)`,
@@ -286,7 +292,7 @@ export class DrawScene extends Phaser.Scene {
     this.redrawButton.animateTo(
       {
         alpha: 1,
-        y: 550,
+        y: LAYOUT.REDRAW_BUTTON_Y,
       },
       500,
       'Back.easeOut'
@@ -298,7 +304,7 @@ export class DrawScene extends Phaser.Scene {
       this.redrawButton.animateTo(
         {
           alpha: 0,
-          y: 550,
+          y: LAYOUT.REDRAW_BUTTON_Y,
         },
         300,
         'Back.easeIn',
