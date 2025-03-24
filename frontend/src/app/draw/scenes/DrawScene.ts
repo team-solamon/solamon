@@ -155,20 +155,27 @@ export class DrawScene extends Phaser.Scene {
       this.card.setDepth(0.9)
     }
 
-    const extractionSpeed = 0.7
-    const extractDistance = 250 + 30
+    const extractionSpeed = 0.6
+    const extractDistance = 280
 
     this.cameras.main.startFollow(this.card, true, 0.1, 0.1)
 
     this.tweens.add({
       targets: this.card,
       y: `-=${extractDistance}`,
+      angle: { from: 0, to: -720 },
+      scaleX: { from: 2, to: 1.5 },
+      scaleY: { from: 2, to: 1.5 },
       duration: 1500 * extractionSpeed,
       ease: 'Cubic.easeOut',
       onComplete: () => {
         this.cameras.main.stopFollow()
         this.completeCardExtraction()
       },
+    })
+
+    this.time.delayedCall(200, () => {
+      this.cameras.main.shake(300, 0.005)
     })
   }
 
@@ -180,32 +187,38 @@ export class DrawScene extends Phaser.Scene {
       scrollX: 0,
       scrollY: 0,
       zoom: this.originalCameraZoom,
-      duration: 1000,
-      ease: 'Sine.easeInOut',
+      duration: 1200,
+      ease: 'Back.easeOut',
     })
 
     this.tweens.add({
       targets: this.card,
-      angle: { from: 0, to: 360 },
-      scaleX: { from: 1, to: 0 },
-      duration: 500,
-      ease: 'Cubic.easeIn',
+      scaleX: { from: 1.5, to: 0 },
+      duration: 600,
+      ease: 'Back.easeIn',
       onComplete: () => {
+        if (this.card) {
+          this.card.angle = 0
+          this.card.y -= 150
+        }
+
         this.tweens.add({
           targets: this.card,
           scaleX: { from: 0, to: 2 },
           scaleY: { from: 1.3, to: 2 },
-          angle: 0,
           y: { from: this.card!.y, to: LAYOUT.CARD_Y },
-          duration: 1200,
-          ease: 'Back.easeOut',
-          easeParams: [1.7],
+          duration: 600,
+          ease: 'Cubic.easeIn',
           onComplete: () => {
             if (this.card) {
               this.card.scaleX = 2
               this.card.scaleY = 2
-              this.card.flipCard()
-              this.card.startIdleAnimation()
+
+              this.cameras.main.shake(300, 0.022)
+              this.time.delayedCall(50, () => {
+                this.card?.flipCard()
+                this.card?.startIdleAnimation()
+              })
             }
 
             this.createEffects()
