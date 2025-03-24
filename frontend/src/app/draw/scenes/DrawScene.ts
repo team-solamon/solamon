@@ -203,7 +203,9 @@ export class DrawScene extends Phaser.Scene {
       extractDistance,
       hintColor,
       extractionSpeed,
-      () => {}
+      () => {
+        console.log('Card extraction animation complete')
+      }
     )
   }
 
