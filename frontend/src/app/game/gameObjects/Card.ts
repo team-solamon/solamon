@@ -329,6 +329,10 @@ export class Card extends Phaser.GameObjects.Container {
     })
   }
 
+  toggleHealthBar(visible: boolean) {
+    this.healthBar.setVisible(visible)
+  }
+
   updateCardData(data: {
     name: string
     attack: number
