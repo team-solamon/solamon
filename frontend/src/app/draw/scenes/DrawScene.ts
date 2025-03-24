@@ -3,7 +3,7 @@ import * as Phaser from 'phaser'
 import { Button } from '../../../game/gameObjects/Button'
 import { Card, CardRarity } from '../gameObjects/Card'
 
-export class CardScene extends Phaser.Scene {
+export class DrawScene extends Phaser.Scene {
   private cardPack: Phaser.GameObjects.Rectangle | null = null
   private card: Card | null = null
   private cardRevealed = false
