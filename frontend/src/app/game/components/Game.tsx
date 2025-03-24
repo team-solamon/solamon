@@ -10,15 +10,15 @@ import { CardData } from '../../../game/data/card'
 import { BattleReplay } from '@/game/data/replay'
 
 const playerCardData: CardData[] = [
-  { name: 'Warrior', attack: 4, health: 10, element: 'WATER' },
-  { name: 'Mage', attack: 8, health: 6, element: 'FIRE' },
-  { name: 'Paladin', attack: 6, health: 12, element: 'METAL' },
+  { name: 'WATER', attack: 4, health: 10, element: 'WATER' },
+  { name: 'FIRE', attack: 8, health: 6, element: 'FIRE' },
+  { name: 'METAL', attack: 6, health: 12, element: 'METAL' },
 ]
 
 const opponentCardData: CardData[] = [
-  { name: 'Goblin', attack: 4, health: 8, element: 'EARTH' },
-  { name: 'Witch', attack: 7, health: 7, element: 'WOOD' },
-  { name: 'Dragon', attack: 9, health: 9, element: 'METAL' },
+  { name: 'EARTH', attack: 4, health: 8, element: 'EARTH' },
+  { name: 'WOOD', attack: 7, health: 7, element: 'WOOD' },
+  { name: 'METAL', attack: 9, health: 9, element: 'METAL' },
 ]
 
 const sampleBattleReplay: BattleReplay = {
