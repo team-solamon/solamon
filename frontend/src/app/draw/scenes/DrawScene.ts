@@ -116,13 +116,11 @@ export class DrawScene extends Phaser.Scene {
     }
 
     this.time.delayedCall(500, () => {
-      console.log('Starting card extraction')
       this.startCardExtraction()
     })
   }
 
   startCardExtraction() {
-    console.log('Starting card extraction animation', this.card)
     if (!this.card || !this.cardPack) return
 
     if (this.cardPack) {
@@ -167,45 +165,6 @@ export class DrawScene extends Phaser.Scene {
           duration: 1200,
           ease: 'Back.easeOut',
           easeParams: [1.7],
-          onUpdate: (tween) => {
-            const progress = tween.progress
-
-            if (this.card && progress > 0.4 && progress < 0.6) {
-              const shimmer = this.add.rectangle(
-                this.card.x,
-                this.card.y,
-                this.card.width * 1.2,
-                this.card.height * 1.2,
-                hintColor,
-                0.7
-              )
-              shimmer.setBlendMode(Phaser.BlendModes.ADD)
-              this.particles.push(shimmer)
-
-              this.tweens.add({
-                targets: shimmer,
-                alpha: 0,
-                scaleX: 1.3,
-                scaleY: 1.3,
-                duration: 400,
-                ease: 'Cubic.easeOut',
-                onComplete: () => {
-                  shimmer.destroy()
-                  this.particles = this.particles.filter((p) => p !== shimmer)
-                },
-              })
-
-              if (this.background) {
-                this.tweens.add({
-                  targets: this.background.flashOverlay,
-                  alpha: { from: 0, to: 0.4 },
-                  duration: 150,
-                  yoyo: true,
-                  ease: 'Cubic.easeOut',
-                })
-              }
-            }
-          },
           onComplete: () => {
             if (this.card) {
               this.card.scaleX = 2
@@ -228,36 +187,6 @@ export class DrawScene extends Phaser.Scene {
         })
       },
     })
-
-    for (let i = 0; i < 20; i++) {
-      const angle = Math.random() * Math.PI * 2
-      const distance = 30 + Math.random() * 60
-      const size = 2 + Math.random() * 3
-
-      const particle = this.add.circle(
-        this.card.x,
-        this.card.y,
-        size,
-        hintColor,
-        0.8
-      )
-      particle.setBlendMode(Phaser.BlendModes.ADD)
-      this.particles.push(particle)
-
-      this.tweens.add({
-        targets: particle,
-        x: this.card.x + Math.cos(angle) * distance,
-        y: this.card.y + Math.sin(angle) * distance,
-        alpha: 0,
-        scale: 0.5,
-        duration: 700 + Math.random() * 300,
-        ease: 'Cubic.easeOut',
-        onComplete: () => {
-          particle.destroy()
-          this.particles = this.particles.filter((p) => p !== particle)
-        },
-      })
-    }
   }
 
   createEffects() {
