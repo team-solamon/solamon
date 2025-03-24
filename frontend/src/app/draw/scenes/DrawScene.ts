@@ -41,7 +41,7 @@ export class DrawScene extends Phaser.Scene {
 
     this.card = new Card(
       this,
-      0,
+      400,
       280,
       'name',
       0,
@@ -49,8 +49,7 @@ export class DrawScene extends Phaser.Scene {
       drawData[this.drawsCount],
       true
     )
-
-    this.card.y = 280
+    this.card.setFaceDown(true)
 
     this.cardPack = new CardPack(this, 400, 300, this.card)
     this.cardPack.setOnReveal((card) => {
@@ -460,10 +459,9 @@ export class DrawScene extends Phaser.Scene {
 
       this.cardRevealed = false
 
-      console.log('Creating new card')
       this.card = new Card(
         this,
-        0,
+        400,
         280,
         'name',
         0,
@@ -471,6 +469,7 @@ export class DrawScene extends Phaser.Scene {
         drawData[this.drawsCount],
         true
       )
+      this.card.setFaceDown(true)
 
       this.cardPack = new CardPack(this, 400, 300, this.card)
       this.cardPack.setOnReveal((card) => {
