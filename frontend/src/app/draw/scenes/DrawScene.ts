@@ -263,12 +263,22 @@ export class DrawScene extends Phaser.Scene {
   createEffects() {
     if (!this.card) return
 
+    const color = getCardColor(this.card.element)
+    const brighterColor =
+      Phaser.Display.Color.ValueToColor(color).brighten(30).color
+    const blendedColor = Phaser.Display.Color.Interpolate.ColorWithColor(
+      Phaser.Display.Color.ValueToColor(color),
+      Phaser.Display.Color.ValueToColor(0xffffff),
+      100,
+      20
+    ).color
+
     createElegantRings(
       this,
       this.card.x,
       this.card.y,
       this.card.depth,
-      getCardColor(this.card.element),
+      brighterColor,
       3
     )
 
@@ -277,7 +287,7 @@ export class DrawScene extends Phaser.Scene {
       this.card.x,
       this.card.y,
       this.card.depth,
-      getCardColor(this.card.element),
+      blendedColor,
       2,
       500
     )
