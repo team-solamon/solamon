@@ -2,6 +2,7 @@ import * as Phaser from 'phaser'
 
 import { Button } from '../../../game/gameObjects/Button'
 import { Card, CardRarity } from '../gameObjects/Card'
+import { Background } from '../gameObjects/Background'
 
 export class DrawScene extends Phaser.Scene {
   private cardPack: Phaser.GameObjects.Rectangle | null = null
@@ -10,8 +11,7 @@ export class DrawScene extends Phaser.Scene {
   private instructionText: Phaser.GameObjects.Text | null = null
   private questionMark: Phaser.GameObjects.Text | null = null
   private particles: Phaser.GameObjects.Shape[] = []
-  private backgroundOverlay: Phaser.GameObjects.Rectangle | null = null
-  private flashOverlay: Phaser.GameObjects.Rectangle | null = null
+  private background: Background | null = null
   private glowEffect: Phaser.GameObjects.Rectangle | null = null
   private redrawButton: Button | null = null
   private drawsCount = 0
@@ -26,15 +26,7 @@ export class DrawScene extends Phaser.Scene {
   create() {
     this.cameras.main.setBackgroundColor('#1a1a2e')
 
-    this.createStarryBackground()
-
-    this.backgroundOverlay = this.add.rectangle(400, 300, 800, 600, 0x000000)
-    this.backgroundOverlay.setAlpha(0)
-    this.backgroundOverlay.setDepth(-1)
-
-    this.flashOverlay = this.add.rectangle(400, 300, 800, 600, 0xffffff)
-    this.flashOverlay.setAlpha(0)
-    this.flashOverlay.setDepth(10)
+    this.background = new Background(this)
 
     this.card = new Card(this, 400, 300)
     this.card.card.y = 280
@@ -144,9 +136,9 @@ export class DrawScene extends Phaser.Scene {
       this.card.card.setDepth(0.9)
     }
 
-    if (this.backgroundOverlay) {
+    if (this.background) {
       this.tweens.add({
-        targets: this.backgroundOverlay,
+        targets: this.background.backgroundOverlay,
         alpha: 0.4,
         duration: 600,
         ease: 'Sine.easeOut',
@@ -283,9 +275,9 @@ export class DrawScene extends Phaser.Scene {
           })
         }
 
-        if (progress > 0.85 && progress < 0.9 && this.flashOverlay) {
+        if (progress > 0.85 && progress < 0.9 && this.background) {
           this.tweens.add({
-            targets: this.flashOverlay,
+            targets: this.background.flashOverlay,
             alpha: { from: 0, to: 0.3 },
             duration: 200,
             yoyo: true,
@@ -338,7 +330,6 @@ export class DrawScene extends Phaser.Scene {
   completeCardExtraction(hintColor: number) {
     if (!this.card) return
 
-    // After card is fully pulled out, add a quick showcase spin
     this.tweens.add({
       targets: this.card.card,
       angle: { from: 0, to: 360 },
@@ -346,19 +337,17 @@ export class DrawScene extends Phaser.Scene {
       duration: 500,
       ease: 'Cubic.easeIn',
       onComplete: () => {
-        // After the spin, show the card front (flipped)
         this.tweens.add({
           targets: this.card?.card,
           scaleX: { from: 0, to: 1.5 },
           scaleY: 1.5,
           angle: 0,
-          y: 300, // Center position
+          y: 300,
           duration: 600,
           ease: 'Back.easeOut',
           onUpdate: (tween) => {
             const progress = tween.progress
 
-            // Mid-flip shimmer effect
             if (this.card && progress > 0.4 && progress < 0.6) {
               const shimmer = this.add.rectangle(
                 this.card.card.x,
@@ -384,10 +373,9 @@ export class DrawScene extends Phaser.Scene {
                 },
               })
 
-              // Add flash effect during flip
-              if (this.flashOverlay) {
+              if (this.background) {
                 this.tweens.add({
-                  targets: this.flashOverlay,
+                  targets: this.background.flashOverlay,
                   alpha: { from: 0, to: 0.4 },
                   duration: 150,
                   yoyo: true,
@@ -397,12 +385,10 @@ export class DrawScene extends Phaser.Scene {
             }
           },
           onComplete: () => {
-            // Show card details
             if (this.card) {
               this.card.reveal()
             }
 
-            // Add after-reveal effects
             this.createParticleEffect()
             this.createRarityBasedEffects()
 
@@ -410,7 +396,6 @@ export class DrawScene extends Phaser.Scene {
               this.instructionText.setText('Congratulations! You got a card!')
             }
 
-            // Update draw counter and show redraw button if needed
             this.drawsCount++
             if (this.drawsCount < this.maxDraws) {
               this.createRedrawButton()
@@ -420,7 +405,6 @@ export class DrawScene extends Phaser.Scene {
       },
     })
 
-    // Add "pop" particles when card is fully extracted
     for (let i = 0; i < 20; i++) {
       const angle = Math.random() * Math.PI * 2
       const distance = 30 + Math.random() * 60
@@ -455,7 +439,6 @@ export class DrawScene extends Phaser.Scene {
   createRarityBasedEffects() {
     if (!this.card) return
 
-    // More elegant effects based on rarity
     switch (this.card.rarity) {
       case CardRarity.LEGENDARY: {
         const legendaryAura = this.add.rectangle(
@@ -480,17 +463,14 @@ export class DrawScene extends Phaser.Scene {
           ease: 'Sine.easeInOut',
         })
 
-        // Gold light circles
         this.createElegantRings(0xffdd00, 3)
         this.createElegantRings(0xffffff, 2, 500)
 
-        // Soft camera effect
         this.cameras.main.flash(300, 255, 220, 80, true)
         break
       }
 
       case CardRarity.EPIC: {
-        // Purple aura
         const epicAura = this.add.rectangle(
           this.card.card.x,
           this.card.card.y,
@@ -513,16 +493,13 @@ export class DrawScene extends Phaser.Scene {
           ease: 'Sine.easeInOut',
         })
 
-        // Epic rings
         this.createElegantRings(0xa335ee, 2)
 
-        // Subtle flash
         this.cameras.main.flash(200, 163, 53, 238, true)
         break
       }
 
       case CardRarity.RARE: {
-        // Blue aura
         const rareAura = this.add.rectangle(
           this.card.card.x,
           this.card.card.y,
@@ -545,13 +522,11 @@ export class DrawScene extends Phaser.Scene {
           ease: 'Sine.easeInOut',
         })
 
-        // Rare ring
         this.createElegantRings(0x0070dd, 1)
         break
       }
 
       default: {
-        // Subtle glow for common
         const commonGlow = this.add.rectangle(
           this.card.card.x,
           this.card.card.y,
@@ -586,13 +561,11 @@ export class DrawScene extends Phaser.Scene {
       setTimeout(() => {
         if (!this.card) return
 
-        // Create a ring of particles
         const ring = this.add.circle(center.x, center.y, 100 + r * 30, color, 0)
         ring.setStrokeStyle(2, color, 0.7)
         ring.setDepth(this.card.card.depth - 0.05)
         this.particles.push(ring)
 
-        // Expand and fade ring
         this.tweens.add({
           targets: ring,
           scale: { from: 0.8, to: 1.5 },
@@ -605,7 +578,6 @@ export class DrawScene extends Phaser.Scene {
           },
         })
 
-        // Create elegant light particles along the ring
         for (let i = 0; i < 10; i++) {
           const angle = (i / 10) * Math.PI * 2
           const radius = 100 + r * 30
@@ -693,7 +665,6 @@ export class DrawScene extends Phaser.Scene {
   }
 
   cleanupCardEffects() {
-    // Stop all particle timers
     this.particleTimers.forEach((timer) => {
       if (timer) {
         timer.remove()
@@ -701,17 +672,14 @@ export class DrawScene extends Phaser.Scene {
     })
     this.particleTimers = []
 
-    // Stop suspense timer if it exists
     if (this.suspenseTimer) {
       this.suspenseTimer.remove()
       this.suspenseTimer = null
     }
 
-    // Clean up particles
     this.particles.forEach((p) => p.destroy())
     this.particles = []
 
-    // Gather targets that exist
     const targetsToRemove = []
     if (this.card) {
       targetsToRemove.push(this.card.card)
@@ -720,7 +688,6 @@ export class DrawScene extends Phaser.Scene {
       }
     }
 
-    // Elegant fade out
     if (targetsToRemove.length > 0) {
       this.tweens.add({
         targets: targetsToRemove,
@@ -737,7 +704,6 @@ export class DrawScene extends Phaser.Scene {
         },
       })
     } else {
-      // If there are no targets, clean up directly
       if (this.card) {
         this.card.destroy()
         this.card = null
@@ -747,9 +713,9 @@ export class DrawScene extends Phaser.Scene {
 
   resetCardState() {
     this.time.delayedCall(400, () => {
-      if (this.backgroundOverlay) {
+      if (this.background) {
         this.tweens.add({
-          targets: this.backgroundOverlay,
+          targets: this.background.backgroundOverlay,
           alpha: 0,
           duration: 300,
         })
@@ -832,7 +798,6 @@ export class DrawScene extends Phaser.Scene {
       )
     }
 
-    // Store the timer reference so we can clean it up later
     const continuousParticleTimer = this.time.addEvent({
       delay: 100,
       callback: () => {
@@ -938,27 +903,5 @@ export class DrawScene extends Phaser.Scene {
         this.particles = this.particles.filter((p) => p !== particle)
       },
     })
-  }
-
-  createStarryBackground() {
-    for (let i = 0; i < 50; i++) {
-      const x = Phaser.Math.Between(20, 780)
-      const y = Phaser.Math.Between(20, 580)
-      const size = Phaser.Math.Between(1, 3)
-      const brightness = Phaser.Math.FloatBetween(0.3, 1)
-
-      const star = this.add.circle(x, y, size, 0xffffff)
-      star.setAlpha(brightness)
-      star.setDepth(-0.5)
-
-      this.tweens.add({
-        targets: star,
-        alpha: { from: brightness, to: 0.1 },
-        yoyo: true,
-        repeat: -1,
-        duration: Phaser.Math.Between(1000, 3000),
-        ease: 'Sine.easeInOut',
-      })
-    }
   }
 }
