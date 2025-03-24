@@ -5,7 +5,7 @@ export class Background extends Phaser.GameObjects.Container {
   public backgroundOverlay: Phaser.GameObjects.Rectangle
   public flashOverlay: Phaser.GameObjects.Rectangle
 
-  constructor(scene: Phaser.Scene, x: number = 400, y: number = 300) {
+  constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y)
     scene.add.existing(this)
 

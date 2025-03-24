@@ -49,7 +49,7 @@ export class DrawScene extends Phaser.Scene {
   create() {
     this.cameras.main.setBackgroundColor('#1a1a2e')
 
-    this.background = new Background(this)
+    this.background = new Background(this, 400, 300)
 
     this.createCardAndPack()
 
@@ -134,7 +134,7 @@ export class DrawScene extends Phaser.Scene {
     }
 
     let hintColor = 0xffffff
-    let extractionSpeed = 0.7
+    const extractionSpeed = 0.7
 
     hintColor = getCardColor(this.card.element)
 
