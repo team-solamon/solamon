@@ -3,7 +3,13 @@ import * as Phaser from 'phaser'
 import { DamageText } from './DamageText'
 import { DefeatedVisual } from './DefeatedVisual'
 import { HealthBar } from './HealthBar'
-import { CardElement } from '@/game/data/card'
+import {
+  CardElement,
+  getCardColor,
+  getCardColorString,
+  getCardTexture,
+  getElementEmoji,
+} from '@/game/data/card'
 
 export class Card extends Phaser.GameObjects.Container {
   public name: string
@@ -28,7 +34,6 @@ export class Card extends Phaser.GameObjects.Container {
   private isFaceDown = false
   private cardWidth = 100
   private cardHeight = 140
-  private glowShader!: Phaser.GameObjects.Shader
   private idleAnimation?: Phaser.Tweens.Tween
 
   isDragging = false
@@ -62,7 +67,7 @@ export class Card extends Phaser.GameObjects.Container {
 
   createCard() {
     this.cardFront = this.scene.add
-      .sprite(0, 0, this.getCardTexture())
+      .sprite(0, 0, getCardTexture(this.element))
       .setDisplaySize(this.cardWidth, this.cardHeight)
 
     this.cardBack = this.scene.add
@@ -75,7 +80,7 @@ export class Card extends Phaser.GameObjects.Container {
 
     this.cardBorder = this.scene.add
       .rectangle(0, 0, this.cardWidth - 3, this.cardHeight - 3, 0x000000, 0)
-      .setStrokeStyle(3, this.getCardColor(), 1)
+      .setStrokeStyle(3, getCardColor(this.element), 1)
 
     this.nameText = this.scene.add
       .text(0, -50, this.name, {
@@ -88,14 +93,14 @@ export class Card extends Phaser.GameObjects.Container {
       .setOrigin(0.5)
 
     this.elementText = this.scene.add
-      .text(0, -30, this.getElementEmoji(), {
+      .text(0, -30, getElementEmoji(this.element), {
         fontSize: '14px',
         fontStyle: 'bold',
       })
       .setOrigin(0.5)
 
     this.attackText = this.scene.add
-      .text(-35, 40, `⚔️`, {
+      .text(-35, 40, `⚔️${this.attack}`, {
         fontSize: '16px',
         color: '#ff5555',
         fontStyle: 'bold',
@@ -105,7 +110,7 @@ export class Card extends Phaser.GameObjects.Container {
       .setOrigin(0.5)
 
     this.healthText = this.scene.add
-      .text(35, 40, `❤️`, {
+      .text(35, 40, `❤️${this.health}`, {
         fontSize: '16px',
         color: '#55ff55',
         fontStyle: 'bold',
@@ -116,21 +121,16 @@ export class Card extends Phaser.GameObjects.Container {
 
     this.healthBar = new HealthBar(this.scene, 80)
 
-    this.glowShader = this.scene.add
-      .shader('CardGlow', 0, 0, this.cardWidth + 20, this.cardHeight + 20)
-      .setVisible(false)
-
     this.add([
       this.glow,
       this.cardFront,
       this.cardBack,
-      this.cardBorder, // 테두리는 카드 이미지 위에 배치
+      this.cardBorder,
       this.nameText,
       this.elementText,
       this.attackText,
       this.healthText,
       this.healthBar,
-      this.glowShader,
     ])
 
     this.cardBack.setVisible(false)
@@ -139,78 +139,6 @@ export class Card extends Phaser.GameObjects.Container {
 
     if (this.health > 0) {
       this.startIdleAnimation()
-    }
-  }
-
-  getCardColor(): number {
-    switch (this.element) {
-      case 'FIRE':
-        return 0xff4500
-      case 'WATER':
-        return 0x1e90ff
-      case 'EARTH':
-        return 0x8b4513
-      case 'METAL':
-        return 0xc0c0c0
-      case 'WOOD':
-        return 0x228b22
-      case 'NONE':
-      default:
-        return 0x333333
-    }
-  }
-
-  getCardTexture(): string {
-    switch (this.element) {
-      case 'FIRE':
-        return 'card-fire'
-      case 'WATER':
-        return 'card-water'
-      case 'EARTH':
-        return 'card-earth'
-      case 'METAL':
-        return 'card-metal'
-      case 'WOOD':
-        return 'card-wood'
-      case 'NONE':
-      default:
-        return 'cardback'
-    }
-  }
-
-  getRarityColor(): string {
-    switch (this.element) {
-      case 'FIRE':
-        return '#FF4500'
-      case 'WATER':
-        return '#1E90FF'
-      case 'EARTH':
-        return '#8B4513'
-      case 'METAL':
-        return '#C0C0C0'
-      case 'WOOD':
-        return '#228B22'
-      case 'NONE':
-      default:
-        return '#AAAAAA'
-    }
-  }
-
-  getElementEmoji(): string {
-    switch (this.element) {
-      case 'FIRE':
-        return '🔥'
-      case 'WATER':
-        return '💧'
-      case 'EARTH':
-        return '🌍'
-      case 'METAL':
-        return '⚙️'
-      case 'WOOD':
-        return '🌳'
-      case 'NONE':
-      default:
-        return '❓'
     }
   }
 
@@ -223,10 +151,12 @@ export class Card extends Phaser.GameObjects.Container {
     this.healthText.setVisible(!isFaceDown)
     this.elementText.setVisible(!isFaceDown)
     this.healthBar.setVisible(!isFaceDown)
-    this.cardBorder.setVisible(!isFaceDown) // 앞면일 때만 테두리 표시
+    this.cardBorder.setVisible(!isFaceDown)
   }
 
   flipCard() {
+    const previousScaleX = this.scaleX
+
     this.scene.tweens.add({
       targets: this,
       scaleX: 0,
@@ -237,7 +167,7 @@ export class Card extends Phaser.GameObjects.Container {
 
         this.scene.tweens.add({
           targets: this,
-          scaleX: 1,
+          scaleX: previousScaleX,
           duration: 200,
           ease: 'Power1',
         })
@@ -379,13 +309,13 @@ export class Card extends Phaser.GameObjects.Container {
     this.nameText.setText(this.name)
     this.attackText.setText(`⚔️${data.attack}`)
     this.healthText.setText(`❤️${this.health}`)
-    this.elementText.setText(this.getElementEmoji())
-    this.elementText.setColor(this.getRarityColor())
+    this.elementText.setText(getElementEmoji(this.element))
+    this.elementText.setColor(getCardColorString(this.element))
 
-    this.cardBorder.setStrokeStyle(3, this.getCardColor(), 1)
+    this.cardBorder.setStrokeStyle(3, getCardColor(this.element), 1)
 
     this.cardFront
-      .setTexture(this.getCardTexture())
+      .setTexture(getCardTexture(this.element))
       .setDisplaySize(this.cardWidth, this.cardHeight)
 
     this.healthBar.update(this.health, this.initialHealth)

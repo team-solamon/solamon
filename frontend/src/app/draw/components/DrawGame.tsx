@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 
-import { CardScene } from '@/app/draw/scenes/CardScene'
+import { DrawScene } from '@/app/draw/scenes/DrawScene'
 
 const createGameConfig = (
   parent: HTMLElement | null
@@ -16,7 +16,7 @@ const createGameConfig = (
         gravity: { x: 0, y: 0 },
       },
     },
-    scene: [CardScene],
+    scene: [DrawScene],
   }
 }
 
