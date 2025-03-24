@@ -205,6 +205,7 @@ export class DrawScene extends Phaser.Scene {
             this.createEffects()
 
             if (this.instructionText) {
+              this.instructionText.setAlpha(1)
               this.instructionText.setText('Congratulations! You got a card!')
             }
 
