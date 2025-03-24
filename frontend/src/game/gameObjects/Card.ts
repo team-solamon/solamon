@@ -100,7 +100,7 @@ export class Card extends Phaser.GameObjects.Container {
       .setOrigin(0.5)
 
     this.attackText = this.scene.add
-      .text(-35, 40, `⚔️`, {
+      .text(-35, 40, `⚔️${this.attack}`, {
         fontSize: '16px',
         color: '#ff5555',
         fontStyle: 'bold',
@@ -110,7 +110,7 @@ export class Card extends Phaser.GameObjects.Container {
       .setOrigin(0.5)
 
     this.healthText = this.scene.add
-      .text(35, 40, `❤️`, {
+      .text(35, 40, `❤️${this.health}`, {
         fontSize: '16px',
         color: '#55ff55',
         fontStyle: 'bold',
@@ -155,6 +155,8 @@ export class Card extends Phaser.GameObjects.Container {
   }
 
   flipCard() {
+    const previousScaleX = this.scaleX
+
     this.scene.tweens.add({
       targets: this,
       scaleX: 0,
@@ -165,7 +167,7 @@ export class Card extends Phaser.GameObjects.Container {
 
         this.scene.tweens.add({
           targets: this,
-          scaleX: 1,
+          scaleX: previousScaleX,
           duration: 200,
           ease: 'Power1',
         })

@@ -77,7 +77,7 @@ export class DrawScene extends Phaser.Scene {
       this,
       400,
       280,
-      'name',
+      drawData[this.drawsCount].element,
       drawData[this.drawsCount].attack,
       drawData[this.drawsCount].health,
       drawData[this.drawsCount].element,
@@ -235,8 +235,8 @@ export class DrawScene extends Phaser.Scene {
       onComplete: () => {
         this.tweens.add({
           targets: this.card,
-          scaleX: { from: 0, to: 1.5 },
-          scaleY: 1.5,
+          scaleX: { from: 0, to: 1.3 },
+          scaleY: 1,
           angle: 0,
           y: 300,
           duration: 600,
@@ -282,6 +282,8 @@ export class DrawScene extends Phaser.Scene {
           },
           onComplete: () => {
             if (this.card) {
+              this.card.scaleX = 2
+              this.card.scaleY = 2
               this.card.flipCard()
             }
 
@@ -383,7 +385,7 @@ export class DrawScene extends Phaser.Scene {
   createRedrawButton() {
     this.redrawButton = new Button(this, {
       x: 400,
-      y: 500,
+      y: 550,
       width: 200,
       height: 50,
       text: `Redraw (${drawData.length - this.drawsCount} left)`,
@@ -404,7 +406,7 @@ export class DrawScene extends Phaser.Scene {
     this.redrawButton.animateTo(
       {
         alpha: 1,
-        y: 500,
+        y: 550,
       },
       500,
       'Back.easeOut'
