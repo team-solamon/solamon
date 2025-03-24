@@ -64,7 +64,7 @@ const PhaserGame: React.FC<PhaserGameProps> = ({ scenes, onGameReady }) => {
         <div className='absolute inset-0 flex items-center justify-center bg-slate-900 bg-opacity-80 z-10'>
           <div className='text-center'>
             <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 mx-auto mb-4'></div>
-            <div className='text-white text-xl'>Loading game...</div>
+            <div className='text-white text-xl'>Loading...</div>
           </div>
         </div>
       )}
