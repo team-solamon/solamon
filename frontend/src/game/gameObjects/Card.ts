@@ -83,9 +83,8 @@ export class Card extends Phaser.GameObjects.Container {
       .setOrigin(0.5)
 
     this.elementText = this.scene.add
-      .text(0, -30, this.element, {
-        fontSize: '10px',
-        color: this.getRarityColor(),
+      .text(0, -30, this.getElementEmoji(), {
+        fontSize: '14px',
         fontStyle: 'bold',
       })
       .setOrigin(0.5)
@@ -188,6 +187,24 @@ export class Card extends Phaser.GameObjects.Container {
       case 'NONE':
       default:
         return '#AAAAAA'
+    }
+  }
+
+  getElementEmoji(): string {
+    switch (this.element) {
+      case 'FIRE':
+        return '🔥'
+      case 'WATER':
+        return '💧'
+      case 'EARTH':
+        return '🌍'
+      case 'METAL':
+        return '⚙️'
+      case 'WOOD':
+        return '🌳'
+      case 'NONE':
+      default:
+        return '❓'
     }
   }
 
@@ -359,7 +376,7 @@ export class Card extends Phaser.GameObjects.Container {
     this.nameText.setText(this.name)
     this.attackText.setText(`⚔️${data.attack}`)
     this.healthText.setText(`❤️${this.health}`)
-    this.elementText.setText(this.element)
+    this.elementText.setText(this.getElementEmoji())
     this.elementText.setColor(this.getRarityColor())
 
     this.cardFront
