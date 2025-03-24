@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser'
 
-import { Card } from '../gameObjects/Card'
+import { Card } from '../../../game/gameObjects/Card'
 
 function createChargeUpEffect(
   scene: Phaser.Scene,
