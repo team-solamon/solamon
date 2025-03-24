@@ -51,6 +51,28 @@ export class DrawScene extends Phaser.Scene {
 
     this.background = new Background(this)
 
+    this.createCardAndPack()
+
+    this.instructionText = this.add
+      .text(400, 500, 'Click the card pack!', {
+        fontSize: '24px',
+        color: '#ffffff',
+      })
+      .setOrigin(0.5)
+
+    this.tweens.add({
+      targets: this.card,
+      alpha: { from: 0.9, to: 1 },
+      yoyo: true,
+      repeat: -1,
+      duration: 1000,
+      ease: 'Sine.easeInOut',
+    })
+
+    this.drawsCount = 0
+  }
+
+  createCardAndPack(animate = false) {
     this.card = new Card(
       this,
       400,
@@ -70,23 +92,24 @@ export class DrawScene extends Phaser.Scene {
       }
     })
 
-    this.instructionText = this.add
-      .text(400, 500, 'Click the card pack!', {
-        fontSize: '24px',
-        color: '#ffffff',
+    if (animate) {
+      this.cardPack.setScale(0)
+      this.card.setScale(0)
+
+      this.tweens.add({
+        targets: [this.card],
+        scale: 1,
+        duration: 400,
+        ease: 'Back.easeOut',
       })
-      .setOrigin(0.5)
 
-    this.tweens.add({
-      targets: this.card,
-      alpha: { from: 0.9, to: 1 },
-      yoyo: true,
-      repeat: -1,
-      duration: 1000,
-      ease: 'Sine.easeInOut',
-    })
-
-    this.drawsCount = 0
+      this.tweens.add({
+        targets: this.cardPack,
+        scale: 1,
+        duration: 400,
+        ease: 'Back.easeOut',
+      })
+    }
   }
 
   revealCard() {
@@ -471,45 +494,11 @@ export class DrawScene extends Phaser.Scene {
 
       this.cardRevealed = false
 
-      this.card = new Card(
-        this,
-        400,
-        280,
-        'name',
-        drawData[this.drawsCount].attack,
-        drawData[this.drawsCount].health,
-        drawData[this.drawsCount].element,
-        true
-      )
-      this.card.setFaceDown(true)
-
-      this.cardPack = new CardPack(this, 400, 300, this.card)
-      this.cardPack.setOnReveal((card) => {
-        if (!this.cardRevealed) {
-          this.revealCard()
-        }
-      })
+      this.createCardAndPack(true)
 
       if (this.instructionText) {
         this.instructionText.setText('Click the card pack!')
       }
-
-      this.cardPack.setScale(0)
-      this.card.setScale(0)
-
-      this.tweens.add({
-        targets: [this.card],
-        scale: 1,
-        duration: 400,
-        ease: 'Back.easeOut',
-      })
-
-      this.tweens.add({
-        targets: this.cardPack,
-        scale: 1,
-        duration: 400,
-        ease: 'Back.easeOut',
-      })
     })
   }
 
