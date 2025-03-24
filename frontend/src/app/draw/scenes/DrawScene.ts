@@ -7,7 +7,19 @@ import { createElegantRings } from '../util/effects'
 import { CardElement, getCardColor } from '@/game/data/card'
 import { Card } from '@/game/gameObjects/Card'
 
-const drawData: CardElement[] = ['FIRE', 'WATER', 'EARTH', 'METAL', 'WOOD']
+interface CardData {
+  element: CardElement
+  attack: number
+  health: number
+}
+
+const drawData: CardData[] = [
+  { element: 'FIRE', attack: 5, health: 3 },
+  { element: 'WATER', attack: 3, health: 6 },
+  { element: 'EARTH', attack: 4, health: 5 },
+  { element: 'METAL', attack: 6, health: 2 },
+  { element: 'WOOD', attack: 4, health: 4 },
+]
 
 export class DrawScene extends Phaser.Scene {
   private cardPack: CardPack | null = null
@@ -44,9 +56,9 @@ export class DrawScene extends Phaser.Scene {
       400,
       280,
       'name',
-      0,
-      0,
-      drawData[this.drawsCount],
+      drawData[this.drawsCount].attack,
+      drawData[this.drawsCount].health,
+      drawData[this.drawsCount].element,
       true
     )
     this.card.setFaceDown(true)
@@ -464,9 +476,9 @@ export class DrawScene extends Phaser.Scene {
         400,
         280,
         'name',
-        0,
-        0,
-        drawData[this.drawsCount],
+        drawData[this.drawsCount].attack,
+        drawData[this.drawsCount].health,
+        drawData[this.drawsCount].element,
         true
       )
       this.card.setFaceDown(true)
