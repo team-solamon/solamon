@@ -34,7 +34,6 @@ export class Card extends Phaser.GameObjects.Container {
   private isFaceDown = false
   private cardWidth = 100
   private cardHeight = 140
-  private glowShader!: Phaser.GameObjects.Shader
   private idleAnimation?: Phaser.Tweens.Tween
 
   isDragging = false
@@ -122,10 +121,6 @@ export class Card extends Phaser.GameObjects.Container {
 
     this.healthBar = new HealthBar(this.scene, 80)
 
-    this.glowShader = this.scene.add
-      .shader('CardGlow', 0, 0, this.cardWidth + 20, this.cardHeight + 20)
-      .setVisible(false)
-
     this.add([
       this.glow,
       this.cardFront,
@@ -136,7 +131,6 @@ export class Card extends Phaser.GameObjects.Container {
       this.attackText,
       this.healthText,
       this.healthBar,
-      this.glowShader,
     ])
 
     this.cardBack.setVisible(false)
