@@ -4,6 +4,7 @@ import { Button } from '../../../game/gameObjects/Button'
 import { Card, CardRarity } from '../gameObjects/Card'
 import { Background } from '../gameObjects/Background'
 import { CardPack } from '../gameObjects/CardPack'
+import { createElegantRings } from '../util/effects'
 
 export class DrawScene extends Phaser.Scene {
   private cardPack: CardPack | null = null
@@ -322,68 +323,27 @@ export class DrawScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     })
 
-    this.createElegantRings(0xffdd00, 3)
-    this.createElegantRings(0xffffff, 2, 500)
+    if (this.card) {
+      createElegantRings(
+        this,
+        this.card!.card.x,
+        this.card!.card.y,
+        this.card!.card.depth,
+        0xffdd00,
+        3
+      )
+      createElegantRings(
+        this,
+        this.card!.card.x,
+        this.card!.card.y,
+        this.card!.card.depth,
+        0xffffff,
+        2,
+        500
+      )
+    }
 
     this.cameras.main.flash(300, 255, 220, 80, true)
-  }
-
-  createElegantRings(color: number, rings: number, delay = 0) {
-    if (!this.card) return
-
-    const center = { x: this.card.card.x, y: this.card.card.y }
-
-    for (let r = 0; r < rings; r++) {
-      setTimeout(() => {
-        if (!this.card) return
-
-        const ring = this.add.circle(center.x, center.y, 100 + r * 30, color, 0)
-        ring.setStrokeStyle(2, color, 0.7)
-        ring.setDepth(this.card.card.depth - 0.05)
-        this.particles.push(ring)
-
-        this.tweens.add({
-          targets: ring,
-          scale: { from: 0.8, to: 1.5 },
-          alpha: { to: 0 },
-          duration: 1500,
-          ease: 'Sine.easeOut',
-          onComplete: () => {
-            ring.destroy()
-            this.particles = this.particles.filter((p) => p !== ring)
-          },
-        })
-
-        for (let i = 0; i < 10; i++) {
-          const angle = (i / 10) * Math.PI * 2
-          const radius = 100 + r * 30
-          const particle = this.add.circle(
-            center.x + Math.cos(angle) * radius,
-            center.y + Math.sin(angle) * radius,
-            3,
-            color,
-            0.8
-          )
-          particle.setBlendMode(Phaser.BlendModes.ADD)
-          this.particles.push(particle)
-
-          this.tweens.add({
-            targets: particle,
-            x: center.x,
-            y: center.y,
-            scale: { from: 1, to: 0.5 },
-            alpha: 0,
-            duration: 800,
-            delay: i * 50,
-            ease: 'Cubic.easeIn',
-            onComplete: () => {
-              particle.destroy()
-              this.particles = this.particles.filter((p) => p !== particle)
-            },
-          })
-        }
-      }, delay + r * 200)
-    }
   }
 
   createRedrawButton() {
