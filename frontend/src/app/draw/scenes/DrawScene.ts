@@ -3,16 +3,15 @@ import * as Phaser from 'phaser'
 import { Button } from '../../../game/gameObjects/Button'
 import { Card, CardRarity } from '../gameObjects/Card'
 import { Background } from '../gameObjects/Background'
+import { CardPack } from '../gameObjects/CardPack'
 
 export class DrawScene extends Phaser.Scene {
-  private cardPack: Phaser.GameObjects.Rectangle | null = null
+  private cardPack: CardPack | null = null
   private card: Card | null = null
   private cardRevealed = false
   private instructionText: Phaser.GameObjects.Text | null = null
-  private questionMark: Phaser.GameObjects.Text | null = null
   private particles: Phaser.GameObjects.Shape[] = []
   private background: Background | null = null
-  private glowEffect: Phaser.GameObjects.Rectangle | null = null
   private redrawButton: Button | null = null
   private drawsCount = 0
   private maxDraws = 5
@@ -31,20 +30,8 @@ export class DrawScene extends Phaser.Scene {
     this.card = new Card(this, 400, 300)
     this.card.card.y = 280
 
-    this.cardPack = this.add.rectangle(400, 300, 180, 250, 0x3282b8)
-    this.cardPack.setStrokeStyle(4, 0xbbe1fa)
-    this.cardPack.setInteractive()
-    this.cardPack.setDepth(1)
-
-    this.questionMark = this.add
-      .text(this.cardPack.x, this.cardPack.y, '?', {
-        fontSize: '60px',
-        color: '#000000',
-      })
-      .setOrigin(0.5)
-      .setDepth(2)
-
-    this.cardPack.on('pointerdown', () => {
+    this.cardPack = new CardPack(this, 400, 300, this.card)
+    this.cardPack.setOnReveal((card) => {
       if (!this.cardRevealed) {
         this.revealCard()
       }
@@ -66,74 +53,17 @@ export class DrawScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     })
 
-    this.glowEffect = this.add.rectangle(
-      this.cardPack.x,
-      this.cardPack.y,
-      200,
-      270,
-      0x00ffff
-    )
-    this.glowEffect.setAlpha(0.2)
-    this.glowEffect.setBlendMode(Phaser.BlendModes.ADD)
-    this.glowEffect.setDepth(0.5)
-
-    this.tweens.add({
-      targets: this.glowEffect,
-      alpha: { from: 0.1, to: 0.5 },
-      scale: { from: 0.95, to: 1.05 },
-      yoyo: true,
-      repeat: -1,
-      duration: 1500,
-      ease: 'Sine.easeInOut',
-    })
-
     this.drawsCount = 0
   }
 
   revealCard() {
+    console.log('Revealing card')
     this.cardRevealed = true
 
     if (this.cardPack) {
-      this.cardPack.disableInteractive()
-    }
-
-    const anticipationTween = {
-      targets: [this.cardPack, this.questionMark],
-      scaleY: 1.02,
-      scaleX: 1.02,
-      y: '-=10',
-      duration: 500,
-      ease: 'Sine.easeInOut',
-      onComplete: () => this.startCardExtraction(),
-    }
-
-    if (this.glowEffect) {
-      this.tweens.add({
-        targets: this.glowEffect,
-        alpha: 0.6,
-        scaleX: 1.2,
-        scaleY: 1.2,
-        duration: 600,
-        ease: 'Sine.easeOut',
-      })
-    }
-
-    this.tweens.add(anticipationTween)
-  }
-
-  startCardExtraction() {
-    if (!this.card) {
-      this.card = new Card(this, 400, 300)
-    }
-
-    if (this.cardPack) {
-      this.card.card.x = this.cardPack.x
-
-      this.card.card.y = this.cardPack.y + this.cardPack.height / 2 - 30
-      this.card.card.angle = 0
-
-      this.card.card.setAlpha(1)
-      this.card.card.setDepth(0.9)
+      console.log('Disabling card pack interaction')
+      this.cardPack.disableInteraction()
+      this.cardPack.startRevealAnimation()
     }
 
     if (this.background) {
@@ -143,6 +73,24 @@ export class DrawScene extends Phaser.Scene {
         duration: 600,
         ease: 'Sine.easeOut',
       })
+    }
+
+    this.time.delayedCall(500, () => {
+      console.log('Starting card extraction')
+      this.startCardExtraction()
+    })
+  }
+
+  startCardExtraction() {
+    console.log('Starting card extraction animation', this.card)
+    if (!this.card || !this.cardPack) return
+
+    if (this.cardPack) {
+      this.card.card.x = 400
+      this.card.card.y = 300 + this.card.card.height / 2 - 30
+      this.card.card.angle = 0
+      this.card.card.setAlpha(1)
+      this.card.card.setDepth(0.9)
     }
 
     let hintColor = 0xffffff
@@ -169,69 +117,12 @@ export class DrawScene extends Phaser.Scene {
       }
     }
 
-    this.extractCardFromPack(extractionSpeed, hintColor)
-  }
-
-  extractCardFromPack(speedFactor: number, hintColor: number) {
-    if (!this.card || !this.cardPack) return
-
-    const extractionDuration = 1500 * speedFactor
-
-    this.tweens.add({
-      targets: this.cardPack,
-      scaleX: 1.05,
-      duration: extractionDuration * 0.2,
-      ease: 'Sine.easeInOut',
-      yoyo: true,
-      repeat: 0,
-    })
-
-    if (this.questionMark) {
-      this.tweens.add({
-        targets: this.questionMark,
-        y: '-=20',
-        alpha: 0,
-        duration: extractionDuration * 0.3,
-        ease: 'Sine.easeIn',
-        onComplete: () => {
-          if (this.questionMark) {
-            this.questionMark.destroy()
-            this.questionMark = null
-          }
-        },
-      })
-    }
-
-    const packTopY = this.cardPack.y - this.cardPack.height / 2
-    const shimmer = this.add.rectangle(
-      this.cardPack.x,
-      packTopY,
-      this.cardPack.width * 0.8,
-      10,
-      hintColor,
-      0.7
-    )
-    shimmer.setBlendMode(Phaser.BlendModes.ADD)
-    this.particles.push(shimmer)
-
-    this.tweens.add({
-      targets: shimmer,
-      alpha: 0,
-      scaleX: 1.2,
-      duration: 500,
-      ease: 'Cubic.easeOut',
-      onComplete: () => {
-        shimmer.destroy()
-        this.particles = this.particles.filter((p) => p !== shimmer)
-      },
-    })
-
-    const extractDistance = this.cardPack.height + 30
+    const extractDistance = 250 + 30
 
     this.tweens.add({
       targets: this.card.card,
       y: `-=${extractDistance}`,
-      duration: extractionDuration,
+      duration: 1500 * extractionSpeed,
       ease: 'Cubic.easeInOut',
       onUpdate: (tween) => {
         const progress = tween.progress
@@ -249,7 +140,7 @@ export class DrawScene extends Phaser.Scene {
               -this.card.card.width / 3,
               this.card.card.width / 3
             )
-          const particleY = this.cardPack.y - this.cardPack.height / 2 + 10
+          const particleY = 300 - 250 / 2 + 10
 
           const friction = this.add.circle(
             particleX,
@@ -290,41 +181,12 @@ export class DrawScene extends Phaser.Scene {
       },
     })
 
-    this.tweens.add({
-      targets: this.cardPack,
-      alpha: 0.7,
-      duration: extractionDuration,
-      ease: 'Sine.easeIn',
-      onComplete: () => {
-        this.tweens.add({
-          targets: this.cardPack,
-          alpha: 0,
-          scaleY: 0.8,
-          duration: 300,
-          ease: 'Back.easeIn',
-          onComplete: () => {
-            if (this.cardPack) {
-              this.cardPack.destroy()
-              this.cardPack = null
-            }
-          },
-        })
-      },
-    })
-
-    if (this.glowEffect) {
-      this.tweens.add({
-        targets: this.glowEffect,
-        y: `-=${extractDistance * 0.9}`,
-        alpha: 0,
-        duration: extractionDuration * 1.1,
-        ease: 'Cubic.easeOut',
-        onComplete: () => {
-          this.glowEffect?.destroy()
-          this.glowEffect = null
-        },
-      })
-    }
+    this.cardPack.startCardExtraction(
+      extractDistance,
+      hintColor,
+      extractionSpeed,
+      () => {}
+    )
   }
 
   completeCardExtraction(hintColor: number) {
@@ -574,12 +436,12 @@ export class DrawScene extends Phaser.Scene {
       )
     }
 
-    this.cleanupCardEffects()
-
-    this.resetCardState()
+    this.cleanupCardEffects(() => {
+      this.resetCardState()
+    })
   }
 
-  cleanupCardEffects() {
+  cleanupCardEffects(callback?: () => void) {
     this.particleTimers.forEach((timer) => {
       if (timer) {
         timer.remove()
@@ -615,6 +477,10 @@ export class DrawScene extends Phaser.Scene {
           if (this.card) {
             this.card.destroy()
             this.card = null
+
+            if (callback) {
+              callback()
+            }
           }
         },
       })
@@ -622,11 +488,16 @@ export class DrawScene extends Phaser.Scene {
       if (this.card) {
         this.card.destroy()
         this.card = null
+
+        if (callback) {
+          callback
+        }
       }
     }
   }
 
   resetCardState() {
+    console.log('Resetting card state')
     this.time.delayedCall(400, () => {
       if (this.background) {
         this.tweens.add({
@@ -638,25 +509,12 @@ export class DrawScene extends Phaser.Scene {
 
       this.cardRevealed = false
 
+      console.log('Creating new card')
       this.card = new Card(this, 400, 300)
+      this.card.card.y = 280
 
-      this.cardPack = this.add.rectangle(400, 300, 180, 250, 0x3282b8)
-      this.cardPack.setStrokeStyle(4, 0xbbe1fa)
-      this.cardPack.setInteractive()
-      this.cardPack.setDepth(1)
-
-      this.card.card.y = this.cardPack.y - 20
-      this.card.card.setDepth(0)
-
-      this.questionMark = this.add
-        .text(this.cardPack.x, this.cardPack.y, '?', {
-          fontSize: '60px',
-          color: '#000000',
-        })
-        .setOrigin(0.5)
-        .setDepth(2)
-
-      this.cardPack.on('pointerdown', () => {
+      this.cardPack = new CardPack(this, 400, 300, this.card)
+      this.cardPack.setOnReveal((card) => {
         if (!this.cardRevealed) {
           this.revealCard()
         }
@@ -666,33 +524,18 @@ export class DrawScene extends Phaser.Scene {
         this.instructionText.setText('Click the card pack!')
       }
 
-      this.glowEffect = this.add.rectangle(
-        this.cardPack.x,
-        this.cardPack.y,
-        200,
-        270,
-        0x00ffff
-      )
-      this.glowEffect.setAlpha(0.2)
-      this.glowEffect.setBlendMode(Phaser.BlendModes.ADD)
-      this.glowEffect.setDepth(0.5)
-
-      this.tweens.add({
-        targets: this.glowEffect,
-        alpha: { from: 0.1, to: 0.5 },
-        scale: { from: 0.95, to: 1.05 },
-        yoyo: true,
-        repeat: -1,
-        duration: 1500,
-        ease: 'Sine.easeInOut',
-      })
-
       this.cardPack.setScale(0)
       this.card.setScale(0)
-      this.questionMark.setScale(0)
 
       this.tweens.add({
-        targets: [this.cardPack, this.card.card, this.questionMark],
+        targets: [this.card.card],
+        scale: 1,
+        duration: 400,
+        ease: 'Back.easeOut',
+      })
+
+      this.tweens.add({
+        targets: this.cardPack,
         scale: 1,
         duration: 400,
         ease: 'Back.easeOut',
