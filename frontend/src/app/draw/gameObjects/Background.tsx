@@ -27,8 +27,8 @@ export class Background extends Phaser.GameObjects.Container {
 
   private createStarryBackground() {
     for (let i = 0; i < 150; i++) {
-      const x = Phaser.Math.Between(-880, 880)
-      const y = Phaser.Math.Between(-630, 630)
+      const x = Phaser.Math.Between(-500, 500)
+      const y = Phaser.Math.Between(-500, 500)
       const size = Phaser.Math.Between(1, 3)
       const brightness = Phaser.Math.FloatBetween(0.3, 1)
 
