@@ -1,41 +1,23 @@
+import {
+  CardElement,
+  getElementEmoji,
+  getRandomElement,
+} from '@/game/data/card'
 import Phaser from 'phaser'
-
-export enum CardRarity {
-  COMMON = 'COMMON',
-  RARE = 'RARE',
-  EPIC = 'EPIC',
-  LEGENDARY = 'LEGENDARY',
-}
 
 export class Card {
   public card: Phaser.GameObjects.Rectangle
   public cardNameText: Phaser.GameObjects.Text
-  public rarity: CardRarity
+  public element: CardElement
   private scene: Phaser.Scene
-  private rarityColors: Record<CardRarity, number> = {
-    [CardRarity.COMMON]: 0x808080,
-    [CardRarity.RARE]: 0x0070dd,
-    [CardRarity.EPIC]: 0xa335ee,
-    [CardRarity.LEGENDARY]: 0xff8000,
-  }
 
-  constructor(scene: Phaser.Scene, x: number, y: number, rarity?: CardRarity) {
+  constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene
-    this.rarity = rarity || this.getRandomRarity()
-
-    this.card = scene.add.rectangle(
-      x,
-      y,
-      150,
-      220,
-      this.rarityColors[this.rarity]
-    )
-    this.card.setStrokeStyle(2, 0xffd700)
-    this.card.setDepth(0)
+    this.element = getRandomElement()
 
     this.cardNameText = scene.add
-      .text(x, y, this.rarity + ' CARD', {
-        fontSize: this.rarity === CardRarity.LEGENDARY ? '28px' : '24px',
+      .text(x, y, getElementEmoji(this.element), {
+        fontSize: '28px',
         color: '#ffffff',
         fontStyle: 'bold',
         align: 'center',
@@ -45,32 +27,10 @@ export class Card {
       .setOrigin(0.5)
       .setDepth(0)
       .setVisible(false)
-  }
 
-  getRandomRarity(): CardRarity {
-    const rarities = [
-      CardRarity.COMMON,
-      CardRarity.RARE,
-      CardRarity.EPIC,
-      CardRarity.LEGENDARY,
-    ]
-    const weights = [60, 25, 10, 5]
-    return this.getWeightedRandom(rarities, weights)
-  }
-
-  getWeightedRandom<T>(items: T[], weights: number[]): T {
-    const totalWeight = weights.reduce((a, b) => a + b, 0)
-    const randomValue = Math.random() * totalWeight
-    let weightSum = 0
-
-    for (let i = 0; i < items.length; i++) {
-      weightSum += weights[i]
-      if (randomValue <= weightSum) {
-        return items[i]
-      }
-    }
-
-    return items[0]
+    this.card = scene.add.rectangle(x, y, 150, 220)
+    this.card.setStrokeStyle(2, 0xffd700)
+    this.card.setDepth(0)
   }
 
   reveal() {

@@ -7,6 +7,11 @@ export interface CardData {
   element: CardElement
 }
 
+export function getRandomElement(): CardElement {
+  const elements = ['FIRE', 'WATER', 'EARTH', 'METAL', 'WOOD']
+  return elements[Math.floor(Math.random() * elements.length)] as CardElement
+}
+
 export function getCardColor(element: CardElement): number {
   switch (element) {
     case 'FIRE':

@@ -1,10 +1,11 @@
 import * as Phaser from 'phaser'
 
 import { Button } from '../../../game/gameObjects/Button'
-import { Card, CardRarity } from '../gameObjects/Card'
+import { Card } from '../gameObjects/Card'
 import { Background } from '../gameObjects/Background'
 import { CardPack } from '../gameObjects/CardPack'
 import { createElegantRings } from '../util/effects'
+import { getCardColor } from '@/game/data/card'
 
 export class DrawScene extends Phaser.Scene {
   private cardPack: CardPack | null = null
@@ -94,28 +95,9 @@ export class DrawScene extends Phaser.Scene {
     }
 
     let hintColor = 0xffffff
-    let extractionSpeed = 1
+    let extractionSpeed = 0.7
 
-    switch (this.card.rarity) {
-      case CardRarity.LEGENDARY: {
-        hintColor = 0xffdd00
-        extractionSpeed = 0.7
-        break
-      }
-      case CardRarity.EPIC: {
-        hintColor = 0xa335ee
-        extractionSpeed = 0.8
-        break
-      }
-      case CardRarity.RARE: {
-        hintColor = 0x0070dd
-        extractionSpeed = 0.9
-        break
-      }
-      default: {
-        extractionSpeed = 1
-      }
-    }
+    hintColor = getCardColor(this.card.element)
 
     const extractDistance = 250 + 30
 
@@ -556,8 +538,7 @@ export class DrawScene extends Phaser.Scene {
         callback: () => {
           if (!this.card) return
 
-          const color =
-            this.card.rarity === CardRarity.LEGENDARY ? 0xffdd00 : 0xa335ee
+          const color = 0xffdd00
           const x = this.card.card.x
           const startY = this.card.card.y - 110
           const endY = this.card.card.y + 110
