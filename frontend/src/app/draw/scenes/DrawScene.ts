@@ -351,7 +351,7 @@ export class DrawScene extends Phaser.Scene {
         this.card.x,
         this.card.y,
         this.card.depth,
-        0xffdd00,
+        getCardColor(this.card.element),
         3
       )
       createElegantRings(
@@ -359,7 +359,7 @@ export class DrawScene extends Phaser.Scene {
         this.card.x,
         this.card.y,
         this.card.depth,
-        0xffffff,
+        getCardColor(this.card.element),
         2,
         500
       )
