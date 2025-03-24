@@ -16,7 +16,7 @@ export class Card extends Phaser.GameObjects.Container {
   public originalY: number
   public isActive = false
 
-  private cardFront!: Phaser.GameObjects.Rectangle
+  private cardFront!: Phaser.GameObjects.Sprite
   private cardBack!: Phaser.GameObjects.Sprite
   private nameText!: Phaser.GameObjects.Text
   private attackText!: Phaser.GameObjects.Text
@@ -60,11 +60,11 @@ export class Card extends Phaser.GameObjects.Container {
   }
 
   createCard() {
-    const cardColor = this.getCardColor()
+    const cardTexture = this.getCardTexture()
 
     this.cardFront = this.scene.add
-      .rectangle(0, 0, this.cardWidth, this.cardHeight, cardColor)
-      .setStrokeStyle(3, 0xffffff)
+      .sprite(0, 0, cardTexture)
+      .setDisplaySize(this.cardWidth, this.cardHeight)
 
     this.cardBack = this.scene.add
       .sprite(0, 0, 'cardback')
@@ -157,6 +157,24 @@ export class Card extends Phaser.GameObjects.Container {
     }
   }
 
+  getCardTexture(): string {
+    switch (this.element) {
+      case 'FIRE':
+        return 'card-fire'
+      case 'WATER':
+        return 'card-water'
+      case 'EARTH':
+        return 'card-earth'
+      case 'METAL':
+        return 'card-metal'
+      case 'WOOD':
+        return 'card-wood'
+      case 'NONE':
+      default:
+        return 'cardback'
+    }
+  }
+
   getRarityColor(): string {
     switch (this.element) {
       case 'FIRE':
@@ -219,13 +237,6 @@ export class Card extends Phaser.GameObjects.Container {
   updateHealthBar() {
     this.healthBar.update(this.health, this.initialHealth)
     this.healthText.setText(`❤️${Math.max(0, this.health)}`)
-
-    const healthPercent = this.health / this.initialHealth
-    if (healthPercent < 0.3) {
-      this.cardFront.setStrokeStyle(3, 0xff0000)
-    } else {
-      this.cardFront.setStrokeStyle(3, 0xffffff)
-    }
   }
 
   takeDamage(amount: number): boolean {
@@ -342,6 +353,7 @@ export class Card extends Phaser.GameObjects.Container {
     element: CardElement
   }) {
     this.name = data.name
+    this.attack = data.attack
     this.health = data.health
     this.initialHealth = data.health
     this.element = data.element
@@ -352,7 +364,7 @@ export class Card extends Phaser.GameObjects.Container {
     this.rarityText.setText(this.element)
     this.rarityText.setColor(this.getRarityColor())
 
-    this.cardFront.setFillStyle(this.getCardColor())
+    this.cardFront.setTexture(this.getCardTexture())
 
     this.healthBar.update(this.health, this.initialHealth)
 

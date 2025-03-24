@@ -38,6 +38,12 @@ export class CardBattleScene extends Phaser.Scene {
     this.load.image('cardback', '/images/game/cardback.png')
     this.load.image('starburst', '/images/game/starburst.png')
     this.load.image('battlefield', '/images/game/battlefield.png')
+
+    this.load.image('card-fire', '/images/game/card-fire.png')
+    this.load.image('card-water', '/images/game/card-water.png')
+    this.load.image('card-earth', '/images/game/card-earth.png')
+    this.load.image('card-metal', '/images/game/card-metal.png')
+    this.load.image('card-wood', '/images/game/card-wood.png')
   }
 
   create() {
