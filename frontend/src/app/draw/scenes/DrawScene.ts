@@ -16,7 +16,6 @@ export class DrawScene extends Phaser.Scene {
   private drawsCount = 0
   private maxDraws = 5
   private particleTimers: Phaser.Time.TimerEvent[] = []
-  private suspenseTimer: Phaser.Time.TimerEvent | null = null
 
   constructor() {
     super({ key: 'CardScene' })
@@ -448,11 +447,6 @@ export class DrawScene extends Phaser.Scene {
       }
     })
     this.particleTimers = []
-
-    if (this.suspenseTimer) {
-      this.suspenseTimer.remove()
-      this.suspenseTimer = null
-    }
 
     this.particles.forEach((p) => p.destroy())
     this.particles = []
