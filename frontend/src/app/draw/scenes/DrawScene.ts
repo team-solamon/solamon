@@ -72,7 +72,7 @@ export class DrawScene extends Phaser.Scene {
     this.drawsCount = 0
   }
 
-  createCardAndPack(animate = false) {
+  createCardAndPack() {
     this.card = new Card(
       this,
       400,
@@ -83,6 +83,9 @@ export class DrawScene extends Phaser.Scene {
       drawData[this.drawsCount].element,
       true
     )
+    this.card.scaleX = 1.5
+    this.card.scaleY = 1.5
+
     this.card.setFaceDown(true)
 
     this.cardPack = new CardPack(this, 400, 300, this.card)
@@ -91,25 +94,6 @@ export class DrawScene extends Phaser.Scene {
         this.revealCard()
       }
     })
-
-    if (animate) {
-      this.cardPack.setScale(0)
-      this.card.setScale(0)
-
-      this.tweens.add({
-        targets: [this.card],
-        scale: 1,
-        duration: 400,
-        ease: 'Back.easeOut',
-      })
-
-      this.tweens.add({
-        targets: this.cardPack,
-        scale: 1,
-        duration: 400,
-        ease: 'Back.easeOut',
-      })
-    }
   }
 
   revealCard() {
@@ -235,8 +219,8 @@ export class DrawScene extends Phaser.Scene {
       onComplete: () => {
         this.tweens.add({
           targets: this.card,
-          scaleX: { from: 0, to: 1.3 },
-          scaleY: 1,
+          scaleX: { from: 0, to: 1.7 },
+          scaleY: 1.3,
           angle: 0,
           y: 300,
           duration: 600,
@@ -496,7 +480,7 @@ export class DrawScene extends Phaser.Scene {
 
       this.cardRevealed = false
 
-      this.createCardAndPack(true)
+      this.createCardAndPack()
 
       if (this.instructionText) {
         this.instructionText.setText('Click the card pack!')
