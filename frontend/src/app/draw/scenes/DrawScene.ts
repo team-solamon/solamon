@@ -390,7 +390,7 @@ export class DrawScene extends Phaser.Scene {
             }
 
             this.createParticleEffect()
-            this.createRarityBasedEffects()
+            this.createEffects()
 
             if (this.instructionText) {
               this.instructionText.setText('Congratulations! You got a card!')
@@ -436,120 +436,35 @@ export class DrawScene extends Phaser.Scene {
     }
   }
 
-  createRarityBasedEffects() {
+  createEffects() {
     if (!this.card) return
 
-    switch (this.card.rarity) {
-      case CardRarity.LEGENDARY: {
-        const legendaryAura = this.add.rectangle(
-          this.card.card.x,
-          this.card.card.y,
-          this.card.card.width * 2.2,
-          this.card.card.height * 1.8,
-          0xffdd00,
-          0.2
-        )
-        legendaryAura.setBlendMode(Phaser.BlendModes.ADD)
-        legendaryAura.setDepth(this.card.card.depth - 0.1)
-        this.particles.push(legendaryAura)
+    const aura = this.add.rectangle(
+      this.card.card.x,
+      this.card.card.y,
+      this.card.card.width * 2.2,
+      this.card.card.height * 1.8,
+      0xffdd00,
+      0.2
+    )
+    aura.setBlendMode(Phaser.BlendModes.ADD)
+    aura.setDepth(this.card.card.depth - 0.1)
+    this.particles.push(aura)
 
-        this.tweens.add({
-          targets: legendaryAura,
-          alpha: { from: 0.2, to: 0.4 },
-          scale: { from: 0.9, to: 1.1 },
-          yoyo: true,
-          repeat: -1,
-          duration: 2000,
-          ease: 'Sine.easeInOut',
-        })
+    this.tweens.add({
+      targets: aura,
+      alpha: { from: 0.2, to: 0.4 },
+      scale: { from: 0.9, to: 1.1 },
+      yoyo: true,
+      repeat: -1,
+      duration: 2000,
+      ease: 'Sine.easeInOut',
+    })
 
-        this.createElegantRings(0xffdd00, 3)
-        this.createElegantRings(0xffffff, 2, 500)
+    this.createElegantRings(0xffdd00, 3)
+    this.createElegantRings(0xffffff, 2, 500)
 
-        this.cameras.main.flash(300, 255, 220, 80, true)
-        break
-      }
-
-      case CardRarity.EPIC: {
-        const epicAura = this.add.rectangle(
-          this.card.card.x,
-          this.card.card.y,
-          this.card.card.width * 1.8,
-          this.card.card.height * 1.6,
-          0xa335ee,
-          0.15
-        )
-        epicAura.setBlendMode(Phaser.BlendModes.ADD)
-        epicAura.setDepth(this.card.card.depth - 0.1)
-        this.particles.push(epicAura)
-
-        this.tweens.add({
-          targets: epicAura,
-          alpha: { from: 0.15, to: 0.3 },
-          scale: { from: 0.95, to: 1.05 },
-          yoyo: true,
-          repeat: -1,
-          duration: 1800,
-          ease: 'Sine.easeInOut',
-        })
-
-        this.createElegantRings(0xa335ee, 2)
-
-        this.cameras.main.flash(200, 163, 53, 238, true)
-        break
-      }
-
-      case CardRarity.RARE: {
-        const rareAura = this.add.rectangle(
-          this.card.card.x,
-          this.card.card.y,
-          this.card.card.width * 1.6,
-          this.card.card.height * 1.4,
-          0x0070dd,
-          0.1
-        )
-        rareAura.setBlendMode(Phaser.BlendModes.ADD)
-        rareAura.setDepth(this.card.card.depth - 0.1)
-        this.particles.push(rareAura)
-
-        this.tweens.add({
-          targets: rareAura,
-          alpha: { from: 0.1, to: 0.2 },
-          scale: { from: 0.97, to: 1.03 },
-          yoyo: true,
-          repeat: -1,
-          duration: 1500,
-          ease: 'Sine.easeInOut',
-        })
-
-        this.createElegantRings(0x0070dd, 1)
-        break
-      }
-
-      default: {
-        const commonGlow = this.add.rectangle(
-          this.card.card.x,
-          this.card.card.y,
-          this.card.card.width * 1.4,
-          this.card.card.height * 1.2,
-          0xffffff,
-          0.05
-        )
-        commonGlow.setBlendMode(Phaser.BlendModes.ADD)
-        commonGlow.setDepth(this.card.card.depth - 0.1)
-        this.particles.push(commonGlow)
-
-        this.tweens.add({
-          targets: commonGlow,
-          alpha: { from: 0.05, to: 0.1 },
-          yoyo: true,
-          repeat: -1,
-          duration: 1200,
-          ease: 'Sine.easeInOut',
-        })
-        break
-      }
-    }
+    this.cameras.main.flash(300, 255, 220, 80, true)
   }
 
   createElegantRings(color: number, rings: number, delay = 0) {
@@ -838,11 +753,7 @@ export class DrawScene extends Phaser.Scene {
 
     launchFirework()
 
-    if (
-      this.card &&
-      (this.card.rarity === CardRarity.LEGENDARY ||
-        this.card.rarity === CardRarity.EPIC)
-    ) {
+    if (this.card) {
       const rarityParticleTimer = this.time.addEvent({
         delay: 200,
         callback: () => {
