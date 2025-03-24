@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser'
 
-import { Button } from '../gameObjects/Button'
+import { Button } from '../../../game/gameObjects/Button'
 import { Card, CardRarity } from '../gameObjects/Card'
 
 export class CardScene extends Phaser.Scene {
