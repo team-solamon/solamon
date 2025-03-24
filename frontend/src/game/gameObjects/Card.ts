@@ -5,28 +5,26 @@ import { DefeatedVisual } from './DefeatedVisual'
 import { HealthBar } from './HealthBar'
 import { CardElement } from '@/game/data/card'
 
-export class Card {
+export class Card extends Phaser.GameObjects.Container {
   public name: string
   public health: number
+  public attack: number
   public initialHealth: number
   public element: CardElement
-  public x: number
-  public y: number
   public isPlayer: boolean
   public originalX: number
   public originalY: number
   public isActive = false
 
-  private scene: Phaser.Scene
-  private cardContainer!: Phaser.GameObjects.Container
-  private cardFront!: Phaser.GameObjects.Rectangle
+  private cardFront!: Phaser.GameObjects.Sprite
   private cardBack!: Phaser.GameObjects.Sprite
   private nameText!: Phaser.GameObjects.Text
   private attackText!: Phaser.GameObjects.Text
   private healthText!: Phaser.GameObjects.Text
-  private rarityText!: Phaser.GameObjects.Text
+  private elementText!: Phaser.GameObjects.Text
   private healthBar!: HealthBar
   private glow!: Phaser.GameObjects.Rectangle
+  private cardBorder!: Phaser.GameObjects.Rectangle
   private isFaceDown = false
   private cardWidth = 100
   private cardHeight = 140
@@ -47,12 +45,13 @@ export class Card {
     element: CardElement,
     isPlayer: boolean
   ) {
-    this.scene = scene
-    this.x = x
-    this.y = y
+    super(scene, x, y)
+    scene.add.existing(this)
+
     this.originalX = x
     this.originalY = y
     this.name = name
+    this.attack = attack
     this.health = health
     this.initialHealth = health
     this.element = element
@@ -62,13 +61,9 @@ export class Card {
   }
 
   createCard() {
-    this.cardContainer = this.scene.add.container(this.x, this.y)
-
-    const cardColor = this.getCardColor()
-
     this.cardFront = this.scene.add
-      .rectangle(0, 0, this.cardWidth, this.cardHeight, cardColor)
-      .setStrokeStyle(3, 0xffffff)
+      .sprite(0, 0, this.getCardTexture())
+      .setDisplaySize(this.cardWidth, this.cardHeight)
 
     this.cardBack = this.scene.add
       .sprite(0, 0, 'cardback')
@@ -77,6 +72,10 @@ export class Card {
     this.glow = this.scene.add
       .rectangle(0, 0, this.cardWidth + 10, this.cardHeight + 10, 0xffff00, 0)
       .setStrokeStyle(2, 0xffff00, 0)
+
+    this.cardBorder = this.scene.add
+      .rectangle(0, 0, this.cardWidth - 3, this.cardHeight - 3, 0x000000, 0)
+      .setStrokeStyle(3, this.getCardColor(), 1)
 
     this.nameText = this.scene.add
       .text(0, -50, this.name, {
@@ -88,10 +87,9 @@ export class Card {
       })
       .setOrigin(0.5)
 
-    this.rarityText = this.scene.add
-      .text(0, -30, this.element, {
-        fontSize: '10px',
-        color: this.getRarityColor(),
+    this.elementText = this.scene.add
+      .text(0, -30, this.getElementEmoji(), {
+        fontSize: '14px',
         fontStyle: 'bold',
       })
       .setOrigin(0.5)
@@ -122,12 +120,13 @@ export class Card {
       .shader('CardGlow', 0, 0, this.cardWidth + 20, this.cardHeight + 20)
       .setVisible(false)
 
-    this.cardContainer.add([
+    this.add([
       this.glow,
       this.cardFront,
       this.cardBack,
+      this.cardBorder, // 테두리는 카드 이미지 위에 배치
       this.nameText,
-      this.rarityText,
+      this.elementText,
       this.attackText,
       this.healthText,
       this.healthBar,
@@ -161,6 +160,24 @@ export class Card {
     }
   }
 
+  getCardTexture(): string {
+    switch (this.element) {
+      case 'FIRE':
+        return 'card-fire'
+      case 'WATER':
+        return 'card-water'
+      case 'EARTH':
+        return 'card-earth'
+      case 'METAL':
+        return 'card-metal'
+      case 'WOOD':
+        return 'card-wood'
+      case 'NONE':
+      default:
+        return 'cardback'
+    }
+  }
+
   getRarityColor(): string {
     switch (this.element) {
       case 'FIRE':
@@ -179,6 +196,24 @@ export class Card {
     }
   }
 
+  getElementEmoji(): string {
+    switch (this.element) {
+      case 'FIRE':
+        return '🔥'
+      case 'WATER':
+        return '💧'
+      case 'EARTH':
+        return '🌍'
+      case 'METAL':
+        return '⚙️'
+      case 'WOOD':
+        return '🌳'
+      case 'NONE':
+      default:
+        return '❓'
+    }
+  }
+
   setFaceDown(isFaceDown: boolean) {
     this.isFaceDown = isFaceDown
     this.cardFront.setVisible(!isFaceDown)
@@ -186,13 +221,14 @@ export class Card {
     this.nameText.setVisible(!isFaceDown)
     this.attackText.setVisible(!isFaceDown)
     this.healthText.setVisible(!isFaceDown)
-    this.rarityText.setVisible(!isFaceDown)
+    this.elementText.setVisible(!isFaceDown)
     this.healthBar.setVisible(!isFaceDown)
+    this.cardBorder.setVisible(!isFaceDown) // 앞면일 때만 테두리 표시
   }
 
   flipCard() {
     this.scene.tweens.add({
-      targets: this.cardContainer,
+      targets: this,
       scaleX: 0,
       duration: 200,
       ease: 'Power1',
@@ -200,7 +236,7 @@ export class Card {
         this.setFaceDown(!this.isFaceDown)
 
         this.scene.tweens.add({
-          targets: this.cardContainer,
+          targets: this,
           scaleX: 1,
           duration: 200,
           ease: 'Power1',
@@ -209,27 +245,20 @@ export class Card {
     })
   }
 
-  setActive(isActive: boolean) {
+  setActiveCard(isActive: boolean) {
     this.isActive = isActive
     this.glow.setAlpha(isActive ? 0.5 : 0)
     this.glow.setStrokeStyle(2, 0xffff00, isActive ? 0.8 : 0)
 
     if (!isActive) {
-      this.scene.tweens.killTweensOf(this.cardContainer)
-      this.cardContainer.y = this.y
+      this.scene.tweens.killTweensOf(this)
+      this.y = this.originalY
     }
   }
 
   updateHealthBar() {
     this.healthBar.update(this.health, this.initialHealth)
     this.healthText.setText(`❤️${Math.max(0, this.health)}`)
-
-    const healthPercent = this.health / this.initialHealth
-    if (healthPercent < 0.3) {
-      this.cardFront.setStrokeStyle(3, 0xff0000)
-    } else {
-      this.cardFront.setStrokeStyle(3, 0xffffff)
-    }
   }
 
   takeDamage(amount: number): boolean {
@@ -241,7 +270,7 @@ export class Card {
     this.scene.cameras.main.flash(150, 100, 0, 0)
 
     this.scene.tweens.add({
-      targets: this.cardContainer,
+      targets: this,
       alpha: 0.8,
       yoyo: true,
       duration: 100,
@@ -254,7 +283,7 @@ export class Card {
       this.idleAnimation?.destroy()
 
       this.scene.tweens.add({
-        targets: this.cardContainer,
+        targets: this,
         alpha: 0.3,
         angle: Phaser.Math.Between(-25, 25),
         scaleX: 0.8,
@@ -273,7 +302,7 @@ export class Card {
       })
 
       const defeatedVisual = new DefeatedVisual(this.scene)
-      this.cardContainer.add(defeatedVisual)
+      this.add(defeatedVisual)
 
       return true
     }
@@ -286,15 +315,11 @@ export class Card {
 
     return new Promise<void>((resolve) => {
       this.scene.tweens.add({
-        targets: this.cardContainer,
+        targets: this,
         x: x,
         y: y,
         duration: duration,
         ease: 'Power2',
-        onUpdate: () => {
-          this.x = this.cardContainer.x
-          this.y = this.cardContainer.y
-        },
         onComplete: () => {
           if (this.health > 0) {
             this.startIdleAnimation()
@@ -316,7 +341,7 @@ export class Card {
     this.idleAnimation?.destroy()
 
     this.scene.tweens.add({
-      targets: this.cardContainer,
+      targets: this,
       rotation: { from: -rotationFactor, to: rotationFactor },
       y: this.y - floatHeight,
       yoyo: true,
@@ -335,8 +360,8 @@ export class Card {
     })
   }
 
-  getContainer(): Phaser.GameObjects.Container {
-    return this.cardContainer
+  toggleHealthBar(visible: boolean) {
+    this.healthBar.setVisible(visible)
   }
 
   updateCardData(data: {
@@ -346,6 +371,7 @@ export class Card {
     element: CardElement
   }) {
     this.name = data.name
+    this.attack = data.attack
     this.health = data.health
     this.initialHealth = data.health
     this.element = data.element
@@ -353,10 +379,14 @@ export class Card {
     this.nameText.setText(this.name)
     this.attackText.setText(`⚔️${data.attack}`)
     this.healthText.setText(`❤️${this.health}`)
-    this.rarityText.setText(this.element)
-    this.rarityText.setColor(this.getRarityColor())
+    this.elementText.setText(this.getElementEmoji())
+    this.elementText.setColor(this.getRarityColor())
 
-    this.cardFront.setFillStyle(this.getCardColor())
+    this.cardBorder.setStrokeStyle(3, this.getCardColor(), 1)
+
+    this.cardFront
+      .setTexture(this.getCardTexture())
+      .setDisplaySize(this.cardWidth, this.cardHeight)
 
     this.healthBar.update(this.health, this.initialHealth)
 

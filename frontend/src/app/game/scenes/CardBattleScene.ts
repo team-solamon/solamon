@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser'
 
 import { BackgroundContainer } from '../gameObjects/Background'
-import { Card } from '../gameObjects/Card'
+import { Card } from '../../../game/gameObjects/Card'
 import { GameResult } from '../gameObjects/GameResult'
 import { performSingleAttack } from '../utils/BattleAnimations'
 import { EventBridge } from '../utils/EventBridge'
@@ -38,6 +38,12 @@ export class CardBattleScene extends Phaser.Scene {
     this.load.image('cardback', '/images/game/cardback.png')
     this.load.image('starburst', '/images/game/starburst.png')
     this.load.image('battlefield', '/images/game/battlefield.png')
+
+    this.load.image('card-fire', '/images/game/card-fire.png')
+    this.load.image('card-water', '/images/game/card-water.png')
+    this.load.image('card-earth', '/images/game/card-earth.png')
+    this.load.image('card-metal', '/images/game/card-metal.png')
+    this.load.image('card-wood', '/images/game/card-wood.png')
   }
 
   create() {
@@ -258,7 +264,7 @@ export class CardBattleScene extends Phaser.Scene {
     const cardOffset = 120
 
     if (!attackerCard.isActive) {
-      attackerCard.setActive(true)
+      attackerCard.setActiveCard(true)
       this.addBattleLog(`🗡️ ${attackerCard.name} enters the battlefield!`)
       await attackerCard.moveToPosition(
         isPlayerAttacking ? centerX - cardOffset : centerX + cardOffset,
@@ -268,7 +274,7 @@ export class CardBattleScene extends Phaser.Scene {
     }
 
     if (!defenderCard.isActive) {
-      defenderCard.setActive(true)
+      defenderCard.setActiveCard(true)
       this.addBattleLog(`⚔️ ${defenderCard.name} enters the battlefield!`)
       await defenderCard.moveToPosition(
         isPlayerAttacking ? centerX + cardOffset : centerX - cardOffset,
@@ -301,7 +307,7 @@ export class CardBattleScene extends Phaser.Scene {
 
   private async handleDefeatedCard(card: Card, isPlayer: boolean) {
     await card.returnToOriginalPosition(600)
-    card.setActive(false)
+    card.setActiveCard(false)
 
     const cards = isPlayer ? this.playerCards : this.opponentCards
     const currentIndex = isPlayer
