@@ -60,10 +60,8 @@ export class Card extends Phaser.GameObjects.Container {
   }
 
   createCard() {
-    const cardTexture = this.getCardTexture()
-
     this.cardFront = this.scene.add
-      .sprite(0, 0, cardTexture)
+      .sprite(0, 0, this.getCardTexture())
       .setDisplaySize(this.cardWidth, this.cardHeight)
 
     this.cardBack = this.scene.add
@@ -364,7 +362,9 @@ export class Card extends Phaser.GameObjects.Container {
     this.elementText.setText(this.element)
     this.elementText.setColor(this.getRarityColor())
 
-    this.cardFront.setTexture(this.getCardTexture())
+    this.cardFront
+      .setTexture(this.getCardTexture())
+      .setDisplaySize(this.cardWidth, this.cardHeight)
 
     this.healthBar.update(this.health, this.initialHealth)
 
