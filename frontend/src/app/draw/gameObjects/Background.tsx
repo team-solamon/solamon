@@ -9,12 +9,15 @@ export class Background extends Phaser.GameObjects.Container {
     super(scene, x, y)
     scene.add.existing(this)
 
-    this.backgroundOverlay = scene.add.rectangle(0, 0, 800, 600, 0x000000)
+    const width = 1600
+    const height = 1200
+
+    this.backgroundOverlay = scene.add.rectangle(0, 0, width, height, 0x000000)
     this.backgroundOverlay.setAlpha(0)
     this.backgroundOverlay.setDepth(-1)
     this.add(this.backgroundOverlay)
 
-    this.flashOverlay = scene.add.rectangle(0, 0, 800, 600, 0xffffff)
+    this.flashOverlay = scene.add.rectangle(0, 0, width, height, 0xffffff)
     this.flashOverlay.setAlpha(0)
     this.flashOverlay.setDepth(10)
     this.add(this.flashOverlay)
@@ -23,9 +26,9 @@ export class Background extends Phaser.GameObjects.Container {
   }
 
   private createStarryBackground() {
-    for (let i = 0; i < 50; i++) {
-      const x = Phaser.Math.Between(-380, 380)
-      const y = Phaser.Math.Between(-280, 280)
+    for (let i = 0; i < 150; i++) {
+      const x = Phaser.Math.Between(-880, 880)
+      const y = Phaser.Math.Between(-630, 630)
       const size = Phaser.Math.Between(1, 3)
       const brightness = Phaser.Math.FloatBetween(0.3, 1)
 

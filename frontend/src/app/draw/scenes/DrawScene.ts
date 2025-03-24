@@ -31,6 +31,7 @@ export class DrawScene extends Phaser.Scene {
   private redrawButton: Button | null = null
   private drawsCount = 0
   private particleTimers: Phaser.Time.TimerEvent[] = []
+  private originalCameraZoom = 1
 
   constructor() {
     super({ key: 'CardScene' })
@@ -71,6 +72,7 @@ export class DrawScene extends Phaser.Scene {
     })
 
     this.drawsCount = 0
+    this.originalCameraZoom = this.cameras.main.zoom
   }
 
   createCardAndPack() {
@@ -101,9 +103,25 @@ export class DrawScene extends Phaser.Scene {
   revealCard() {
     this.cardRevealed = true
 
+    if (this.instructionText) {
+      this.tweens.add({
+        targets: this.instructionText,
+        alpha: 0,
+        duration: 300,
+        ease: 'Sine.easeOut',
+      })
+    }
+
     if (this.cardPack) {
       this.cardPack.disableInteraction()
       this.cardPack.startRevealAnimation()
+
+      this.tweens.add({
+        targets: this.cameras.main,
+        zoom: 1.3,
+        duration: 800,
+        ease: 'Sine.easeInOut',
+      })
     }
 
     if (this.background) {
@@ -134,12 +152,15 @@ export class DrawScene extends Phaser.Scene {
     const extractionSpeed = 0.7
     const extractDistance = 250 + 30
 
+    this.cameras.main.startFollow(this.card, true, 0.1, 0.1)
+
     this.tweens.add({
       targets: this.card,
       y: `-=${extractDistance}`,
       duration: 1500 * extractionSpeed,
       ease: 'Cubic.easeOut',
       onComplete: () => {
+        this.cameras.main.stopFollow()
         this.completeCardExtraction()
       },
     })
@@ -147,6 +168,15 @@ export class DrawScene extends Phaser.Scene {
 
   completeCardExtraction() {
     if (!this.card) return
+
+    this.tweens.add({
+      targets: this.cameras.main,
+      scrollX: 0,
+      scrollY: 0,
+      zoom: this.originalCameraZoom,
+      duration: 1000,
+      ease: 'Sine.easeInOut',
+    })
 
     const hintColor = getCardColor(this.card.element)
     this.tweens.add({
@@ -222,6 +252,7 @@ export class DrawScene extends Phaser.Scene {
     )
 
     this.cameras.main.flash(300, 255, 220, 80, true)
+    this.cameras.main.shake(300, 0.003)
   }
 
   createRedrawButton() {
@@ -327,6 +358,9 @@ export class DrawScene extends Phaser.Scene {
 
   resetCardState() {
     this.time.delayedCall(400, () => {
+      this.cameras.main.setScroll(0, 0)
+      this.cameras.main.setZoom(this.originalCameraZoom)
+
       if (this.background) {
         this.tweens.add({
           targets: this.background.backgroundOverlay,
