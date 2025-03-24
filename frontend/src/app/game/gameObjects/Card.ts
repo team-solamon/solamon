@@ -8,6 +8,7 @@ import { CardElement } from '@/game/data/card'
 export class Card extends Phaser.GameObjects.Container {
   public name: string
   public health: number
+  public attack: number
   public initialHealth: number
   public element: CardElement
   public isPlayer: boolean
@@ -49,6 +50,7 @@ export class Card extends Phaser.GameObjects.Container {
     this.originalX = x
     this.originalY = y
     this.name = name
+    this.attack = attack
     this.health = health
     this.initialHealth = health
     this.element = element
