@@ -77,19 +77,20 @@ export class DrawScene extends Phaser.Scene {
     this.card = new Card(
       this,
       400,
-      280,
+      300,
       drawData[this.drawsCount].element,
       drawData[this.drawsCount].attack,
       drawData[this.drawsCount].health,
       drawData[this.drawsCount].element,
       true
     )
-    this.card.scaleX = 1.5
-    this.card.scaleY = 1.5
+    this.card.scaleX = 2.0
+    this.card.scaleY = 2.0
+    this.card.stopIdleAnimation()
 
     this.card.setFaceDown(true)
-
     this.cardPack = new CardPack(this, 400, 300, this.card)
+
     this.cardPack.setOnReveal((card) => {
       if (!this.cardRevealed) {
         this.revealCard()
@@ -134,76 +135,24 @@ export class DrawScene extends Phaser.Scene {
       this.card.setDepth(0.9)
     }
 
-    let hintColor = 0xffffff
     const extractionSpeed = 0.7
-
-    hintColor = getCardColor(this.card.element)
-
     const extractDistance = 250 + 30
 
     this.tweens.add({
       targets: this.card,
       y: `-=${extractDistance}`,
       duration: 1500 * extractionSpeed,
-      ease: 'Cubic.easeInOut',
-      onUpdate: (tween) => {
-        const progress = tween.progress
-
-        if (
-          this.card &&
-          this.cardPack &&
-          progress > 0.2 &&
-          progress < 0.8 &&
-          Math.random() > 0.85
-        ) {
-          const particleX =
-            this.card.x +
-            Phaser.Math.Between(-this.card.width / 3, this.card.width / 3)
-          const particleY = 300 - 250 / 2 + 10
-
-          const friction = this.add.circle(
-            particleX,
-            particleY,
-            2,
-            hintColor,
-            0.7
-          )
-          friction.setBlendMode(Phaser.BlendModes.ADD)
-          this.particles.push(friction)
-
-          this.tweens.add({
-            targets: friction,
-            y: '+=20',
-            alpha: 0,
-            scale: 0.5,
-            duration: 400,
-            ease: 'Cubic.easeOut',
-            onComplete: () => {
-              friction.destroy()
-              this.particles = this.particles.filter((p) => p !== friction)
-            },
-          })
-        }
-
-        if (progress > 0.85 && progress < 0.9 && this.background) {
-          this.tweens.add({
-            targets: this.background.flashOverlay,
-            alpha: { from: 0, to: 0.3 },
-            duration: 200,
-            yoyo: true,
-            ease: 'Cubic.easeOut',
-          })
-        }
-      },
+      ease: 'Cubic.easeOut',
       onComplete: () => {
-        this.completeCardExtraction(hintColor)
+        this.completeCardExtraction()
       },
     })
   }
 
-  completeCardExtraction(hintColor: number) {
+  completeCardExtraction() {
     if (!this.card) return
 
+    const hintColor = getCardColor(this.card.element)
     this.tweens.add({
       targets: this.card,
       angle: { from: 0, to: 360 },
@@ -213,12 +162,13 @@ export class DrawScene extends Phaser.Scene {
       onComplete: () => {
         this.tweens.add({
           targets: this.card,
-          scaleX: { from: 0, to: 1.7 },
-          scaleY: 1.3,
+          scaleX: { from: 0, to: 2 },
+          scaleY: { from: 1.3, to: 2 },
           angle: 0,
-          y: 300,
-          duration: 600,
+          y: { from: this.card!.y, to: 300 },
+          duration: 1200,
           ease: 'Back.easeOut',
+          easeParams: [1.7],
           onUpdate: (tween) => {
             const progress = tween.progress
 
@@ -263,6 +213,7 @@ export class DrawScene extends Phaser.Scene {
               this.card.scaleX = 2
               this.card.scaleY = 2
               this.card.flipCard()
+              this.card.startIdleAnimation()
             }
 
             this.createParticleEffect()

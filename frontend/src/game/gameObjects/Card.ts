@@ -290,6 +290,10 @@ export class Card extends Phaser.GameObjects.Container {
     })
   }
 
+  stopIdleAnimation() {
+    this.idleAnimation?.pause()
+  }
+
   toggleHealthBar(visible: boolean) {
     this.healthBar.setVisible(visible)
   }
