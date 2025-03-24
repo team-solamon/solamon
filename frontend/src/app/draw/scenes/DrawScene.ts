@@ -99,11 +99,9 @@ export class DrawScene extends Phaser.Scene {
   }
 
   revealCard() {
-    console.log('Revealing card')
     this.cardRevealed = true
 
     if (this.cardPack) {
-      console.log('Disabling card pack interaction')
       this.cardPack.disableInteraction()
       this.cardPack.startRevealAnimation()
     }
@@ -216,7 +214,6 @@ export class DrawScene extends Phaser.Scene {
               this.card.startIdleAnimation()
             }
 
-            this.createParticleEffect()
             this.createEffects()
 
             if (this.instructionText) {
@@ -266,47 +263,24 @@ export class DrawScene extends Phaser.Scene {
   createEffects() {
     if (!this.card) return
 
-    const aura = this.add.rectangle(
+    createElegantRings(
+      this,
       this.card.x,
       this.card.y,
-      this.card.width * 2.2,
-      this.card.height * 1.8,
-      0xffdd00,
-      0.2
+      this.card.depth,
+      getCardColor(this.card.element),
+      3
     )
-    aura.setBlendMode(Phaser.BlendModes.ADD)
-    aura.setDepth(this.card.depth - 0.1)
-    this.particles.push(aura)
 
-    this.tweens.add({
-      targets: aura,
-      alpha: { from: 0.2, to: 0.4 },
-      scale: { from: 0.9, to: 1.1 },
-      yoyo: true,
-      repeat: -1,
-      duration: 2000,
-      ease: 'Sine.easeInOut',
-    })
-
-    if (this.card) {
-      createElegantRings(
-        this,
-        this.card.x,
-        this.card.y,
-        this.card.depth,
-        getCardColor(this.card.element),
-        3
-      )
-      createElegantRings(
-        this,
-        this.card.x,
-        this.card.y,
-        this.card.depth,
-        getCardColor(this.card.element),
-        2,
-        500
-      )
-    }
+    createElegantRings(
+      this,
+      this.card.x,
+      this.card.y,
+      this.card.depth,
+      getCardColor(this.card.element),
+      2,
+      500
+    )
 
     this.cameras.main.flash(300, 255, 220, 80, true)
   }
@@ -413,7 +387,6 @@ export class DrawScene extends Phaser.Scene {
   }
 
   resetCardState() {
-    console.log('Resetting card state')
     this.time.delayedCall(400, () => {
       if (this.background) {
         this.tweens.add({
@@ -430,121 +403,6 @@ export class DrawScene extends Phaser.Scene {
       if (this.instructionText) {
         this.instructionText.setText('Click the card pack!')
       }
-    })
-  }
-
-  createParticleEffect() {
-    const colors = [0xffff00, 0xff00ff, 0x00ffff, 0xff0000, 0x00ff00, 0x0000ff]
-
-    for (let i = 0; i < 100; i++) {
-      this.createParticle(
-        this.card!.x,
-        this.card!.y,
-        colors[Math.floor(Math.random() * colors.length)],
-        5,
-        2000
-      )
-    }
-
-    const continuousParticleTimer = this.time.addEvent({
-      delay: 100,
-      callback: () => {
-        if (!this.cardRevealed || !this.card) return
-
-        for (let i = 0; i < 3; i++) {
-          const x = this.card.x + Phaser.Math.Between(-75, 75)
-          const y = this.card.y + Phaser.Math.Between(-110, 110)
-          this.createParticle(
-            x,
-            y,
-            colors[Math.floor(Math.random() * colors.length)],
-            3,
-            800
-          )
-        }
-      },
-      repeat: -1,
-    })
-
-    this.particleTimers.push(continuousParticleTimer)
-
-    let fireworkCount = 0
-    const launchFirework = () => {
-      if (fireworkCount >= 6 || !this.card) return
-
-      const x = this.card.x + Phaser.Math.Between(-200, 200)
-      const y = this.card.y + Phaser.Math.Between(-200, 100)
-      const color = colors[Math.floor(Math.random() * colors.length)]
-
-      for (let i = 0; i < 30; i++) {
-        this.createParticle(x, y, color, 4, 1000)
-      }
-
-      fireworkCount++
-      this.time.delayedCall(300, launchFirework)
-    }
-
-    launchFirework()
-
-    if (this.card) {
-      const rarityParticleTimer = this.time.addEvent({
-        delay: 200,
-        callback: () => {
-          if (!this.card) return
-
-          const color = 0xffdd00
-          const x = this.card.x
-          const startY = this.card.y - 110
-          const endY = this.card.y + 110
-
-          for (let i = 0; i < 2; i++) {
-            const offsetX = Phaser.Math.Between(-60, 60)
-            const particle = this.add.circle(x + offsetX, startY, 4, color)
-            particle.setAlpha(0.8)
-            this.particles.push(particle)
-
-            this.tweens.add({
-              targets: particle,
-              y: endY,
-              alpha: 0,
-              scale: 0.5,
-              duration: 1500,
-              ease: 'Sine.easeIn',
-              onComplete: () => {
-                particle.destroy()
-                this.particles = this.particles.filter((p) => p !== particle)
-              },
-            })
-          }
-        },
-        repeat: 20,
-      })
-
-      this.particleTimers.push(rarityParticleTimer)
-    }
-  }
-
-  createParticle(
-    x: number,
-    y: number,
-    color: number,
-    size: number,
-    lifespan: number
-  ) {
-    const particle = this.add.circle(x, y, size, color)
-    particle.setAlpha(0.8)
-    this.particles.push(particle)
-
-    this.tweens.add({
-      targets: particle,
-      alpha: 0,
-      scale: 0.5,
-      duration: lifespan,
-      ease: 'Sine.easeIn',
-      onComplete: () => {
-        particle.destroy()
-        this.particles = this.particles.filter((p) => p !== particle)
-      },
     })
   }
 }

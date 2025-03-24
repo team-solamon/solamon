@@ -1,5 +1,9 @@
 import * as Phaser from 'phaser'
 
+export interface ParticleEffect {
+  destroy: () => void
+}
+
 export function createElegantRings(
   scene: Phaser.Scene,
   x: number,
@@ -8,7 +12,7 @@ export function createElegantRings(
   color: number,
   rings: number,
   delay = 0
-) {
+): ParticleEffect {
   const particles: Phaser.GameObjects.Shape[] = []
   const center = { x: x, y: y }
 
