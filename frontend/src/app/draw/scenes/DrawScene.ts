@@ -1,11 +1,11 @@
 import * as Phaser from 'phaser'
 
 import { Button } from '../../../game/gameObjects/Button'
-import { Card } from '../gameObjects/Card'
 import { Background } from '../gameObjects/Background'
 import { CardPack } from '../gameObjects/CardPack'
 import { createElegantRings } from '../util/effects'
 import { CardElement, getCardColor } from '@/game/data/card'
+import { Card } from '@/game/gameObjects/Card'
 
 const drawData: CardElement[] = ['FIRE', 'WATER', 'EARTH', 'METAL', 'WOOD']
 
@@ -24,13 +24,33 @@ export class DrawScene extends Phaser.Scene {
     super({ key: 'CardScene' })
   }
 
+  preload() {
+    this.load.image('cardback', '/images/game/cardback.png')
+
+    this.load.image('card-fire', '/images/game/card-fire.png')
+    this.load.image('card-water', '/images/game/card-water.png')
+    this.load.image('card-earth', '/images/game/card-earth.png')
+    this.load.image('card-metal', '/images/game/card-metal.png')
+    this.load.image('card-wood', '/images/game/card-wood.png')
+  }
+
   create() {
     this.cameras.main.setBackgroundColor('#1a1a2e')
 
     this.background = new Background(this)
 
-    this.card = new Card(this, 400, 300, drawData[this.drawsCount])
-    this.card.card.y = 280
+    this.card = new Card(
+      this,
+      0,
+      280,
+      'name',
+      0,
+      0,
+      drawData[this.drawsCount],
+      true
+    )
+
+    this.card.y = 280
 
     this.cardPack = new CardPack(this, 400, 300, this.card)
     this.cardPack.setOnReveal((card) => {
@@ -47,7 +67,7 @@ export class DrawScene extends Phaser.Scene {
       .setOrigin(0.5)
 
     this.tweens.add({
-      targets: this.card.card,
+      targets: this.card,
       alpha: { from: 0.9, to: 1 },
       yoyo: true,
       repeat: -1,
@@ -88,11 +108,11 @@ export class DrawScene extends Phaser.Scene {
     if (!this.card || !this.cardPack) return
 
     if (this.cardPack) {
-      this.card.card.x = 400
-      this.card.card.y = 300 + this.card.card.height / 2 - 30
-      this.card.card.angle = 0
-      this.card.card.setAlpha(1)
-      this.card.card.setDepth(0.9)
+      this.card.x = 400
+      this.card.y = 300 + this.card.height / 2 - 30
+      this.card.angle = 0
+      this.card.setAlpha(1)
+      this.card.setDepth(0.9)
     }
 
     let hintColor = 0xffffff
@@ -103,7 +123,7 @@ export class DrawScene extends Phaser.Scene {
     const extractDistance = 250 + 30
 
     this.tweens.add({
-      targets: this.card.card,
+      targets: this.card,
       y: `-=${extractDistance}`,
       duration: 1500 * extractionSpeed,
       ease: 'Cubic.easeInOut',
@@ -118,11 +138,8 @@ export class DrawScene extends Phaser.Scene {
           Math.random() > 0.85
         ) {
           const particleX =
-            this.card.card.x +
-            Phaser.Math.Between(
-              -this.card.card.width / 3,
-              this.card.card.width / 3
-            )
+            this.card.x +
+            Phaser.Math.Between(-this.card.width / 3, this.card.width / 3)
           const particleY = 300 - 250 / 2 + 10
 
           const friction = this.add.circle(
@@ -176,14 +193,14 @@ export class DrawScene extends Phaser.Scene {
     if (!this.card) return
 
     this.tweens.add({
-      targets: this.card.card,
+      targets: this.card,
       angle: { from: 0, to: 360 },
       scaleX: { from: 1, to: 0 },
       duration: 500,
       ease: 'Cubic.easeIn',
       onComplete: () => {
         this.tweens.add({
-          targets: this.card?.card,
+          targets: this.card,
           scaleX: { from: 0, to: 1.5 },
           scaleY: 1.5,
           angle: 0,
@@ -195,10 +212,10 @@ export class DrawScene extends Phaser.Scene {
 
             if (this.card && progress > 0.4 && progress < 0.6) {
               const shimmer = this.add.rectangle(
-                this.card.card.x,
-                this.card.card.y,
-                this.card.card.width * 1.2,
-                this.card.card.height * 1.2,
+                this.card.x,
+                this.card.y,
+                this.card.width * 1.2,
+                this.card.height * 1.2,
                 hintColor,
                 0.7
               )
@@ -231,7 +248,7 @@ export class DrawScene extends Phaser.Scene {
           },
           onComplete: () => {
             if (this.card) {
-              this.card.reveal()
+              this.card.flipCard()
             }
 
             this.createParticleEffect()
@@ -256,8 +273,8 @@ export class DrawScene extends Phaser.Scene {
       const size = 2 + Math.random() * 3
 
       const particle = this.add.circle(
-        this.card.card.x,
-        this.card.card.y,
+        this.card.x,
+        this.card.y,
         size,
         hintColor,
         0.8
@@ -267,8 +284,8 @@ export class DrawScene extends Phaser.Scene {
 
       this.tweens.add({
         targets: particle,
-        x: this.card.card.x + Math.cos(angle) * distance,
-        y: this.card.card.y + Math.sin(angle) * distance,
+        x: this.card.x + Math.cos(angle) * distance,
+        y: this.card.y + Math.sin(angle) * distance,
         alpha: 0,
         scale: 0.5,
         duration: 700 + Math.random() * 300,
@@ -285,15 +302,15 @@ export class DrawScene extends Phaser.Scene {
     if (!this.card) return
 
     const aura = this.add.rectangle(
-      this.card.card.x,
-      this.card.card.y,
-      this.card.card.width * 2.2,
-      this.card.card.height * 1.8,
+      this.card.x,
+      this.card.y,
+      this.card.width * 2.2,
+      this.card.height * 1.8,
       0xffdd00,
       0.2
     )
     aura.setBlendMode(Phaser.BlendModes.ADD)
-    aura.setDepth(this.card.card.depth - 0.1)
+    aura.setDepth(this.card.depth - 0.1)
     this.particles.push(aura)
 
     this.tweens.add({
@@ -309,17 +326,17 @@ export class DrawScene extends Phaser.Scene {
     if (this.card) {
       createElegantRings(
         this,
-        this.card!.card.x,
-        this.card!.card.y,
-        this.card!.card.depth,
+        this.card.x,
+        this.card.y,
+        this.card.depth,
         0xffdd00,
         3
       )
       createElegantRings(
         this,
-        this.card!.card.x,
-        this.card!.card.y,
-        this.card!.card.depth,
+        this.card.x,
+        this.card.y,
+        this.card.depth,
         0xffffff,
         2,
         500
@@ -396,10 +413,7 @@ export class DrawScene extends Phaser.Scene {
 
     const targetsToRemove = []
     if (this.card) {
-      targetsToRemove.push(this.card.card)
-      if (this.card.cardNameText) {
-        targetsToRemove.push(this.card.cardNameText)
-      }
+      targetsToRemove.push(this.card)
     }
 
     if (targetsToRemove.length > 0) {
@@ -447,8 +461,16 @@ export class DrawScene extends Phaser.Scene {
       this.cardRevealed = false
 
       console.log('Creating new card')
-      this.card = new Card(this, 400, 300, drawData[this.drawsCount])
-      this.card.card.y = 280
+      this.card = new Card(
+        this,
+        0,
+        280,
+        'name',
+        0,
+        0,
+        drawData[this.drawsCount],
+        true
+      )
 
       this.cardPack = new CardPack(this, 400, 300, this.card)
       this.cardPack.setOnReveal((card) => {
@@ -465,7 +487,7 @@ export class DrawScene extends Phaser.Scene {
       this.card.setScale(0)
 
       this.tweens.add({
-        targets: [this.card.card],
+        targets: [this.card],
         scale: 1,
         duration: 400,
         ease: 'Back.easeOut',
@@ -485,8 +507,8 @@ export class DrawScene extends Phaser.Scene {
 
     for (let i = 0; i < 100; i++) {
       this.createParticle(
-        this.card!.card.x,
-        this.card!.card.y,
+        this.card!.x,
+        this.card!.y,
         colors[Math.floor(Math.random() * colors.length)],
         5,
         2000
@@ -499,8 +521,8 @@ export class DrawScene extends Phaser.Scene {
         if (!this.cardRevealed || !this.card) return
 
         for (let i = 0; i < 3; i++) {
-          const x = this.card.card.x + Phaser.Math.Between(-75, 75)
-          const y = this.card.card.y + Phaser.Math.Between(-110, 110)
+          const x = this.card.x + Phaser.Math.Between(-75, 75)
+          const y = this.card.y + Phaser.Math.Between(-110, 110)
           this.createParticle(
             x,
             y,
@@ -519,8 +541,8 @@ export class DrawScene extends Phaser.Scene {
     const launchFirework = () => {
       if (fireworkCount >= 6 || !this.card) return
 
-      const x = this.card.card.x + Phaser.Math.Between(-200, 200)
-      const y = this.card.card.y + Phaser.Math.Between(-200, 100)
+      const x = this.card.x + Phaser.Math.Between(-200, 200)
+      const y = this.card.y + Phaser.Math.Between(-200, 100)
       const color = colors[Math.floor(Math.random() * colors.length)]
 
       for (let i = 0; i < 30; i++) {
@@ -540,9 +562,9 @@ export class DrawScene extends Phaser.Scene {
           if (!this.card) return
 
           const color = 0xffdd00
-          const x = this.card.card.x
-          const startY = this.card.card.y - 110
-          const endY = this.card.card.y + 110
+          const x = this.card.x
+          const startY = this.card.y - 110
+          const endY = this.card.y + 110
 
           for (let i = 0; i < 2; i++) {
             const offsetX = Phaser.Math.Between(-60, 60)
