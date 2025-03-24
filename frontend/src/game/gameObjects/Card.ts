@@ -21,7 +21,7 @@ export class Card extends Phaser.GameObjects.Container {
   private nameText!: Phaser.GameObjects.Text
   private attackText!: Phaser.GameObjects.Text
   private healthText!: Phaser.GameObjects.Text
-  private rarityText!: Phaser.GameObjects.Text
+  private elementText!: Phaser.GameObjects.Text
   private healthBar!: HealthBar
   private glow!: Phaser.GameObjects.Rectangle
   private isFaceDown = false
@@ -84,7 +84,7 @@ export class Card extends Phaser.GameObjects.Container {
       })
       .setOrigin(0.5)
 
-    this.rarityText = this.scene.add
+    this.elementText = this.scene.add
       .text(0, -30, this.element, {
         fontSize: '10px',
         color: this.getRarityColor(),
@@ -123,7 +123,7 @@ export class Card extends Phaser.GameObjects.Container {
       this.cardFront,
       this.cardBack,
       this.nameText,
-      this.rarityText,
+      this.elementText,
       this.attackText,
       this.healthText,
       this.healthBar,
@@ -200,7 +200,7 @@ export class Card extends Phaser.GameObjects.Container {
     this.nameText.setVisible(!isFaceDown)
     this.attackText.setVisible(!isFaceDown)
     this.healthText.setVisible(!isFaceDown)
-    this.rarityText.setVisible(!isFaceDown)
+    this.elementText.setVisible(!isFaceDown)
     this.healthBar.setVisible(!isFaceDown)
   }
 
@@ -361,8 +361,8 @@ export class Card extends Phaser.GameObjects.Container {
     this.nameText.setText(this.name)
     this.attackText.setText(`⚔️${data.attack}`)
     this.healthText.setText(`❤️${this.health}`)
-    this.rarityText.setText(this.element)
-    this.rarityText.setColor(this.getRarityColor())
+    this.elementText.setText(this.element)
+    this.elementText.setColor(this.getRarityColor())
 
     this.cardFront.setTexture(this.getCardTexture())
 
