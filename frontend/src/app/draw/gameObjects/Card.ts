@@ -11,9 +11,9 @@ export class Card {
   public element: CardElement
   private scene: Phaser.Scene
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, element: CardElement) {
     this.scene = scene
-    this.element = getRandomElement()
+    this.element = element
 
     this.cardNameText = scene.add
       .text(x, y, getElementEmoji(this.element), {

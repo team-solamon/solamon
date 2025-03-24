@@ -5,7 +5,9 @@ import { Card } from '../gameObjects/Card'
 import { Background } from '../gameObjects/Background'
 import { CardPack } from '../gameObjects/CardPack'
 import { createElegantRings } from '../util/effects'
-import { getCardColor } from '@/game/data/card'
+import { CardElement, getCardColor } from '@/game/data/card'
+
+const drawData: CardElement[] = ['FIRE', 'WATER', 'EARTH', 'METAL', 'WOOD']
 
 export class DrawScene extends Phaser.Scene {
   private cardPack: CardPack | null = null
@@ -16,7 +18,6 @@ export class DrawScene extends Phaser.Scene {
   private background: Background | null = null
   private redrawButton: Button | null = null
   private drawsCount = 0
-  private maxDraws = 5
   private particleTimers: Phaser.Time.TimerEvent[] = []
 
   constructor() {
@@ -28,7 +29,7 @@ export class DrawScene extends Phaser.Scene {
 
     this.background = new Background(this)
 
-    this.card = new Card(this, 400, 300)
+    this.card = new Card(this, 400, 300, drawData[this.drawsCount])
     this.card.card.y = 280
 
     this.cardPack = new CardPack(this, 400, 300, this.card)
@@ -241,7 +242,7 @@ export class DrawScene extends Phaser.Scene {
             }
 
             this.drawsCount++
-            if (this.drawsCount < this.maxDraws) {
+            if (this.drawsCount < drawData.length) {
               this.createRedrawButton()
             }
           },
@@ -334,7 +335,7 @@ export class DrawScene extends Phaser.Scene {
       y: 500,
       width: 200,
       height: 50,
-      text: `Redraw (${this.maxDraws - this.drawsCount} left)`,
+      text: `Redraw (${drawData.length - this.drawsCount} left)`,
       backgroundColor: 0x4a6fa5,
       hoverColor: 0x6389c0,
       strokeColor: 0xffffff,
@@ -446,7 +447,7 @@ export class DrawScene extends Phaser.Scene {
       this.cardRevealed = false
 
       console.log('Creating new card')
-      this.card = new Card(this, 400, 300)
+      this.card = new Card(this, 400, 300, drawData[this.drawsCount])
       this.card.card.y = 280
 
       this.cardPack = new CardPack(this, 400, 300, this.card)
