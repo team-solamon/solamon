@@ -53,18 +53,14 @@ export class CardPack extends Phaser.GameObjects.Container {
 
   public startRevealAnimation() {
     const fadeOutTween = {
-      targets: [this.pack],
+      targets: [this.pack, this.glowEffect],
       alpha: 0,
-      duration: 400,
-      ease: 'Sine.easeOut',
+      duration: 800,
+      ease: 'Power1.easeOut',
+      onComplete: () => {
+        this.destroy()
+      },
     }
-
-    this.scene.tweens.add({
-      targets: this.glowEffect,
-      alpha: 0,
-      duration: 400,
-      ease: 'Sine.easeOut',
-    })
 
     this.scene.tweens.add(fadeOutTween)
   }
