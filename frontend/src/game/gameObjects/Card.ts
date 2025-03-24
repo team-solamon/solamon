@@ -268,9 +268,9 @@ export class Card extends Phaser.GameObjects.Container {
     const rotationFactor = 0.08
     const floatHeight = 5
 
-    this.idleAnimation?.destroy()
+    this.stopIdleAnimation()
 
-    this.scene.tweens.add({
+    this.idleAnimation = this.scene.tweens.add({
       targets: this,
       rotation: { from: -rotationFactor, to: rotationFactor },
       y: this.y - floatHeight,
@@ -291,7 +291,13 @@ export class Card extends Phaser.GameObjects.Container {
   }
 
   stopIdleAnimation() {
-    this.idleAnimation?.pause()
+    if (this.idleAnimation) {
+      this.scene.tweens.killTweensOf(this)
+      this.rotation = 0
+      this.y = this.originalY
+      this.glow.setAlpha(this.isActive ? 0.5 : 0)
+      this.idleAnimation = undefined
+    }
   }
 
   toggleHealthBar(visible: boolean) {
