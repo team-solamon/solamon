@@ -320,10 +320,6 @@ export class Card extends Phaser.GameObjects.Container {
         y: y,
         duration: duration,
         ease: 'Power2',
-        onUpdate: () => {
-          this.x = this.x
-          this.y = this.y
-        },
         onComplete: () => {
           if (this.health > 0) {
             this.startIdleAnimation()
