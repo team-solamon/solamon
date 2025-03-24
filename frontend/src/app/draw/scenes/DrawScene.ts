@@ -37,6 +37,7 @@ export class DrawScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image('cardpack', '/images/game/cardpack.png')
     this.load.image('cardback', '/images/game/cardback.png')
 
     this.load.image('card-fire', '/images/game/card-fire.png')

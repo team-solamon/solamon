@@ -3,8 +3,7 @@ import * as Phaser from 'phaser'
 
 export class CardPack extends Phaser.GameObjects.Container {
   private card: Card
-  private pack!: Phaser.GameObjects.Rectangle
-  private questionMark!: Phaser.GameObjects.Text
+  private pack!: Phaser.GameObjects.Image
   private glowEffect!: Phaser.GameObjects.Rectangle
   private onRevealCallback?: (card: Card) => void
 
@@ -16,21 +15,16 @@ export class CardPack extends Phaser.GameObjects.Container {
   }
 
   private create() {
-    this.pack = this.scene.add.rectangle(0, 0, 180, 250, 0x3282b8)
-    this.pack.setStrokeStyle(4, 0xbbe1fa).setInteractive().setDepth(1)
+    this.pack = this.scene.add.image(0, 0, 'cardpack')
+    this.pack.setDisplaySize(220, 300).setInteractive().setDepth(1)
 
-    this.questionMark = this.scene.add
-      .text(0, 0, '?', { fontSize: '60px', color: '#000000' })
-      .setOrigin(0.5)
-      .setDepth(2)
-
-    this.glowEffect = this.scene.add.rectangle(0, 0, 200, 270, 0x00ffff)
+    this.glowEffect = this.scene.add.rectangle(0, 0, 240, 320, 0x00ffff)
     this.glowEffect
       .setAlpha(0.2)
       .setBlendMode(Phaser.BlendModes.ADD)
       .setDepth(0.5)
 
-    this.add([this.glowEffect, this.pack, this.questionMark])
+    this.add([this.glowEffect, this.pack])
 
     this.scene.tweens.add({
       targets: this.glowEffect,
@@ -59,7 +53,7 @@ export class CardPack extends Phaser.GameObjects.Container {
 
   public startRevealAnimation() {
     const anticipationTween = {
-      targets: [this.pack, this.questionMark],
+      targets: [this.pack],
       scaleY: 1.02,
       scaleX: 1.02,
       y: '-=10',
@@ -94,17 +88,6 @@ export class CardPack extends Phaser.GameObjects.Container {
       ease: 'Sine.easeInOut',
       yoyo: true,
       repeat: 0,
-    })
-
-    this.scene.tweens.add({
-      targets: this.questionMark,
-      y: '-=20',
-      alpha: 0,
-      duration: extractionDuration * 0.3,
-      ease: 'Sine.easeIn',
-      onComplete: () => {
-        this.questionMark.destroy()
-      },
     })
 
     const packTopY = this.pack.y - this.pack.height / 2
@@ -163,7 +146,6 @@ export class CardPack extends Phaser.GameObjects.Container {
 
   public destroy() {
     this.pack.destroy()
-    this.questionMark.destroy()
     this.glowEffect.destroy()
     super.destroy()
   }
