@@ -178,7 +178,6 @@ export class DrawScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     })
 
-    const hintColor = getCardColor(this.card.element)
     this.tweens.add({
       targets: this.card,
       angle: { from: 0, to: 360 },
@@ -251,7 +250,14 @@ export class DrawScene extends Phaser.Scene {
       500
     )
 
-    this.cameras.main.flash(300, 255, 220, 80, true)
+    const flashColor = Phaser.Display.Color.ValueToColor(color)
+    this.cameras.main.flash(
+      300,
+      flashColor.red,
+      flashColor.green,
+      flashColor.blue,
+      true
+    )
     this.cameras.main.shake(300, 0.003)
   }
 
