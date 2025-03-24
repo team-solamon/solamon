@@ -199,15 +199,6 @@ export class DrawScene extends Phaser.Scene {
         this.completeCardExtraction(hintColor)
       },
     })
-
-    this.cardPack.startCardExtraction(
-      extractDistance,
-      hintColor,
-      extractionSpeed,
-      () => {
-        console.log('Card extraction animation complete')
-      }
-    )
   }
 
   completeCardExtraction(hintColor: number) {
