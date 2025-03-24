@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-
+import { useEffect, useState } from 'react'
+import PhaserGame from '@/components/PhaserGame'
 import GameLogs from './GameLogs'
 import ScoreDisplay from './ScoreDisplay'
 import { CardBattleScene } from '../scenes/CardBattleScene'
@@ -39,13 +39,8 @@ const sampleBattleReplay: BattleReplay = {
 }
 
 const Game: React.FC = () => {
-  const gameRef = useRef<HTMLDivElement>(null)
-  const gameInstanceRef = useRef<any>(null)
   const [battleLogs, setBattleLogs] = useState<string[]>([])
   const [scores, setScores] = useState({ player: 0, opponent: 0 })
-  const [gameStatus, setGameStatus] = useState<
-    'loading' | 'playing' | 'gameover'
-  >('loading')
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -55,79 +50,24 @@ const Game: React.FC = () => {
     return () => clearTimeout(timer)
   }, [])
 
-  useEffect(() => {
-    const initPhaser = async () => {
-      if (typeof window !== 'undefined') {
-        const Phaser = (await import('phaser')).default
-
-        if (gameInstanceRef.current) {
-          gameInstanceRef.current.destroy(true)
-        }
-
-        EventBridge.onLogUpdate = (message: string) => {
-          setBattleLogs((prevLogs) => [message, ...prevLogs.slice(0, 19)])
-        }
-
-        EventBridge.onScoreUpdate = (
-          playerScore: number,
-          opponentScore: number
-        ) => {
-          setScores({ player: playerScore, opponent: opponentScore })
-        }
-
-        const config = {
-          type: Phaser.AUTO,
-          width: 800,
-          height: 600,
-          parent: gameRef.current || undefined,
-          scale: {
-            mode: Phaser.Scale.FIT,
-            autoCenter: Phaser.Scale.CENTER_BOTH,
-            width: 800,
-            height: 600,
-          },
-          physics: {
-            default: 'arcade',
-            arcade: {
-              gravity: { x: 0, y: 0 },
-            },
-          },
-          scene: [CardBattleScene],
-          transparent: true,
-        }
-
-        gameInstanceRef.current = new Phaser.Game(config)
-        setGameStatus('playing')
-      }
+  const handleGameReady = () => {
+    EventBridge.onLogUpdate = (message: string) => {
+      setBattleLogs((prevLogs) => [message, ...prevLogs.slice(0, 19)])
     }
 
-    initPhaser()
-
-    return () => {
-      if (gameInstanceRef.current) {
-        gameInstanceRef.current.destroy(true)
-
-        EventBridge.reset()
-      }
+    EventBridge.onScoreUpdate = (
+      playerScore: number,
+      opponentScore: number
+    ) => {
+      setScores({ player: playerScore, opponent: opponentScore })
     }
-  }, [])
+  }
 
   return (
     <div className='relative w-full max-w-[1200px] mx-auto'>
-      <div className='bg-gradient-to-b from-slate-900 to-indigo-900 rounded-lg overflow-hidden shadow-2xl border border-indigo-700'>
-        <div className='relative w-full aspect-[4/3] bg-slate-950'>
-          <div ref={gameRef} className='game-container absolute inset-0' />
-          {gameStatus === 'loading' && (
-            <div className='absolute inset-0 flex items-center justify-center bg-slate-900 bg-opacity-80 z-10'>
-              <div className='text-center'>
-                <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto mb-4'></div>
-                <div className='text-white text-xl'>Loading game...</div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className='p-4 border-t border-indigo-700 bg-slate-800'>
+      <div className='bg-gradient-to-b from-slate-900 to-indigo-900 rounded-lg overflow-hidden shadow-2xl border'>
+        <PhaserGame scenes={[CardBattleScene]} onGameReady={handleGameReady} />
+        <div className='p-4 border-t bg-slate-800'>
           <ScoreDisplay
             playerScore={scores.player}
             opponentScore={scores.opponent}
