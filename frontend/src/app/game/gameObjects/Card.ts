@@ -5,20 +5,16 @@ import { DefeatedVisual } from './DefeatedVisual'
 import { HealthBar } from './HealthBar'
 import { CardElement } from '@/game/data/card'
 
-export class Card {
+export class Card extends Phaser.GameObjects.Container {
   public name: string
   public health: number
   public initialHealth: number
   public element: CardElement
-  public x: number
-  public y: number
   public isPlayer: boolean
   public originalX: number
   public originalY: number
   public isActive = false
 
-  private scene: Phaser.Scene
-  private cardContainer!: Phaser.GameObjects.Container
   private cardFront!: Phaser.GameObjects.Rectangle
   private cardBack!: Phaser.GameObjects.Sprite
   private nameText!: Phaser.GameObjects.Text
@@ -47,9 +43,9 @@ export class Card {
     element: CardElement,
     isPlayer: boolean
   ) {
-    this.scene = scene
-    this.x = x
-    this.y = y
+    super(scene, x, y)
+    scene.add.existing(this)
+
     this.originalX = x
     this.originalY = y
     this.name = name
@@ -62,8 +58,6 @@ export class Card {
   }
 
   createCard() {
-    this.cardContainer = this.scene.add.container(this.x, this.y)
-
     const cardColor = this.getCardColor()
 
     this.cardFront = this.scene.add
@@ -122,7 +116,7 @@ export class Card {
       .shader('CardGlow', 0, 0, this.cardWidth + 20, this.cardHeight + 20)
       .setVisible(false)
 
-    this.cardContainer.add([
+    this.add([
       this.glow,
       this.cardFront,
       this.cardBack,
@@ -192,7 +186,7 @@ export class Card {
 
   flipCard() {
     this.scene.tweens.add({
-      targets: this.cardContainer,
+      targets: this,
       scaleX: 0,
       duration: 200,
       ease: 'Power1',
@@ -200,7 +194,7 @@ export class Card {
         this.setFaceDown(!this.isFaceDown)
 
         this.scene.tweens.add({
-          targets: this.cardContainer,
+          targets: this,
           scaleX: 1,
           duration: 200,
           ease: 'Power1',
@@ -209,14 +203,14 @@ export class Card {
     })
   }
 
-  setActive(isActive: boolean) {
+  setActiveCard(isActive: boolean) {
     this.isActive = isActive
     this.glow.setAlpha(isActive ? 0.5 : 0)
     this.glow.setStrokeStyle(2, 0xffff00, isActive ? 0.8 : 0)
 
     if (!isActive) {
-      this.scene.tweens.killTweensOf(this.cardContainer)
-      this.cardContainer.y = this.y
+      this.scene.tweens.killTweensOf(this)
+      this.y = this.originalY
     }
   }
 
@@ -241,7 +235,7 @@ export class Card {
     this.scene.cameras.main.flash(150, 100, 0, 0)
 
     this.scene.tweens.add({
-      targets: this.cardContainer,
+      targets: this,
       alpha: 0.8,
       yoyo: true,
       duration: 100,
@@ -254,7 +248,7 @@ export class Card {
       this.idleAnimation?.destroy()
 
       this.scene.tweens.add({
-        targets: this.cardContainer,
+        targets: this,
         alpha: 0.3,
         angle: Phaser.Math.Between(-25, 25),
         scaleX: 0.8,
@@ -273,7 +267,7 @@ export class Card {
       })
 
       const defeatedVisual = new DefeatedVisual(this.scene)
-      this.cardContainer.add(defeatedVisual)
+      this.add(defeatedVisual)
 
       return true
     }
@@ -286,14 +280,14 @@ export class Card {
 
     return new Promise<void>((resolve) => {
       this.scene.tweens.add({
-        targets: this.cardContainer,
+        targets: this,
         x: x,
         y: y,
         duration: duration,
         ease: 'Power2',
         onUpdate: () => {
-          this.x = this.cardContainer.x
-          this.y = this.cardContainer.y
+          this.x = this.x
+          this.y = this.y
         },
         onComplete: () => {
           if (this.health > 0) {
@@ -316,7 +310,7 @@ export class Card {
     this.idleAnimation?.destroy()
 
     this.scene.tweens.add({
-      targets: this.cardContainer,
+      targets: this,
       rotation: { from: -rotationFactor, to: rotationFactor },
       y: this.y - floatHeight,
       yoyo: true,
@@ -333,10 +327,6 @@ export class Card {
       duration: 1000 + Math.random() * 500,
       ease: 'Sine.easeInOut',
     })
-  }
-
-  getContainer(): Phaser.GameObjects.Container {
-    return this.cardContainer
   }
 
   updateCardData(data: {

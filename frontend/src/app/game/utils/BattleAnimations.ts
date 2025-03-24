@@ -361,10 +361,9 @@ export function createImpactEffect(
 function createDeathEffect(scene: Phaser.Scene, card: Card, color: number) {
   const x = card.x
   const y = card.y
-  const cardContainer = card.getContainer()
 
   scene.tweens.add({
-    targets: cardContainer,
+    targets: card,
     angle: { from: -5, to: 5 },
     duration: 50,
     repeat: 3,
@@ -449,7 +448,7 @@ export const performSingleAttack = async (
       attackColor,
       () => {
         const impactEffect = createImpactEffect(scene, endX, endY, attackColor)
-        impactEffect.applyCardRecoil(defenderCard.getContainer())
+        impactEffect.applyCardRecoil(defenderCard)
 
         createImpactEffect(scene, endX, endY, attackColor)
 
@@ -463,7 +462,7 @@ export const performSingleAttack = async (
           resolveAttack(isDefeated)
         })
       },
-      attackerCard.getContainer()
+      attackerCard
     )
   })
 }

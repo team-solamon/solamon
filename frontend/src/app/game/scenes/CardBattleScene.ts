@@ -258,7 +258,7 @@ export class CardBattleScene extends Phaser.Scene {
     const cardOffset = 120
 
     if (!attackerCard.isActive) {
-      attackerCard.setActive(true)
+      attackerCard.setActiveCard(true)
       this.addBattleLog(`🗡️ ${attackerCard.name} enters the battlefield!`)
       await attackerCard.moveToPosition(
         isPlayerAttacking ? centerX - cardOffset : centerX + cardOffset,
@@ -268,7 +268,7 @@ export class CardBattleScene extends Phaser.Scene {
     }
 
     if (!defenderCard.isActive) {
-      defenderCard.setActive(true)
+      defenderCard.setActiveCard(true)
       this.addBattleLog(`⚔️ ${defenderCard.name} enters the battlefield!`)
       await defenderCard.moveToPosition(
         isPlayerAttacking ? centerX + cardOffset : centerX - cardOffset,
@@ -301,7 +301,7 @@ export class CardBattleScene extends Phaser.Scene {
 
   private async handleDefeatedCard(card: Card, isPlayer: boolean) {
     await card.returnToOriginalPosition(600)
-    card.setActive(false)
+    card.setActiveCard(false)
 
     const cards = isPlayer ? this.playerCards : this.opponentCards
     const currentIndex = isPlayer
