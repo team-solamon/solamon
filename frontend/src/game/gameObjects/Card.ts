@@ -24,6 +24,7 @@ export class Card extends Phaser.GameObjects.Container {
   private elementText!: Phaser.GameObjects.Text
   private healthBar!: HealthBar
   private glow!: Phaser.GameObjects.Rectangle
+  private cardBorder!: Phaser.GameObjects.Rectangle
   private isFaceDown = false
   private cardWidth = 100
   private cardHeight = 140
@@ -72,6 +73,10 @@ export class Card extends Phaser.GameObjects.Container {
       .rectangle(0, 0, this.cardWidth + 10, this.cardHeight + 10, 0xffff00, 0)
       .setStrokeStyle(2, 0xffff00, 0)
 
+    this.cardBorder = this.scene.add
+      .rectangle(0, 0, this.cardWidth - 3, this.cardHeight - 3, 0x000000, 0)
+      .setStrokeStyle(3, this.getCardColor(), 1)
+
     this.nameText = this.scene.add
       .text(0, -50, this.name, {
         fontSize: '14px',
@@ -119,6 +124,7 @@ export class Card extends Phaser.GameObjects.Container {
       this.glow,
       this.cardFront,
       this.cardBack,
+      this.cardBorder, // 테두리는 카드 이미지 위에 배치
       this.nameText,
       this.elementText,
       this.attackText,
@@ -217,6 +223,7 @@ export class Card extends Phaser.GameObjects.Container {
     this.healthText.setVisible(!isFaceDown)
     this.elementText.setVisible(!isFaceDown)
     this.healthBar.setVisible(!isFaceDown)
+    this.cardBorder.setVisible(!isFaceDown) // 앞면일 때만 테두리 표시
   }
 
   flipCard() {
@@ -378,6 +385,8 @@ export class Card extends Phaser.GameObjects.Container {
     this.healthText.setText(`❤️${this.health}`)
     this.elementText.setText(this.getElementEmoji())
     this.elementText.setColor(this.getRarityColor())
+
+    this.cardBorder.setStrokeStyle(3, this.getCardColor(), 1)
 
     this.cardFront
       .setTexture(this.getCardTexture())
