@@ -1,7 +1,32 @@
-import React from 'react'
+'use client'
+
+import React, { useState } from 'react'
 import Button from '../../components/Button'
 
+import dynamic from 'next/dynamic'
+import Modal from '../../components/Modal'
+import { DrawableCards } from '@/game/data/draw'
+
+const DrawGame = dynamic(() => import('../draw/components/DrawGame'), {
+  ssr: false,
+})
+
+const drawableCards: DrawableCards = {
+  cards: [
+    { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
+    { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
+    { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
+    { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
+    { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
+  ],
+}
+
 const HomePage = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const openModal = () => setIsModalOpen(true)
+  const closeModal = () => setIsModalOpen(false)
+
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
       <header className='header flex justify-between items-center mb-6'>
@@ -13,7 +38,7 @@ const HomePage = () => {
       </header>
 
       <div className='action-buttons flex justify-center gap-4 mb-8'>
-        <Button>
+        <Button onClick={openModal}>
           + New Card <span className='text-blue-400'>0.1</span>
         </Button>
         <Button>Open Match</Button>
@@ -65,6 +90,9 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+      <Modal isOpen={isModalOpen} onClose={closeModal} title='+ New Card'>
+        <DrawGame onClose={closeModal} drawableCards={drawableCards} />
+      </Modal>
     </div>
   )
 }
