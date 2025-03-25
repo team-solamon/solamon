@@ -16,7 +16,7 @@ export default function HomePage() {
   }
 
   return (
-    <main className='flex min-h-screen flex-col items-center justify-center bg-gray-100'>
+    <main className='flex min-h-screen flex-col items-center justify-center'>
       <div
         className='game-container p-6 bg-white border-4 border-gray-800 rounded-none text-gray-800 w-full max-w-md mx-auto relative'
         style={{
