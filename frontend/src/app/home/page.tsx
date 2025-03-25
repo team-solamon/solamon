@@ -7,6 +7,7 @@ import CardImage from '../../components/CardImage'
 import dynamic from 'next/dynamic'
 import Modal from '../../components/Modal'
 import { DrawableCards } from '@/game/data/draw'
+import { CardData } from '@/game/data/card'
 
 const DrawGame = dynamic(() => import('../draw/components/DrawGame'), {
   ssr: false,
@@ -21,6 +22,13 @@ const drawableCards: DrawableCards = {
     { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
   ],
 }
+
+const myCards: CardData[] = [
+  { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
+  { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
+  { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
+  { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
+]
 
 const HomePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -53,7 +61,6 @@ const HomePage = () => {
           </h2>
           <div className='battle-cards flex gap-4'>
             <div className='card bg-gray-700 p-4 rounded-lg'>
-              <CardImage id='fire-card' />
               <Button>배틀 결과 보기</Button>
             </div>
           </div>
@@ -72,22 +79,12 @@ const HomePage = () => {
             <span>⚒️ 1</span>
           </div>
           <div className='card-list grid grid-cols-4 gap-4'>
-            <div className='card bg-gray-700 p-4 rounded-lg'>
-              <CardImage id='water' />
-              <Button>Stats</Button>
-            </div>
-            <div className='card bg-gray-700 p-4 rounded-lg'>
-              <CardImage id='earth' />
-              <Button>Stats</Button>
-            </div>
-            <div className='card bg-gray-700 p-4 rounded-lg'>
-              <CardImage id='metal' />
-              <Button>Stats</Button>
-            </div>
-            <div className='card bg-gray-700 p-4 rounded-lg'>
-              <CardImage id='wood' />
-              <Button>Stats</Button>
-            </div>
+            {myCards.map((card, index) => (
+              <div key={index} className='card bg-gray-700 p-4 rounded-lg'>
+                <CardImage card={card} />
+                <Button>Stats</Button>
+              </div>
+            ))}
           </div>
         </div>
       </section>
