@@ -86,7 +86,7 @@ const HomePage = () => {
             <span>🌱 2</span>
             <span>⚒️ 1</span>
           </div>
-          <div className='card-list grid grid-cols-4 gap-4'>
+          <div className='card-list grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4'>
             {myCards.map((card, index) => (
               <div key={index} className='card bg-gray-700 p-4 rounded-lg'>
                 <CardImage card={card} />
