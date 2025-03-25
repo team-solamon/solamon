@@ -345,6 +345,15 @@ export class DrawScene extends Phaser.Scene {
       )
     }
 
+    if (this.instructionText) {
+      this.tweens.add({
+        targets: this.instructionText,
+        alpha: 0,
+        duration: 300,
+        ease: 'Sine.easeOut',
+      })
+    }
+
     this.cleanupCardEffects(() => {
       this.resetCardState()
     })
