@@ -7,6 +7,8 @@ interface ModalProps {
   onClose: () => void
   title?: string
   children: ReactNode
+  maxWidth?: string
+  maxHeight?: string
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -14,12 +16,20 @@ const Modal: React.FC<ModalProps> = ({
   onClose,
   title = 'Modal',
   children,
+  maxWidth = '800px',
+  maxHeight = '700px',
 }) => {
   if (!isOpen) return null
 
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-      <div className='relative w-full max-w-[1200px] mx-auto bg-[#978578] rounded-lg shadow-2xl  overflow-hidden'>
+      <div
+        className='relative w-full max-w-[1200px] mx-auto bg-[#978578] rounded-lg shadow-2xl overflow-hidden'
+        style={{
+          maxWidth,
+          maxHeight,
+        }}
+      >
         <div className='bg-[#978578] px-4 py-3 flex justify-center items-center'>
           <h2
             className='text-[#FFD400] font-semibold'
