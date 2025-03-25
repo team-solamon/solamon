@@ -59,7 +59,7 @@ describe("solamon", () => {
 	it("Spawns solamons", async () => {
 		// Spawn elements
 		const solamonCount = 5
-		const tx = await program.methods
+		const txHash = await program.methods
 			.spawnSolamons(solamonCount)
 			.accounts({
 				player: player.publicKey,
@@ -68,7 +68,14 @@ describe("solamon", () => {
 			.signers([player])
 			.rpc()
 
-		console.log("Your transaction signature for spawning elements", tx)
+		await connection.confirmTransaction(txHash)
+
+		const tx = await connection.getTransaction(txHash, {
+			commitment: "confirmed",
+		})
+
+		console.log("Solamon spawn tx logs")
+		console.log(tx.meta?.logMessages)
 
 		// Fetch the user account to verify elements were added
 		const userAccount = await getUserAccount(program, player.publicKey)

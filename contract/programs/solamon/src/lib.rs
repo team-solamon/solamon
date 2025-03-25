@@ -60,6 +60,8 @@ pub mod solamon {
                 attack: pseudorandom_u8(i as u64) % (MAX_ATTACK / 2) + (MAX_ATTACK / 2), // give at least 50
                 health: pseudorandom_u8(i as u64 + 1) % (MAX_HEALTH / 2) + (MAX_HEALTH / 2), // give at least 50
             };
+            // 'Program log: Solamon { id: 0, species: 0, element: Fire, attack: 55, health: 89 }',
+            msg!("{:?}", solamon);
             user_account.solamons.push(solamon);
             config_account.solamon_count += 1;
         }
@@ -209,6 +211,7 @@ impl Space for UserAccount {
 }
 
 #[account]
+#[derive(Debug)]
 pub struct Solamon {
     pub id: u16,          //2 bytes
     pub species: u8,      //1 byte
@@ -221,7 +224,7 @@ impl Space for Solamon {
     const INIT_SPACE: usize = 2 + 1 + 1 + 1 + 1;
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Debug)]
 pub enum Element {
     Fire,
     Wood,

@@ -28,43 +28,20 @@ pub fn execute_battle(battle_account: &mut BattleAccount) -> BattleResult {
     let player2_len = battle_account.player_2_solamons.len();
 
     let mut player1_solamon = &mut battle_account.player_1_solamons[0];
-    msg!(
-        "Player 1's Solamon (index: {}, id: {}) comes to the battle! (Attack: {}, Health: {})",
-        player1_index,
-        player1_solamon.id,
-        player1_solamon.attack,
-        player1_solamon.health
-    );
     let mut player2_solamon = &mut battle_account.player_2_solamons[0];
-    msg!(
-        "Player 2's Solamon (index: {}, id: {}) comes to the battle! (Attack: {}, Health: {})",
-        player2_index,
-        player2_solamon.id,
-        player2_solamon.attack,
-        player2_solamon.health
-    );
 
     while player1_index < player1_len && player2_index < player2_len {
-        // Player 1's Solamon attacks Player 2's Solamon
+        let (damage, event) = calculate_damage(player1_solamon.clone(), player2_solamon.clone());
         msg!(
-            "Player 1's Solamon (index: {}, id: {}) attacks Player 2's Solamon (index: {}, id: {})",
+            "{{ player: {:?}, atkIdx: {}, defIdx: {}, damage: {}, event: {} }}",
+            battle_account.player_1,
             player1_index,
-            player1_solamon.id,
             player2_index,
-            player2_solamon.id,
+            damage,
+            event
         );
-
-        let damage = calculate_damage(player1_solamon.clone(), player2_solamon.clone());
-        msg!("Damage: {}", damage);
-
         if player2_solamon.health <= damage {
             player2_solamon.health = 0;
-            msg!(
-                "Player 2's Solamon (index: {}, id: {}) is defeated!",
-                player2_index,
-                player2_solamon.id
-            );
-
             player2_index += 1; // Move to the next Solamon
 
             // Check if Player 2 has any Solamons left
@@ -74,44 +51,24 @@ pub fn execute_battle(battle_account: &mut BattleAccount) -> BattleResult {
             } else {
                 // Bring the next Solamon to the battle
                 player2_solamon = &mut battle_account.player_2_solamons[player2_index];
-                msg!(
-                    "Player 2's Solamon (index: {}, id: {}) comes to the battle! (Attack: {}, Health: {})",
-                    player2_index,
-                    player2_solamon.id,
-                    player2_solamon.attack,
-                    player2_solamon.health
-                );
             }
         } else {
             player2_solamon.health -= damage;
-            msg!(
-                "Player 2's Solamon (index: {}, id: {}) health after attack: {}",
-                player2_index,
-                player2_solamon.id,
-                player2_solamon.health
-            );
         }
 
         // Player 2's Solamon attacks Player 1's Solamon
+        let (damage, event) = calculate_damage(player2_solamon.clone(), player1_solamon.clone());
         msg!(
-            "Player 2's Solamon (index: {}, id: {}) attacks Player 1's Solamon (index: {}, id: {})",
+            "{{ player: {:?}, atkIdx: {}, defIdx: {}, damage: {}, event: {} }}",
+            battle_account.player_2,
             player2_index,
-            player2_solamon.id,
             player1_index,
-            player1_solamon.id
+            damage,
+            event
         );
-
-        let damage = calculate_damage(player2_solamon.clone(), player1_solamon.clone());
-        msg!("Damage: {}", damage);
 
         if player1_solamon.health <= damage {
             player1_solamon.health = 0;
-            msg!(
-                "Player 1's Solamon (index: {}, id: {}) is defeated!",
-                player1_index,
-                player1_solamon.id
-            );
-
             player1_index += 1; // Move to the next Solamon
 
             // Check if Player 1 has any Solamons left
@@ -121,22 +78,9 @@ pub fn execute_battle(battle_account: &mut BattleAccount) -> BattleResult {
             } else {
                 // Bring the next Solamon to the battle
                 player1_solamon = &mut battle_account.player_1_solamons[player1_index];
-                msg!(
-                    "Player 1's Solamon (index: {}, id: {}) comes to the battle! (Attack: {}, Health: {})",
-                    player1_index,
-                    player1_solamon.id,
-                    player1_solamon.attack,
-                    player1_solamon.health
-                );
             }
         } else {
             player1_solamon.health -= damage;
-            msg!(
-                "Player 1's Solamon (index: {}, id: {}) health after attack: {}",
-                player1_index,
-                player1_solamon.id,
-                player1_solamon.health
-            );
         }
     }
 
@@ -145,56 +89,57 @@ pub fn execute_battle(battle_account: &mut BattleAccount) -> BattleResult {
     BattleResult::Pending // This should not happen in a normal battle
 }
 
-pub fn calculate_damage(attacker: Solamon, defender: Solamon) -> u8 {
+pub fn calculate_damage(attacker: Solamon, defender: Solamon) -> (u8, String) {
     let mut damage = attacker.attack;
+    let mut event = String::from("NONE");
 
     if attacker.element == Element::Wood && defender.element == Element::Earth {
         damage = damage * 2;
-        msg!("Wood beats Earth, damage is doubled!");
+        event = "CRITICAL".to_string();
     }
 
     if attacker.element == Element::Fire && defender.element == Element::Metal {
         damage = damage * 2;
-        msg!("Fire beats Metal, damage is doubled!");
+        event = "CRITICAL".to_string();
     }
 
     if attacker.element == Element::Metal && defender.element == Element::Wood {
         damage = damage * 2;
-        msg!("Metal beats Wood, damage is doubled!");
+        event = "CRITICAL".to_string();
     }
     if attacker.element == Element::Water && defender.element == Element::Fire {
         damage = damage * 2;
-        msg!("Water beats Fire, damage is doubled!");
+        event = "CRITICAL".to_string();
     }
     if attacker.element == Element::Earth && defender.element == Element::Water {
         damage = damage * 2;
-        msg!("Earth beats Water, damage is doubled!");
+        event = "CRITICAL".to_string();
     }
 
     if attacker.element == Element::Wood && defender.element == Element::Fire {
         damage = damage / 2;
-        msg!("Wood is weak against Fire, damage is halved!");
+        event = "HALVED".to_string();
     }
 
     if attacker.element == Element::Fire && defender.element == Element::Earth {
         damage = damage / 2;
-        msg!("Fire is weak against Earth, damage is halved!");
+        event = "HALVED".to_string();
     }
 
     if attacker.element == Element::Earth && defender.element == Element::Metal {
         damage = damage / 2;
-        msg!("Earth is weak against Metal, damage is halved!");
+        event = "HALVED".to_string();
     }
 
     if attacker.element == Element::Metal && defender.element == Element::Water {
         damage = damage / 2;
-        msg!("Metal is weak against Water, damage is halved!");
+        event = "HALVED".to_string();
     }
 
     if attacker.element == Element::Water && defender.element == Element::Wood {
         damage = damage / 2;
-        msg!("Water is weak against Wood, damage is halved!");
+        event = "HALVED".to_string();
     }
 
-    damage
+    (damage, event)
 }
