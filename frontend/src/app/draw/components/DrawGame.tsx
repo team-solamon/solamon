@@ -6,32 +6,20 @@ import { DrawScene } from '@/app/draw/scenes/DrawScene'
 import { EventBridge } from '../util/EventBridge'
 import { DrawableCards } from '@/game/data/draw'
 
-const drawableCards: DrawableCards = {
-  cards: [
-    { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
-    { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
-    { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
-    { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
-    { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
-  ],
-}
-
 interface DrawGameProps {
   onClose?: () => void
+  drawableCards: DrawableCards
 }
 
-const DrawGame: React.FC<DrawGameProps> = ({ onClose }) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      EventBridge.loadDrawData(drawableCards)
-    }, 1000)
-
-    return () => clearTimeout(timer)
-  }, [])
+const DrawGame: React.FC<DrawGameProps> = ({ onClose, drawableCards }) => {
+  const handleGameReady = () => {
+    console.log('Game is ready, setting draw data', drawableCards)
+    EventBridge.loadDrawData(drawableCards)
+  }
 
   return (
     <div className='relative w-full max-w-[1200px] mx-auto'>
-      <PhaserGame scenes={[DrawScene]} />
+      <PhaserGame scenes={[DrawScene]} onGameReady={handleGameReady} />
     </div>
   )
 }
