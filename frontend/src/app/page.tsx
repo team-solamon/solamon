@@ -21,9 +21,7 @@ export default function HomePage() {
           className='w-full max-w-2xl rounded-lg'
         />
         <div className='absolute bottom-10 left-1/2 transform -translate-x-1/2'>
-          <Button>
-            <span onClick={handleCreateAccount}>Create account</span>
-          </Button>
+          <Button onClick={handleCreateAccount}>Create account</Button>
         </div>
       </div>
     </main>
