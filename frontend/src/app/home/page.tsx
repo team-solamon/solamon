@@ -143,6 +143,7 @@ const HomePage = () => {
         isOpen={modals['purchaseCard']}
         onClose={() => closeModal('purchaseCard')}
         title='Purchase Card'
+        maxWidth='400px'
       >
         <div className='purchase-modal text-center flex flex-col items-center'>
           <img
@@ -168,6 +169,7 @@ const HomePage = () => {
         isOpen={modals['cardDetails']}
         onClose={() => closeModal('cardDetails')}
         title='Card Details'
+        maxWidth='400px'
       >
         {selectedCard && (
           <div className='card-details text-center'>
