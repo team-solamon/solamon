@@ -7,7 +7,7 @@ import CardImage from '../../components/CardImage'
 import dynamic from 'next/dynamic'
 import Modal from '../../components/Modal'
 import { DrawableCards } from '@/game/data/draw'
-import { CardData } from '@/game/data/card'
+import { CardData, CardElement, getElementEmoji } from '@/game/data/card'
 
 const DrawGame = dynamic(() => import('../draw/components/DrawGame'), {
   ssr: false,
@@ -24,6 +24,9 @@ const drawableCards: DrawableCards = {
 }
 
 const myCards: CardData[] = [
+  { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
+  { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
+  { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
   { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
   { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
   { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
@@ -43,6 +46,26 @@ const HomePage = () => {
     setModals((prev) => ({ ...prev, [modalKey]: false }))
     if (modalKey === 'cardDetails') setSelectedCard(null)
   }
+
+  const getElementCounts = () => {
+    const counts: { [key: string]: number } = {
+      FIRE: 0,
+      WATER: 0,
+      EARTH: 0,
+      METAL: 0,
+      WOOD: 0,
+    }
+
+    myCards.forEach((card) => {
+      if (counts[card.element] !== undefined) {
+        counts[card.element]++
+      }
+    })
+
+    return counts
+  }
+
+  const elementCounts = getElementCounts()
 
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
@@ -78,13 +101,17 @@ const HomePage = () => {
       <section className='my-card-section'>
         <div className='bg-[#978578] p-4 rounded-lg'>
           <h2 className='text-2xl font-semibold text-yellow-400 mb-4'>
-            My Card | 10
+            My Card | {myCards.length}
           </h2>
           <div className='card-stats flex gap-4 text-lg mb-4'>
-            <span>🔥 2</span>
-            <span>💧 8</span>
-            <span>🌱 2</span>
-            <span>⚒️ 1</span>
+            {Object.entries(elementCounts).map(
+              ([element, count]) =>
+                count > 0 && (
+                  <span key={element}>
+                    {getElementEmoji(element as CardElement)} {count}
+                  </span>
+                )
+            )}
           </div>
           <div className='card-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4'>
             {myCards.map((card, index) => (
