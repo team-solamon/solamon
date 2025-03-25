@@ -2,12 +2,13 @@
 
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
+import Button from '@/components/Button'
 
 export default function HomePage() {
   const router = useRouter()
 
   const handleCreateAccount = () => {
-    router.push('/create-account')
+    router.push('/home')
   }
 
   return (
@@ -19,12 +20,11 @@ export default function HomePage() {
           alt='Intro'
           className='w-full max-w-2xl rounded-lg'
         />
-        <button
-          onClick={handleCreateAccount}
-          className='absolute bottom-10 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black font-bold py-2 px-6 rounded-lg border-2 border-gray-800 hover:bg-yellow-600'
-        >
-          Create account
-        </button>
+        <div className='absolute bottom-10 left-1/2 transform -translate-x-1/2'>
+          <Button>
+            <span onClick={handleCreateAccount}>Create account</span>
+          </Button>
+        </div>
       </div>
     </main>
   )
