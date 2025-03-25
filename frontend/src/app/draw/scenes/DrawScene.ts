@@ -457,18 +457,8 @@ export class DrawScene extends Phaser.Scene {
     }
 
     if (this.loadingText) {
-      this.tweens.add({
-        targets: this.loadingText,
-        alpha: 0,
-        y: '+=20',
-        duration: 300,
-        onComplete: () => {
-          if (this.loadingText) {
-            this.loadingText.destroy()
-            this.loadingText = null
-          }
-        },
-      })
+      this.loadingText.destroy()
+      this.loadingText = null
     }
   }
 }
