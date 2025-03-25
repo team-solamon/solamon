@@ -11,7 +11,7 @@ const CardImage: React.FC<CardImageProps> = ({ card }) => {
   }
 
   return (
-    <div className='card-image w-32 h-40 bg-gray-500 rounded-lg mb-2 relative'>
+    <div className='card-image w-full aspect-[4/5] bg-gray-500 rounded-lg mb-2 relative'>
       <img
         src={getImageSrc(card)}
         alt={`Card ${card.name}`}
