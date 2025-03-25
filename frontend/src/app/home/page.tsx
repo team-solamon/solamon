@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic'
 import Modal from '../../components/Modal'
 import { DrawableCards } from '@/game/data/draw'
 import { CardData, CardElement, getElementEmoji } from '@/game/data/card'
+import { useRouter } from 'next/navigation'
 
 const DrawGame = dynamic(() => import('../draw/components/DrawGame'), {
   ssr: false,
@@ -34,6 +35,8 @@ const myCards: CardData[] = [
 ]
 
 const HomePage = () => {
+  const router = useRouter()
+
   const [modals, setModals] = useState<{ [key: string]: boolean }>({})
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null)
 
@@ -92,7 +95,9 @@ const HomePage = () => {
           </h2>
           <div className='battle-cards flex gap-4'>
             <div className='card bg-gray-700 p-4 rounded-lg'>
-              <Button>배틀 결과 보기</Button>
+              <Button onClick={() => router.push('/game')}>
+                배틀 결과 보기
+              </Button>
             </div>
           </div>
         </div>
