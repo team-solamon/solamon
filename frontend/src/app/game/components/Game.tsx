@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import PhaserGame from '@/components/PhaserGame'
 import GameLogs from './GameLogs'
 import ScoreDisplay from './ScoreDisplay'
@@ -42,6 +42,7 @@ const Game: React.FC = () => {
   const [battleLogs, setBattleLogs] = useState<string[]>([])
   const [scores, setScores] = useState({ player: 0, opponent: 0 })
 
+  // TODO Test setup
   useEffect(() => {
     const timer = setTimeout(() => {
       EventBridge.loadReplay(sampleBattleReplay)
@@ -63,10 +64,17 @@ const Game: React.FC = () => {
     }
   }
 
+  const phaserGame = useMemo(
+    () => (
+      <PhaserGame scenes={[CardBattleScene]} onGameReady={handleGameReady} />
+    ),
+    []
+  )
+
   return (
     <div className='relative w-full max-w-[1200px] mx-auto'>
       <div className='bg-gradient-to-b from-slate-900 to-indigo-900 rounded-lg overflow-hidden shadow-2xl border'>
-        <PhaserGame scenes={[CardBattleScene]} onGameReady={handleGameReady} />
+        {phaserGame}
         <div className='p-4 border-t bg-slate-800'>
           <ScoreDisplay
             playerScore={scores.player}
