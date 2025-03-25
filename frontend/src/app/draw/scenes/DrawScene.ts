@@ -71,11 +71,10 @@ export class DrawScene extends Phaser.Scene {
         return
       }
 
-      EventBridge.onDrawDataLoaded = (cards: DrawableCards) => {
+      EventBridge.setOnDrawDataLoaded((cards: DrawableCards) => {
         this.config = cards
-
         resolve()
-      }
+      })
     })
   }
 
