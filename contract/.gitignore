@@ -1,0 +1,14 @@
+.anchor
+.DS_Store
+**/*.rs.bk
+node_modules
+test-ledger
+.yarn
+.idea
+.local
+.npmrc
+target/*
+!target/idl/
+!target/deploy/*.json
+!target/types/
+test-ledger
