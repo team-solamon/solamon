@@ -50,6 +50,11 @@ const HomePage = () => {
     if (modalKey === 'cardDetails') setSelectedCard(null)
   }
 
+  const handlePurchase = () => {
+    closeModal('purchaseCard')
+    openModal('newCard')
+  }
+
   const getElementCounts = () => {
     const counts: { [key: string]: number } = {
       FIRE: 0,
@@ -81,7 +86,7 @@ const HomePage = () => {
       </header>
 
       <div className='action-buttons flex justify-center gap-4 mb-8'>
-        <Button onClick={() => openModal('newCard')}>
+        <Button onClick={() => openModal('purchaseCard')}>
           + New Card <span className='text-blue-400'>0.1</span>
         </Button>
         <Button>Open Match</Button>
@@ -133,6 +138,23 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      <Modal
+        isOpen={modals['purchaseCard']}
+        onClose={() => closeModal('purchaseCard')}
+        title='Purchase Card'
+      >
+        <div className='purchase-modal text-center flex flex-col items-center'>
+          <img
+            src='/images/game/cardpack.png'
+            alt='Card Pack'
+            className='w-32 h-auto mb-4'
+          />
+          <div className='flex justify-center gap-4'>
+            <Button onClick={handlePurchase}>+ New Card (0.1)</Button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal
         isOpen={modals['newCard']}
