@@ -318,6 +318,9 @@ export function createImpactEffect(
       }
     }
   )
+  scene.time.delayedCall(duration, () => {
+    scene.cameras.main.setScroll(originalX, originalY)
+  })
 
   const flashColor = color
   scene.cameras.main.flash(
@@ -341,6 +344,9 @@ export function createImpactEffect(
     onComplete: () => {
       scene.cameras.main.zoom = originalZoom
     },
+  })
+  scene.time.delayedCall(100, () => {
+    scene.cameras.main.zoom = originalZoom
   })
 
   return {
