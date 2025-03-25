@@ -4,28 +4,16 @@ import { Button } from '../../../game/gameObjects/Button'
 import { Background } from '../gameObjects/Background'
 import { CardPack } from '../gameObjects/CardPack'
 import { createElegantRings } from '../util/effects'
-import { CardElement, getCardColor } from '@/game/data/card'
+import { getCardColor } from '@/game/data/card'
 import { Card } from '@/game/gameObjects/Card'
-
-interface CardData {
-  element: CardElement
-  attack: number
-  health: number
-}
+import { EventBridge } from '../util/EventBridge'
+import { DrawableCards } from '@/game/data/draw'
 
 const LAYOUT = {
   CARD_Y: 250,
   INSTRUCTION_TEXT_Y: 450,
   REDRAW_BUTTON_Y: 520,
 } as const
-
-const drawData: CardData[] = [
-  { element: 'FIRE', attack: 5, health: 3 },
-  { element: 'WATER', attack: 3, health: 6 },
-  { element: 'EARTH', attack: 4, health: 5 },
-  { element: 'METAL', attack: 6, health: 2 },
-  { element: 'WOOD', attack: 4, health: 4 },
-]
 
 export class DrawScene extends Phaser.Scene {
   private cardPack: CardPack | null = null
@@ -38,6 +26,8 @@ export class DrawScene extends Phaser.Scene {
   private drawsCount = 0
   private particleTimers: Phaser.Time.TimerEvent[] = []
   private originalCameraZoom = 1
+
+  private config: DrawableCards | null = null
 
   constructor() {
     super({ key: 'CardScene' })
@@ -59,7 +49,53 @@ export class DrawScene extends Phaser.Scene {
 
     this.background = new Background(this, 400, 300)
 
-    this.createCardAndPack()
+    this.drawsCount = 0
+    this.originalCameraZoom = this.cameras.main.zoom
+
+    this.loadDrawConfiguration().then(() => {
+      this.createCardAndPack()
+    })
+  }
+
+  private async loadDrawConfiguration() {
+    return new Promise<void>((resolve) => {
+      if (this.config) {
+        resolve()
+        return
+      }
+
+      EventBridge.onDrawDataLoaded = (cards: DrawableCards) => {
+        this.config = cards
+
+        resolve()
+      }
+    })
+  }
+
+  createCardAndPack() {
+    const cards = this.config?.cards || []
+    this.card = new Card(
+      this,
+      400,
+      LAYOUT.CARD_Y,
+      cards[this.drawsCount].element,
+      cards[this.drawsCount].attack,
+      cards[this.drawsCount].health,
+      cards[this.drawsCount].element,
+      true
+    )
+    this.card.scaleX = 2.0
+    this.card.scaleY = 2.0
+    this.card.stopIdleAnimation()
+
+    this.card.setFaceDown(true)
+    this.cardPack = new CardPack(this, 400, LAYOUT.CARD_Y, this.card)
+
+    this.cardPack.setOnReveal((card) => {
+      if (!this.cardRevealed) {
+        this.revealCard()
+      }
+    })
 
     this.instructionText = this.add
       .text(400, LAYOUT.INSTRUCTION_TEXT_Y, 'Click the card pack!', {
@@ -75,34 +111,6 @@ export class DrawScene extends Phaser.Scene {
       repeat: -1,
       duration: 1000,
       ease: 'Sine.easeInOut',
-    })
-
-    this.drawsCount = 0
-    this.originalCameraZoom = this.cameras.main.zoom
-  }
-
-  createCardAndPack() {
-    this.card = new Card(
-      this,
-      400,
-      LAYOUT.CARD_Y,
-      drawData[this.drawsCount].element,
-      drawData[this.drawsCount].attack,
-      drawData[this.drawsCount].health,
-      drawData[this.drawsCount].element,
-      true
-    )
-    this.card.scaleX = 2.0
-    this.card.scaleY = 2.0
-    this.card.stopIdleAnimation()
-
-    this.card.setFaceDown(true)
-    this.cardPack = new CardPack(this, 400, LAYOUT.CARD_Y, this.card)
-
-    this.cardPack.setOnReveal((card) => {
-      if (!this.cardRevealed) {
-        this.revealCard()
-      }
     })
   }
 
@@ -229,7 +237,7 @@ export class DrawScene extends Phaser.Scene {
             }
 
             this.drawsCount++
-            if (this.drawsCount < drawData.length) {
+            if (this.drawsCount < (this.config?.cards.length ?? 0)) {
               this.createRedrawButton()
             }
           },
@@ -287,7 +295,7 @@ export class DrawScene extends Phaser.Scene {
       y: LAYOUT.REDRAW_BUTTON_Y,
       width: 200,
       height: 50,
-      text: `Redraw (${drawData.length - this.drawsCount} left)`,
+      text: `Redraw (${this.config?.cards.length ?? 0 - this.drawsCount} left)`,
       backgroundColor: 0x4a6fa5,
       hoverColor: 0x6389c0,
       strokeColor: 0xffffff,
