@@ -19,13 +19,17 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-      <div className='relative w-full max-w-[1200px] mx-auto bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg shadow-2xl border border-gray-700 overflow-hidden'>
-        <div className='bg-gray-900 px-4 py-3 flex justify-between items-center border-b border-gray-700'>
-          <h2 className='text-white font-semibold'>{title}</h2>
-          <button
-            onClick={onClose}
-            className='text-gray-400 hover:text-white focus:outline-none'
+      <div className='relative w-full max-w-[1200px] mx-auto bg-[#978578] rounded-lg shadow-2xl  overflow-hidden'>
+        <div className='bg-[#978578] px-4 py-3 flex justify-center items-center'>
+          <h2
+            className='text-[#FFD400] font-semibold'
+            style={{
+              WebkitTextStroke: '1px black',
+            }}
           >
+            {title}
+          </h2>
+          <button onClick={onClose} className='absolute right-4 text-black'>
             <svg
               xmlns='http://www.w3.org/2000/svg'
               className='h-6 w-6'

@@ -23,7 +23,7 @@ export default function DrawPage() {
         </button>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal} title='Card Draw'>
+      <Modal isOpen={isModalOpen} onClose={closeModal} title='+ New Card'>
         <DrawGame onClose={closeModal} />
       </Modal>
     </div>
