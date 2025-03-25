@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Button from '../../components/Button'
+import CardImage from '../../components/CardImage'
 
 import dynamic from 'next/dynamic'
 import Modal from '../../components/Modal'
@@ -52,7 +53,7 @@ const HomePage = () => {
           </h2>
           <div className='battle-cards flex gap-4'>
             <div className='card bg-gray-700 p-4 rounded-lg'>
-              <div className='w-32 h-40 bg-gray-500 rounded-lg mb-2'></div>
+              <CardImage id='fire-card' />
               <Button>배틀 결과 보기</Button>
             </div>
           </div>
@@ -72,19 +73,19 @@ const HomePage = () => {
           </div>
           <div className='card-list grid grid-cols-4 gap-4'>
             <div className='card bg-gray-700 p-4 rounded-lg'>
-              <div className='w-32 h-40 bg-gray-500 rounded-lg mb-2'></div>
+              <CardImage id='water' />
               <Button>Stats</Button>
             </div>
             <div className='card bg-gray-700 p-4 rounded-lg'>
-              <div className='w-32 h-40 bg-gray-500 rounded-lg mb-2'></div>
+              <CardImage id='earth' />
               <Button>Stats</Button>
             </div>
             <div className='card bg-gray-700 p-4 rounded-lg'>
-              <div className='w-32 h-40 bg-gray-500 rounded-lg mb-2'></div>
+              <CardImage id='metal' />
               <Button>Stats</Button>
             </div>
             <div className='card bg-gray-700 p-4 rounded-lg'>
-              <div className='w-32 h-40 bg-gray-500 rounded-lg mb-2'></div>
+              <CardImage id='wood' />
               <Button>Stats</Button>
             </div>
           </div>
