@@ -31,10 +31,18 @@ const myCards: CardData[] = [
 ]
 
 const HomePage = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modals, setModals] = useState<{ [key: string]: boolean }>({})
+  const [selectedCard, setSelectedCard] = useState<CardData | null>(null)
 
-  const openModal = () => setIsModalOpen(true)
-  const closeModal = () => setIsModalOpen(false)
+  const openModal = (modalKey: string, card?: CardData) => {
+    setModals((prev) => ({ ...prev, [modalKey]: true }))
+    if (card) setSelectedCard(card)
+  }
+
+  const closeModal = (modalKey: string) => {
+    setModals((prev) => ({ ...prev, [modalKey]: false }))
+    if (modalKey === 'cardDetails') setSelectedCard(null)
+  }
 
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
@@ -47,7 +55,7 @@ const HomePage = () => {
       </header>
 
       <div className='action-buttons flex justify-center gap-4 mb-8'>
-        <Button onClick={openModal}>
+        <Button onClick={() => openModal('newCard')}>
           + New Card <span className='text-blue-400'>0.1</span>
         </Button>
         <Button>Open Match</Button>
@@ -82,14 +90,39 @@ const HomePage = () => {
             {myCards.map((card, index) => (
               <div key={index} className='card bg-gray-700 p-4 rounded-lg'>
                 <CardImage card={card} />
-                <Button>Stats</Button>
+                <Button onClick={() => openModal('cardDetails', card)}>
+                  Stats
+                </Button>
               </div>
             ))}
           </div>
         </div>
       </section>
-      <Modal isOpen={isModalOpen} onClose={closeModal} title='+ New Card'>
-        <DrawGame onClose={closeModal} drawableCards={drawableCards} />
+
+      <Modal
+        isOpen={modals['newCard']}
+        onClose={() => closeModal('newCard')}
+        title='+ New Card'
+      >
+        <DrawGame drawableCards={drawableCards} />
+      </Modal>
+
+      <Modal
+        isOpen={modals['cardDetails']}
+        onClose={() => closeModal('cardDetails')}
+        title='Card Details'
+      >
+        {selectedCard && (
+          <div className='card-details text-center'>
+            <h3 className='text-2xl font-bold mb-4'>{selectedCard.name}</h3>
+            <div className='flex justify-center mb-4'>
+              <CardImage card={selectedCard} />
+            </div>
+            <p>Element: {selectedCard.element}</p>
+            <p>Attack: {selectedCard.attack}</p>
+            <p>Health: {selectedCard.health}</p>
+          </div>
+        )}
       </Modal>
     </div>
   )
