@@ -16,7 +16,11 @@ const drawableCards: DrawableCards = {
   ],
 }
 
-const DrawGame: React.FC = () => {
+interface DrawGameProps {
+  onClose?: () => void
+}
+
+const DrawGame: React.FC<DrawGameProps> = ({ onClose }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       EventBridge.loadDrawData(drawableCards)
