@@ -51,17 +51,17 @@ pub mod solamon {
                 id: config_account.solamon_count,
                 species: pseudorandom_u8(i as u64) % 5,
                 element: match pseudorandom_u64(i as u64) as usize % 5 {
-                    0 => Element::Fire,
-                    1 => Element::Wood,
-                    2 => Element::Earth,
-                    3 => Element::Water,
-                    _ => Element::Metal,
+                    0 => Element::FIRE,
+                    1 => Element::WOOD,
+                    2 => Element::EARTH,
+                    3 => Element::WATER,
+                    _ => Element::METAL,
                 },
                 attack: pseudorandom_u8(i as u64) % (MAX_ATTACK / 2) + (MAX_ATTACK / 2), // give at least 50
                 health: pseudorandom_u8(i as u64 + 1) % (MAX_HEALTH / 2) + (MAX_HEALTH / 2), // give at least 50
             };
             // 'Program log: Solamon { id: 0, species: 0, element: Fire, attack: 55, health: 89 }',
-            msg!("{:?}", solamon);
+            msg!("Spawned {:?}", solamon);
             user_account.solamons.push(solamon);
             config_account.solamon_count += 1;
         }
@@ -226,11 +226,11 @@ impl Space for Solamon {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Debug)]
 pub enum Element {
-    Fire,
-    Wood,
-    Earth,
-    Water,
-    Metal,
+    FIRE,
+    WOOD,
+    EARTH,
+    WATER,
+    METAL,
 }
 
 #[derive(Accounts)]

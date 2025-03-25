@@ -564,19 +564,19 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "Fire"
+            "name": "FIRE"
           },
           {
-            "name": "Wood"
+            "name": "WOOD"
           },
           {
-            "name": "Earth"
+            "name": "EARTH"
           },
           {
-            "name": "Water"
+            "name": "WATER"
           },
           {
-            "name": "Metal"
+            "name": "METAL"
           }
         ]
       }
