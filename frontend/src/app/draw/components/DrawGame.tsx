@@ -31,9 +31,7 @@ const DrawGame: React.FC<DrawGameProps> = ({ onClose }) => {
 
   return (
     <div className='relative w-full max-w-[1200px] mx-auto'>
-      <div className='bg-gradient-to-b from-slate-900 to-indigo-900 rounded-lg overflow-hidden shadow-2xl border'>
-        <PhaserGame scenes={[DrawScene]} />
-      </div>
+      <PhaserGame scenes={[DrawScene]} />
     </div>
   )
 }
