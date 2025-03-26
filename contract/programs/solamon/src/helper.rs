@@ -1,5 +1,5 @@
 use crate::BattleAccount;
-use crate::BattleResult;
+use crate::BattleStatus;
 use crate::Element;
 use crate::Solamon;
 use anchor_lang::prelude::*;
@@ -21,7 +21,7 @@ pub fn xorshift64(seed: u64) -> u64 {
     x
 }
 
-pub fn execute_battle(battle_account: &mut BattleAccount) -> BattleResult {
+pub fn execute_battle(battle_account: &mut BattleAccount) -> BattleStatus {
     let mut player1_index = 0;
     let mut player2_index = 0;
     let player1_len = battle_account.player_1_solamons.len();
@@ -47,7 +47,7 @@ pub fn execute_battle(battle_account: &mut BattleAccount) -> BattleResult {
             // Check if Player 2 has any Solamons left
             if player2_index >= player2_len {
                 msg!("Player 1 wins the battle!");
-                return BattleResult::Player1Wins;
+                return BattleStatus::Player1Wins;
             } else {
                 // Bring the next Solamon to the battle
                 player2_solamon = &mut battle_account.player_2_solamons[player2_index];
@@ -74,7 +74,7 @@ pub fn execute_battle(battle_account: &mut BattleAccount) -> BattleResult {
             // Check if Player 1 has any Solamons left
             if player1_index >= player1_len {
                 msg!("Player 2 wins the battle!");
-                return BattleResult::Player2Wins;
+                return BattleStatus::Player2Wins;
             } else {
                 // Bring the next Solamon to the battle
                 player1_solamon = &mut battle_account.player_1_solamons[player1_index];
@@ -86,7 +86,7 @@ pub fn execute_battle(battle_account: &mut BattleAccount) -> BattleResult {
 
     // If the loop exits without returning, it means all Solamons are defeated
     msg!("Battle ended in a draw, which should not happen!");
-    BattleResult::Pending // This should not happen in a normal battle
+    BattleStatus::Pending // This should not happen in a normal battle
 }
 
 pub fn calculate_damage(attacker: Solamon, defender: Solamon) -> (u8, String) {

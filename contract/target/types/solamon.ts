@@ -14,6 +14,115 @@ export type Solamon = {
   },
   "instructions": [
     {
+      "name": "cancelBattle",
+      "discriminator": [
+        234,
+        61,
+        97,
+        187,
+        97,
+        170,
+        101,
+        141
+      ],
+      "accounts": [
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "configAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "battleAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  116,
+                  116,
+                  108,
+                  101,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "battle_account.battle_id",
+                "account": "battleAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "userAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initialize",
       "discriminator": [
         175,
@@ -177,8 +286,34 @@ export type Solamon = {
           }
         },
         {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "name": "opponentUserAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "battle_account.player_1",
+                "account": "battleAccount"
+              }
+            ]
+          }
         }
       ],
       "args": [
@@ -462,6 +597,16 @@ export type Solamon = {
       "code": 6003,
       "name": "battleNotAvailable",
       "msg": "Battle not available"
+    },
+    {
+      "code": 6004,
+      "name": "solamonNotAvailable",
+      "msg": "Solamon not available"
+    },
+    {
+      "code": 6005,
+      "name": "invalidBattleParticipant",
+      "msg": "Invalid battle participant"
     }
   ],
   "types": [
@@ -513,6 +658,14 @@ export type Solamon = {
                 "name": "battleResult"
               }
             }
+          },
+          {
+            "name": "fightMoney",
+            "type": "u64"
+          },
+          {
+            "name": "claimTimestamp",
+            "type": "u64"
           }
         ]
       }
@@ -530,6 +683,9 @@ export type Solamon = {
           },
           {
             "name": "player2Wins"
+          },
+          {
+            "name": "canceled"
           }
         ]
       }
@@ -615,6 +771,10 @@ export type Solamon = {
           {
             "name": "health",
             "type": "u8"
+          },
+          {
+            "name": "isAvailable",
+            "type": "bool"
           }
         ]
       }

@@ -241,4 +241,32 @@ describe("solamon", () => {
 		)
 		expect(battleAccountsByUser.player2BattleAccounts.length).to.equal(0)
 	})
+
+	it("Player 3 cancels one battle", async () => {
+		const battleAccountsByUser = await getBattleAccountsByUser(
+			program,
+			player3.publicKey
+		)
+
+		const battleAccount = battleAccountsByUser.player1BattleAccounts[0]
+		console.log({ battleAccount })
+		console.log(battleAccount.publicKey)
+
+		const txSig = await program.methods
+			.cancelBattle()
+			.accountsPartial({
+				player: player3.publicKey,
+				battleAccount: battleAccount.publicKey,
+			})
+			.signers([player3])
+			.rpc()
+
+		await connection.confirmTransaction(txSig)
+
+		const battleAccountAfter = await getBattleAccount(
+			program,
+			battleAccount.account.battleId.toNumber()
+		)
+		console.log({ battleAccountAfter })
+	})
 })

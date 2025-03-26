@@ -10,4 +10,6 @@ pub enum SolamonError {
     InvalidBattleParticipants,
     #[msg("Battle not available")]
     BattleNotAvailable,
+    #[msg("Invalid battle participant")]
+    InvalidBattleParticipant,
 }
