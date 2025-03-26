@@ -1,6 +1,5 @@
 import * as Phaser from 'phaser'
 
-import { DamageText } from './DamageText'
 import { DefeatedVisual } from './DefeatedVisual'
 import { HealthBar } from './HealthBar'
 import {
@@ -10,6 +9,7 @@ import {
   getCardTexture,
   getElementEmoji,
 } from '@/game/data/card'
+import { FloatingText } from './FloatingText'
 
 export class Card extends Phaser.GameObjects.Container {
   public name: string
@@ -207,7 +207,14 @@ export class Card extends Phaser.GameObjects.Container {
       repeat: 2,
     })
 
-    new DamageText(this.scene, this.x, this.y, amount)
+    new FloatingText(
+      this.scene,
+      this.x,
+      this.y,
+      `-${amount}`,
+      '#ff0000',
+      '#000000'
+    )
 
     if (startHealth > 0 && this.health <= 0) {
       this.idleAnimation?.destroy()
