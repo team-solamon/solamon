@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser'
 
 import { Card } from '../../../game/gameObjects/Card'
+import { AttackEvent } from '@/game/data/replay'
 
 function createChargeUpEffect(
   scene: Phaser.Scene,
@@ -246,6 +247,7 @@ export function createImpactEffect(
   scene: Phaser.Scene,
   x: number,
   y: number,
+  attackEvent: AttackEvent,
   color: number
 ) {
   const flash = scene.add.circle(x, y, 40, color, 0.8)
@@ -288,21 +290,26 @@ export function createImpactEffect(
     afterglowParticles.destroy()
   })
 
-  const shakeIntensity = 0.008
-  const shakeDuration = 300
-  scene.cameras.main.shake(shakeDuration, shakeIntensity)
+  let shakeIntensity = 0.008
+  let shakeDuration = 300
+
+  if (attackEvent === 'CRITICAL') {
+    shakeIntensity = 0.015
+    shakeDuration = 500
+  } else if (attackEvent === 'HALVED') {
+    shakeIntensity = 0.004
+    shakeDuration = 200
+  }
 
   const originalX = scene.cameras.main.scrollX
   const originalY = scene.cameras.main.scrollY
-  const intensity = 0.012
-  const duration = 400
 
   scene.cameras.main.shake(
-    duration,
-    intensity,
+    shakeDuration,
+    shakeIntensity,
     true,
     (camera: Phaser.Cameras.Scene2D.Camera, progress: number) => {
-      const currentIntensity = intensity * (1 - progress)
+      const currentIntensity = shakeIntensity * (1 - progress)
       camera.setScroll(
         originalX +
           Phaser.Math.Between(
@@ -318,7 +325,8 @@ export function createImpactEffect(
       }
     }
   )
-  scene.time.delayedCall(duration, () => {
+
+  scene.time.delayedCall(shakeDuration, () => {
     scene.cameras.main.setScroll(originalX, originalY)
   })
 
@@ -423,6 +431,7 @@ export const performSingleAttack = async (
   attackerCard: Card,
   defenderCard: Card,
   damage: number,
+  attackEvent: AttackEvent,
   attackColor: number,
   addBattleLog: (message: string) => void
 ) => {
@@ -453,12 +462,18 @@ export const performSingleAttack = async (
       endY,
       attackColor,
       () => {
-        const impactEffect = createImpactEffect(scene, endX, endY, attackColor)
+        const impactEffect = createImpactEffect(
+          scene,
+          endX,
+          endY,
+          attackEvent,
+          attackColor
+        )
         impactEffect.applyCardRecoil(defenderCard)
 
-        createImpactEffect(scene, endX, endY, attackColor)
+        createImpactEffect(scene, endX, endY, attackEvent, attackColor)
 
-        const isDefeated = defenderCard.takeDamage(damage)
+        const isDefeated = defenderCard.takeDamage(damage, attackEvent)
 
         if (isDefeated) {
           handleCardDefeat(scene, defenderCard, attackColor, addBattleLog)

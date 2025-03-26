@@ -1,6 +1,5 @@
 import * as Phaser from 'phaser'
 
-import { DamageText } from './DamageText'
 import { DefeatedVisual } from './DefeatedVisual'
 import { HealthBar } from './HealthBar'
 import {
@@ -10,6 +9,8 @@ import {
   getCardTexture,
   getElementEmoji,
 } from '@/game/data/card'
+import { FloatingText } from './FloatingText'
+import { AttackEvent } from '../data/replay'
 
 export class Card extends Phaser.GameObjects.Container {
   public name: string
@@ -191,7 +192,7 @@ export class Card extends Phaser.GameObjects.Container {
     this.healthText.setText(`❤️${Math.max(0, this.health)}`)
   }
 
-  takeDamage(amount: number): boolean {
+  takeDamage(amount: number, attackEvent: AttackEvent): boolean {
     const startHealth = this.health
     this.health = Math.max(0, this.health - amount)
 
@@ -207,7 +208,34 @@ export class Card extends Phaser.GameObjects.Container {
       repeat: 2,
     })
 
-    new DamageText(this.scene, this.x, this.y, amount)
+    new FloatingText(
+      this.scene,
+      this.x,
+      this.y,
+      `-${amount}`,
+      '#ff0000',
+      '#000000'
+    )
+
+    if (attackEvent === 'CRITICAL') {
+      new FloatingText(
+        this.scene,
+        this.x,
+        this.y - 20,
+        `🔥CRITICAL!`,
+        '#ff0000',
+        '#000000'
+      )
+    } else if (attackEvent === 'HALVED') {
+      new FloatingText(
+        this.scene,
+        this.x,
+        this.y - 20,
+        `🛡️HALVED!`,
+        '#00ff00',
+        '#000000'
+      )
+    }
 
     if (startHealth > 0 && this.health <= 0) {
       this.idleAnimation?.destroy()

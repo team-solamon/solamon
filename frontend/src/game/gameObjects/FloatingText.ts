@@ -1,16 +1,23 @@
 import * as Phaser from 'phaser'
 
-export class DamageText {
+export class FloatingText {
   private scene: Phaser.Scene
   private text: Phaser.GameObjects.Text
 
-  constructor(scene: Phaser.Scene, x: number, y: number, damage: number) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    content: string,
+    color: string,
+    stroke: string
+  ) {
     this.scene = scene
     this.text = scene.add
-      .text(x, y, `-${damage}`, {
+      .text(x, y, content, {
         fontSize: '24px',
-        color: '#ff0000',
-        stroke: '#000000',
+        color: color,
+        stroke: stroke,
         strokeThickness: 4,
       })
       .setOrigin(0.5)
@@ -22,9 +29,9 @@ export class DamageText {
     this.scene.tweens.add({
       targets: this.text,
       y: this.text.y - 40,
-      alpha: 0,
-      scale: 1.5,
-      duration: 800,
+      alpha: 0.3,
+      scale: 1.2,
+      duration: 2000,
       onComplete: () => {
         this.text.destroy()
       },

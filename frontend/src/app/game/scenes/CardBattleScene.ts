@@ -228,6 +228,7 @@ export class CardBattleScene extends Phaser.Scene {
       attackerCard,
       defenderCard,
       damage,
+      currentAction.attackType,
       attackColor,
       this.addBattleLog.bind(this)
     )
