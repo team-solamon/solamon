@@ -58,8 +58,10 @@ pub mod solamon {
                     3 => Element::WATER,
                     _ => Element::METAL,
                 },
+                //@TODO divide from 15
                 attack: pseudorandom_u8(i as u64) % (MAX_ATTACK / 2) + (MAX_ATTACK / 2), // give at least 50
                 health: pseudorandom_u8(i as u64 + 1) % (MAX_HEALTH / 2) + (MAX_HEALTH / 2), // give at least 50
+                is_available: true,
             };
             // 'Program log: Solamon { id: 0, species: 0, element: Fire, attack: 55, health: 89 }',
             msg!("Spawned {:?}", solamon);
@@ -86,16 +88,22 @@ pub mod solamon {
         battle_account.player_1_solamons = solamon_ids
             .iter()
             .map(|id| {
-                user_account
+                let solamon_index = user_account
                     .solamons
                     .iter()
-                    .find(|solamon| solamon.id == *id)
+                    .position(|solamon| solamon.id == *id)
                     .ok_or(SolamonError::InvalidSolamonIds)
-                    .unwrap()
-                    .clone()
+                    .unwrap();
+                if user_account.solamons[solamon_index].is_available {
+                    user_account.solamons[solamon_index].is_available = false;
+                    user_account.solamons[solamon_index].clone()
+                } else {
+                    // @TODO: use SolamonError::SolamonNotAvailable
+                    panic!("Solamon not available");
+                }
             })
             .collect();
-
+        battle_account.battle_status = BattleStatus::Pending;
         config_account.available_battle_ids.push(battle_id);
 
         user_account.battle_count += 1;
@@ -173,6 +181,18 @@ pub mod solamon {
             .available_battle_ids
             .remove(battle_account.battle_id as usize);
 
+        opponent_user_account
+            .solamons
+            .iter_mut()
+            .filter(|solamon| {
+                battle_account
+                    .player_1_solamons
+                    .iter()
+                    .any(|p1_solamon| p1_solamon.id == solamon.id)
+            })
+            .for_each(|solamon| {
+                solamon.is_available = true;
+            });
         Ok(())
     }
 }

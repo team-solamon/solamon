@@ -95,7 +95,7 @@ describe("solamon", () => {
 		const userAccount2 = await getUserAccount(program, player2.publicKey)
 		expect(userAccount2.solamons.length).to.equal(solamonCount2)
 
-		const solamonCount3 = 3
+		const solamonCount3 = 9
 
 		await program.methods
 			.spawnSolamons(solamonCount3)
@@ -197,10 +197,9 @@ describe("solamon", () => {
 		const numberOfBattlesToOpen = 3
 
 		for (let i = 0; i < numberOfBattlesToOpen; i++) {
-			// @TODO: Cannot use the same solamon IDs for multiple battles
 			const solamonIds = userAccountBefore.solamons
 				.map((solamon) => solamon.id)
-				.slice(0, 3)
+				.slice(0 + i * 3, 3 + i * 3)
 
 			const txSig = await program.methods
 				.openBattle(solamonIds)
