@@ -26,8 +26,8 @@ const sampleBattleReplay: BattleReplay = {
   playerCards: playerCardData,
   opponentCards: opponentCardData,
   actions: [
-    { isPlayer: true, atkIdx: 0, defIdx: 0, damage: 4, attackType: 'NONE' },
-    { isPlayer: false, atkIdx: 0, defIdx: 0, damage: 4, attackType: 'NONE' },
+    { isPlayer: true, atkIdx: 0, defIdx: 0, damage: 4, attackType: 'CRITICAL' },
+    { isPlayer: false, atkIdx: 0, defIdx: 0, damage: 4, attackType: 'HALVED' },
     { isPlayer: true, atkIdx: 0, defIdx: 0, damage: 4, attackType: 'NONE' },
     { isPlayer: true, atkIdx: 0, defIdx: 1, damage: 4, attackType: 'NONE' },
     { isPlayer: false, atkIdx: 1, defIdx: 0, damage: 7, attackType: 'NONE' },
