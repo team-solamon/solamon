@@ -279,6 +279,10 @@
         {
           "name": "fee_percentage_in_basis_points",
           "type": "u16"
+        },
+        {
+          "name": "spawn_fee",
+          "type": "u64"
         }
       ]
     },
@@ -627,6 +631,44 @@
           "writable": true
         },
         {
+          "name": "solamon_prototype_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  97,
+                  109,
+                  111,
+                  110,
+                  95,
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  116,
+                  121,
+                  112,
+                  101,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
@@ -830,6 +872,10 @@
           {
             "name": "admin",
             "type": "pubkey"
+          },
+          {
+            "name": "spawn_fee",
+            "type": "u64"
           },
           {
             "name": "fee_percentage_in_basis_points",

@@ -1,5 +1,5 @@
 import * as anchor from "@coral-xyz/anchor"
-import { Program } from "@coral-xyz/anchor"
+import { BN, Program } from "@coral-xyz/anchor"
 import { Solamon } from "../target/types/solamon"
 import { Connection, LAMPORTS_PER_SOL } from "@solana/web3.js"
 import { expect } from "chai"
@@ -42,8 +42,15 @@ describe("solamon", () => {
 	it("Is initialized", async () => {
 		// Derive the PDA for the config account
 
+		const spawnFee = LAMPORTS_PER_SOL * 0.1
+		const feePercentageInBasisPoints = 100
 		const tx = await program.methods
-			.initialize(admin.publicKey, admin.publicKey, 100)
+			.initialize(
+				admin.publicKey,
+				admin.publicKey,
+				feePercentageInBasisPoints,
+				new BN(spawnFee)
+			)
 			.accounts({
 				signer: admin.publicKey,
 			})
@@ -68,31 +75,31 @@ describe("solamon", () => {
 			{
 				imageUrl: "https://example.com/image.png",
 				possibleElements: [{ fire: {} }, { water: {} }],
-				elementProbabilityInBasisPoints: [80, 20],
+				elementProbabilityInBasisPoints: [8000, 2000],
 				distributablePoints: 15,
 			},
 			{
 				imageUrl: "https://example.com/image2.png",
 				possibleElements: [{ wood: {} }, { earth: {} }],
-				elementProbabilityInBasisPoints: [80, 20],
+				elementProbabilityInBasisPoints: [8000, 2000],
 				distributablePoints: 15,
 			},
 			{
 				imageUrl: "https://example.com/image3.png",
 				possibleElements: [{ earth: {} }, { metal: {} }],
-				elementProbabilityInBasisPoints: [80, 20],
+				elementProbabilityInBasisPoints: [8000, 2000],
 				distributablePoints: 15,
 			},
 			{
 				imageUrl: "https://example.com/image4.png",
 				possibleElements: [{ metal: {} }, { water: {} }],
-				elementProbabilityInBasisPoints: [80, 20],
+				elementProbabilityInBasisPoints: [8000, 2000],
 				distributablePoints: 15,
 			},
 			{
 				imageUrl: "https://example.com/image5.png",
 				possibleElements: [{ wood: {} }, { fire: {} }],
-				elementProbabilityInBasisPoints: [80, 20],
+				elementProbabilityInBasisPoints: [8000, 2000],
 				distributablePoints: 15,
 			},
 		]

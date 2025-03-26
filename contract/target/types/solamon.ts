@@ -285,6 +285,10 @@ export type Solamon = {
         {
           "name": "feePercentageInBasisPoints",
           "type": "u16"
+        },
+        {
+          "name": "spawnFee",
+          "type": "u64"
         }
       ]
     },
@@ -633,6 +637,44 @@ export type Solamon = {
           "writable": true
         },
         {
+          "name": "solamonPrototypeAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  97,
+                  109,
+                  111,
+                  110,
+                  95,
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  116,
+                  121,
+                  112,
+                  101,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
@@ -836,6 +878,10 @@ export type Solamon = {
           {
             "name": "admin",
             "type": "pubkey"
+          },
+          {
+            "name": "spawnFee",
+            "type": "u64"
           },
           {
             "name": "feePercentageInBasisPoints",

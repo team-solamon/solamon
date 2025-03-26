@@ -18,12 +18,14 @@ pub mod solamon {
         fee_account: Pubkey,
         admin: Pubkey,
         fee_percentage_in_basis_points: u16,
+        spawn_fee: u64,
     ) -> Result<()> {
         let config_account = &mut ctx.accounts.config_account;
         config_account.bump = ctx.bumps.config_account;
         config_account.fee_account = fee_account.key();
         config_account.admin = admin;
         config_account.fee_percentage_in_basis_points = fee_percentage_in_basis_points;
+        config_account.spawn_fee = spawn_fee;
         Ok(())
     }
 
@@ -34,6 +36,7 @@ pub mod solamon {
         let solamon_prototype_account = &mut ctx.accounts.solamon_prototype_account;
         solamon_prototype_account.bump = ctx.bumps.solamon_prototype_account;
         solamon_prototype_account.total_species = solamon_prototypes.len() as u8;
+        // @TODO: check probability sum and order
         solamon_prototype_account.solamon_prototypes = solamon_prototypes;
         Ok(())
     }
@@ -45,6 +48,7 @@ pub mod solamon {
         let config_account = &mut ctx.accounts.config_account;
         user_account.bump = ctx.bumps.user_account;
         let current_count = user_account.solamons.len();
+        let solamon_prototype_account = &ctx.accounts.solamon_prototype_account;
 
         require!(
             current_count + count as usize <= MAX_SOLAMONS_PER_USER_ACCOUNT,
@@ -54,7 +58,7 @@ pub mod solamon {
         let ix = anchor_lang::solana_program::system_instruction::transfer(
             &ctx.accounts.player.key(),
             &ctx.accounts.fee_account.key(),
-            FEE * count as u64,
+            config_account.spawn_fee * count as u64,
         );
         anchor_lang::solana_program::program::invoke(
             &ix,
@@ -65,19 +69,34 @@ pub mod solamon {
             ],
         )?;
         for i in 0..count {
+            let species: u8 = pseudorandom_u8(i as u64) % solamon_prototype_account.total_species;
+            let solamon_prototype = &solamon_prototype_account.solamon_prototypes[species as usize];
+
+            // choose element based on probability
+            let random_value = pseudorandom_u64(i as u64) as usize % MAX_BASIS_POINTS;
+            let mut cumulative_probability = 0;
+            let mut selected_element = &solamon_prototype.possible_elements[0]; // Default to first element
+            for (idx, probability) in solamon_prototype
+                .element_probability_in_basis_points
+                .iter()
+                .enumerate()
+            {
+                cumulative_probability += *probability as usize;
+                if random_value < cumulative_probability {
+                    selected_element = &solamon_prototype.possible_elements[idx];
+                    break;
+                }
+            }
+
+            let attack = pseudorandom_u8(i as u64) % solamon_prototype.distributable_points;
+            let health = solamon_prototype.distributable_points - attack;
+
             let solamon = Solamon {
                 id: config_account.solamon_count,
-                species: pseudorandom_u8(i as u64) % 5,
-                element: match pseudorandom_u64(i as u64) as usize % 5 {
-                    0 => Element::Fire,
-                    1 => Element::Wood,
-                    2 => Element::Earth,
-                    3 => Element::Water,
-                    _ => Element::Metal,
-                },
-                //@TODO divide from 15
-                attack: pseudorandom_u8(i as u64) % (MAX_ATTACK / 2) + (MAX_ATTACK / 2), // give at least 50
-                health: pseudorandom_u8(i as u64 + 1) % (MAX_HEALTH / 2) + (MAX_HEALTH / 2), // give at least 50
+                species: species,
+                element: selected_element.clone(),
+                attack: attack,
+                health: health,
                 is_available: true,
             };
             // 'Program log: Solamon { id: 0, species: 0, element: Fire, attack: 55, health: 89 }',
@@ -232,6 +251,7 @@ pub struct ConfigAccount {
     pub battle_count: u64,
     pub solamon_count: u16,
     pub admin: Pubkey,
+    pub spawn_fee: u64,
     pub fee_percentage_in_basis_points: u16,
     pub available_battle_ids: Vec<u64>,
 }
@@ -243,6 +263,7 @@ impl Space for ConfigAccount {
         + 8 // battle_count
         + 2 // solamon_count
         + 32 // admin
+        + 8 // spawn_fee
         + 2 // fee_percentage_in_basis_points
         + 8 * 100; // available_battle_ids (max 100 battles)
 }
@@ -312,6 +333,9 @@ pub struct SpawnSolamons<'info> {
     )]
     /// CHECK: This is the fee account
     pub fee_account: AccountInfo<'info>,
+
+    #[account(mut, seeds = [SOLAMON_PROTOTYPE_ACCOUNT], bump = solamon_prototype_account.bump)]
+    pub solamon_prototype_account: Account<'info, SolamonPrototypeAccount>,
 
     pub system_program: Program<'info, System>,
 }
