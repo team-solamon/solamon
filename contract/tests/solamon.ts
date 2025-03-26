@@ -40,7 +40,7 @@ describe("solamon", () => {
 		// Derive the PDA for the config account
 
 		const tx = await program.methods
-			.initialize(admin.publicKey)
+			.initialize(admin.publicKey, admin.publicKey, 100)
 			.accounts({
 				signer: admin.publicKey,
 			})
@@ -54,6 +54,10 @@ describe("solamon", () => {
 		expect(configAccount.feeAccount.toBase58()).to.equal(
 			admin.publicKey.toBase58()
 		)
+		expect(configAccount.admin.toBase58()).to.equal(
+			admin.publicKey.toBase58()
+		)
+		expect(configAccount.feePercentageInBasisPoints).to.equal(100)
 	})
 
 	it("Spawns solamons", async () => {

@@ -13,11 +13,17 @@ use helper::*;
 pub mod solamon {
     use super::*;
 
-    // @TODO add admin
-    pub fn initialize(ctx: Context<Initialize>, fee_account: Pubkey) -> Result<()> {
+    pub fn initialize(
+        ctx: Context<Initialize>,
+        fee_account: Pubkey,
+        admin: Pubkey,
+        fee_percentage_in_basis_points: u16,
+    ) -> Result<()> {
         let config_account = &mut ctx.accounts.config_account;
         config_account.bump = ctx.bumps.config_account;
         config_account.fee_account = fee_account.key();
+        config_account.admin = admin;
+        config_account.fee_percentage_in_basis_points = fee_percentage_in_basis_points;
         Ok(())
     }
 
@@ -214,6 +220,8 @@ pub struct ConfigAccount {
     pub fee_account: Pubkey,
     pub battle_count: u64,
     pub solamon_count: u16,
+    pub admin: Pubkey,
+    pub fee_percentage_in_basis_points: u16,
     pub available_battle_ids: Vec<u64>,
 }
 
@@ -223,6 +231,8 @@ impl Space for ConfigAccount {
         + 32 // fee_account
         + 8 // battle_count
         + 2 // solamon_count
+        + 32 // admin
+        + 2 // fee_percentage_in_basis_points
         + 8 * 100; // available_battle_ids (max 100 battles)
 }
 

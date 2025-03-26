@@ -170,6 +170,14 @@
         {
           "name": "fee_account",
           "type": "pubkey"
+        },
+        {
+          "name": "admin",
+          "type": "pubkey"
+        },
+        {
+          "name": "fee_percentage_in_basis_points",
+          "type": "u16"
         }
       ]
     },
@@ -646,10 +654,10 @@
             }
           },
           {
-            "name": "battle_result",
+            "name": "battle_status",
             "type": {
               "defined": {
-                "name": "BattleResult"
+                "name": "BattleStatus"
               }
             }
           },
@@ -665,7 +673,7 @@
       }
     },
     {
-      "name": "BattleResult",
+      "name": "BattleStatus",
       "type": {
         "kind": "enum",
         "variants": [
@@ -673,13 +681,13 @@
             "name": "Pending"
           },
           {
+            "name": "Canceled"
+          },
+          {
             "name": "Player1Wins"
           },
           {
             "name": "Player2Wins"
-          },
-          {
-            "name": "Canceled"
           }
         ]
       }
@@ -703,6 +711,14 @@
           },
           {
             "name": "solamon_count",
+            "type": "u16"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "fee_percentage_in_basis_points",
             "type": "u16"
           },
           {

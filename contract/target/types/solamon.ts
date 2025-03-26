@@ -176,6 +176,14 @@ export type Solamon = {
         {
           "name": "feeAccount",
           "type": "pubkey"
+        },
+        {
+          "name": "admin",
+          "type": "pubkey"
+        },
+        {
+          "name": "feePercentageInBasisPoints",
+          "type": "u16"
         }
       ]
     },
@@ -652,10 +660,10 @@ export type Solamon = {
             }
           },
           {
-            "name": "battleResult",
+            "name": "battleStatus",
             "type": {
               "defined": {
-                "name": "battleResult"
+                "name": "battleStatus"
               }
             }
           },
@@ -671,7 +679,7 @@ export type Solamon = {
       }
     },
     {
-      "name": "battleResult",
+      "name": "battleStatus",
       "type": {
         "kind": "enum",
         "variants": [
@@ -679,13 +687,13 @@ export type Solamon = {
             "name": "pending"
           },
           {
+            "name": "canceled"
+          },
+          {
             "name": "player1Wins"
           },
           {
             "name": "player2Wins"
-          },
-          {
-            "name": "canceled"
           }
         ]
       }
@@ -709,6 +717,14 @@ export type Solamon = {
           },
           {
             "name": "solamonCount",
+            "type": "u16"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "feePercentageInBasisPoints",
             "type": "u16"
           },
           {
