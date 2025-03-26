@@ -9,8 +9,8 @@ export class FloatingText {
     x: number,
     y: number,
     content: string,
-    color: string = '#ffffff',
-    stroke: string = '#000000'
+    color: string,
+    stroke: string
   ) {
     this.scene = scene
     this.text = scene.add
