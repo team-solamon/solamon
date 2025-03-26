@@ -29,9 +29,9 @@ export class FloatingText {
     this.scene.tweens.add({
       targets: this.text,
       y: this.text.y - 40,
-      alpha: 0,
-      scale: 1.5,
-      duration: 800,
+      alpha: 0.3,
+      scale: 1.2,
+      duration: 2000,
       onComplete: () => {
         this.text.destroy()
       },

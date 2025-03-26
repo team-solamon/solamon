@@ -473,7 +473,7 @@ export const performSingleAttack = async (
 
         createImpactEffect(scene, endX, endY, attackEvent, attackColor)
 
-        const isDefeated = defenderCard.takeDamage(damage)
+        const isDefeated = defenderCard.takeDamage(damage, attackEvent)
 
         if (isDefeated) {
           handleCardDefeat(scene, defenderCard, attackColor, addBattleLog)
