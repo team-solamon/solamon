@@ -55,6 +55,11 @@ const HomePage = () => {
     openModal('newCard')
   }
 
+  const handleViewAllCards = () => {
+    closeModal('newCard')
+    openModal('viewAllCards')
+  }
+
   const getElementCounts = () => {
     const counts: { [key: string]: number } = {
       FIRE: 0,
@@ -163,6 +168,25 @@ const HomePage = () => {
         title='+ New Card'
       >
         <DrawGame drawableCards={drawableCards} />
+        <Button onClick={handleViewAllCards}>Open All</Button>
+      </Modal>
+
+      <Modal
+        isOpen={modals['viewAllCards']}
+        onClose={() => closeModal('viewAllCards')}
+        title='Result'
+        maxWidth='600px'
+      >
+        <div className='flex justify-center overflow-x-auto gap-4 p-2'>
+          {drawableCards.cards.map((card, index) => (
+            <div
+              key={index}
+              className='card bg-gray-700 p-2 rounded-lg flex-shrink-0 w-24'
+            >
+              <CardImage card={card} className='mx-auto' />
+            </div>
+          ))}
+        </div>
       </Modal>
 
       <Modal
