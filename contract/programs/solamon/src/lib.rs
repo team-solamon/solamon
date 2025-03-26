@@ -27,7 +27,18 @@ pub mod solamon {
         Ok(())
     }
 
-    // TODO: add create solamon logic
+    pub fn create_solamon_prototype(
+        ctx: Context<CreateSolamonPrototype>,
+        solamon_prototypes: Vec<SolamonPrototype>,
+    ) -> Result<()> {
+        let solamon_prototype_account = &mut ctx.accounts.solamon_prototype_account;
+        solamon_prototype_account.bump = ctx.bumps.solamon_prototype_account;
+        solamon_prototype_account.total_species = solamon_prototypes.len() as u8;
+        solamon_prototype_account.solamon_prototypes = solamon_prototypes;
+        Ok(())
+    }
+
+    // @TODO: add & update solamon prototype logic
 
     pub fn spawn_solamons(ctx: Context<SpawnSolamons>, count: u8) -> Result<()> {
         let user_account = &mut ctx.accounts.user_account;
@@ -36,7 +47,7 @@ pub mod solamon {
         let current_count = user_account.solamons.len();
 
         require!(
-            current_count + count as usize <= MAX_SOLAMONS,
+            current_count + count as usize <= MAX_SOLAMONS_PER_USER_ACCOUNT,
             SolamonError::MaxElementsReached
         );
 
@@ -58,11 +69,11 @@ pub mod solamon {
                 id: config_account.solamon_count,
                 species: pseudorandom_u8(i as u64) % 5,
                 element: match pseudorandom_u64(i as u64) as usize % 5 {
-                    0 => Element::FIRE,
-                    1 => Element::WOOD,
-                    2 => Element::EARTH,
-                    3 => Element::WATER,
-                    _ => Element::METAL,
+                    0 => Element::Fire,
+                    1 => Element::Wood,
+                    2 => Element::Earth,
+                    3 => Element::Water,
+                    _ => Element::Metal,
                 },
                 //@TODO divide from 15
                 attack: pseudorandom_u8(i as u64) % (MAX_ATTACK / 2) + (MAX_ATTACK / 2), // give at least 50
@@ -208,7 +219,7 @@ pub struct Initialize<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(init, payer = signer, space = ConfigAccount::INIT_SPACE, seeds = [CONFIG_ACCOUNT ], bump)]
+    #[account(init, payer = signer, space = ConfigAccount::INIT_SPACE, seeds = [CONFIG_ACCOUNT], bump)]
     pub config_account: Account<'info, ConfigAccount>,
 
     pub system_program: Program<'info, System>,
@@ -234,6 +245,49 @@ impl Space for ConfigAccount {
         + 32 // admin
         + 2 // fee_percentage_in_basis_points
         + 8 * 100; // available_battle_ids (max 100 battles)
+}
+
+#[derive(Accounts)]
+pub struct CreateSolamonPrototype<'info> {
+    #[account(mut, constraint = admin.key() == config_account.admin)]
+    pub admin: Signer<'info>,
+
+    #[account(mut, seeds = [CONFIG_ACCOUNT], bump = config_account.bump)]
+    pub config_account: Account<'info, ConfigAccount>,
+
+    #[account(init_if_needed, payer = admin, space = SolamonPrototypeAccount::INIT_SPACE, seeds = [SOLAMON_PROTOTYPE_ACCOUNT], bump)]
+    pub solamon_prototype_account: Account<'info, SolamonPrototypeAccount>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[account]
+pub struct SolamonPrototypeAccount {
+    pub bump: u8,
+    pub total_species: u8,
+    pub solamon_prototypes: Vec<SolamonPrototype>,
+}
+
+impl Space for SolamonPrototypeAccount {
+    const INIT_SPACE: usize = 8 // discriminator
+        + 1 // bump
+        + 1 // total_species
+        + MAX_SOLAMON_PROTOTYPES * SolamonPrototype::INIT_SPACE; // solamon_prototypes (max 30 species)
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Debug)]
+pub struct SolamonPrototype {
+    pub image_url: String,
+    pub possible_elements: Vec<Element>,
+    pub element_probability_in_basis_points: Vec<u16>,
+    pub distributable_points: u8,
+}
+
+impl Space for SolamonPrototype {
+    const INIT_SPACE: usize = 80 // image_url (max 80 characters)
+        + 5 // possible_elements
+        + 10 // element_probability_in_basis_points
+        + 1; // distributable_points
 }
 
 #[derive(Accounts)]
@@ -272,7 +326,7 @@ pub struct UserAccount {
 impl Space for UserAccount {
     const INIT_SPACE: usize = 8 // discriminator
         + 1 // bump
-        + MAX_SOLAMONS * Solamon::INIT_SPACE // solamons
+        + MAX_SOLAMONS_PER_USER_ACCOUNT * Solamon::INIT_SPACE // solamons
         + 8; // battle_count
 }
 
@@ -293,11 +347,11 @@ impl Space for Solamon {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Debug)]
 pub enum Element {
-    FIRE,
-    WOOD,
-    EARTH,
-    WATER,
-    METAL,
+    Fire,
+    Wood,
+    Earth,
+    Water,
+    Metal,
 }
 
 #[derive(Accounts)]

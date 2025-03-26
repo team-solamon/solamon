@@ -93,50 +93,50 @@ pub fn calculate_damage(attacker: Solamon, defender: Solamon) -> (u8, String) {
     let mut damage = attacker.attack;
     let mut event = String::from("NONE");
 
-    if attacker.element == Element::WOOD && defender.element == Element::EARTH {
+    if attacker.element == Element::Wood && defender.element == Element::Earth {
         damage = damage * 2;
         event = "CRITICAL".to_string();
     }
 
-    if attacker.element == Element::FIRE && defender.element == Element::METAL {
+    if attacker.element == Element::Fire && defender.element == Element::Metal {
         damage = damage * 2;
         event = "CRITICAL".to_string();
     }
 
-    if attacker.element == Element::METAL && defender.element == Element::WOOD {
+    if attacker.element == Element::Metal && defender.element == Element::Wood {
         damage = damage * 2;
         event = "CRITICAL".to_string();
     }
-    if attacker.element == Element::WATER && defender.element == Element::FIRE {
+    if attacker.element == Element::Water && defender.element == Element::Fire {
         damage = damage * 2;
         event = "CRITICAL".to_string();
     }
-    if attacker.element == Element::EARTH && defender.element == Element::WATER {
+    if attacker.element == Element::Earth && defender.element == Element::Water {
         damage = damage * 2;
         event = "CRITICAL".to_string();
     }
 
-    if attacker.element == Element::WOOD && defender.element == Element::FIRE {
+    if attacker.element == Element::Wood && defender.element == Element::Fire {
         damage = damage / 2;
         event = "HALVED".to_string();
     }
 
-    if attacker.element == Element::FIRE && defender.element == Element::EARTH {
+    if attacker.element == Element::Fire && defender.element == Element::Earth {
         damage = damage / 2;
         event = "HALVED".to_string();
     }
 
-    if attacker.element == Element::EARTH && defender.element == Element::METAL {
+    if attacker.element == Element::Earth && defender.element == Element::Metal {
         damage = damage / 2;
         event = "HALVED".to_string();
     }
 
-    if attacker.element == Element::METAL && defender.element == Element::WATER {
+    if attacker.element == Element::Metal && defender.element == Element::Water {
         damage = damage / 2;
         event = "HALVED".to_string();
     }
 
-    if attacker.element == Element::WATER && defender.element == Element::WOOD {
+    if attacker.element == Element::Water && defender.element == Element::Wood {
         damage = damage / 2;
         event = "HALVED".to_string();
     }

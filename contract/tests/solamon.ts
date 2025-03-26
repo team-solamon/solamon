@@ -13,6 +13,9 @@ import {
 	getUserAccount,
 	getUserAccountPDA,
 	getBattleLogs,
+	Element,
+	SolamonPrototype,
+	getSolamonPrototypeAccount,
 } from "./helper"
 
 describe("solamon", () => {
@@ -58,6 +61,58 @@ describe("solamon", () => {
 			admin.publicKey.toBase58()
 		)
 		expect(configAccount.feePercentageInBasisPoints).to.equal(100)
+	})
+
+	it("Creates solamon prototype", async () => {
+		const solamonPrototype: SolamonPrototype[] = [
+			{
+				imageUrl: "https://example.com/image.png",
+				possibleElements: [{ fire: {} }, { water: {} }],
+				elementProbabilityInBasisPoints: [80, 20],
+				distributablePoints: 15,
+			},
+			{
+				imageUrl: "https://example.com/image2.png",
+				possibleElements: [{ wood: {} }, { earth: {} }],
+				elementProbabilityInBasisPoints: [80, 20],
+				distributablePoints: 15,
+			},
+			{
+				imageUrl: "https://example.com/image3.png",
+				possibleElements: [{ earth: {} }, { metal: {} }],
+				elementProbabilityInBasisPoints: [80, 20],
+				distributablePoints: 15,
+			},
+			{
+				imageUrl: "https://example.com/image4.png",
+				possibleElements: [{ metal: {} }, { water: {} }],
+				elementProbabilityInBasisPoints: [80, 20],
+				distributablePoints: 15,
+			},
+			{
+				imageUrl: "https://example.com/image5.png",
+				possibleElements: [{ wood: {} }, { fire: {} }],
+				elementProbabilityInBasisPoints: [80, 20],
+				distributablePoints: 15,
+			},
+		]
+
+		const txSig = await program.methods
+			.createSolamonPrototype(solamonPrototype)
+			.accounts({
+				admin: admin.publicKey,
+			})
+			.signers([admin])
+			.rpc()
+
+		await connection.confirmTransaction(txSig)
+
+		const solamonPrototypeAccount = await getSolamonPrototypeAccount(
+			program
+		)
+		expect(solamonPrototypeAccount.solamonPrototypes.length).to.equal(
+			solamonPrototype.length
+		)
 	})
 
 	it("Spawns solamons", async () => {

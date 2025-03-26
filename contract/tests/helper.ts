@@ -1,7 +1,11 @@
-import { BN, Program } from "@coral-xyz/anchor"
+import { BN, IdlTypes, Program } from "@coral-xyz/anchor"
 import { Solamon } from "../target/types/solamon"
 import * as anchor from "@coral-xyz/anchor"
 import { Connection, PublicKey } from "@solana/web3.js"
+
+export type SolamonPrototype = IdlTypes<Solamon>["solamonPrototype"]
+export type Element = IdlTypes<Solamon>["element"]
+export type BattleStatus = IdlTypes<Solamon>["battleStatus"]
 
 export const getConfigPDA = (program: Program<Solamon>) => {
 	const [configPDA, _bump] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -18,6 +22,27 @@ export const getConfigAccount = async (program: Program<Solamon>) => {
 	const configAccount = await program.account.configAccount.fetch(configPDA)
 
 	return configAccount
+}
+
+export const getSolamonPrototypeAccountPDA = (program: Program<Solamon>) => {
+	const [solamonPrototypeAccountPDA, _bump] =
+		anchor.web3.PublicKey.findProgramAddressSync(
+			[Buffer.from("solamon_prototype_account")],
+			program.programId
+		)
+
+	return solamonPrototypeAccountPDA
+}
+
+export const getSolamonPrototypeAccount = async (program: Program<Solamon>) => {
+	const solamonPrototypeAccountPDA = getSolamonPrototypeAccountPDA(program)
+
+	const solamonPrototypeAccount =
+		await program.account.solamonPrototypeAccount.fetch(
+			solamonPrototypeAccountPDA
+		)
+
+	return solamonPrototypeAccount
 }
 
 export const getUserAccountPDA = (

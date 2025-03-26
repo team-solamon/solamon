@@ -123,6 +123,107 @@ export type Solamon = {
       "args": []
     },
     {
+      "name": "createSolamonPrototype",
+      "discriminator": [
+        147,
+        26,
+        236,
+        246,
+        206,
+        203,
+        105,
+        104
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "configAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "solamonPrototypeAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  97,
+                  109,
+                  111,
+                  110,
+                  95,
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  116,
+                  121,
+                  112,
+                  101,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "solamonPrototypes",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "solamonPrototype"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "initialize",
       "discriminator": [
         175,
@@ -572,6 +673,19 @@ export type Solamon = {
       ]
     },
     {
+      "name": "solamonPrototypeAccount",
+      "discriminator": [
+        1,
+        216,
+        133,
+        241,
+        157,
+        208,
+        231,
+        73
+      ]
+    },
+    {
       "name": "userAccount",
       "discriminator": [
         211,
@@ -791,6 +905,64 @@ export type Solamon = {
           {
             "name": "isAvailable",
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "solamonPrototype",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "imageUrl",
+            "type": "string"
+          },
+          {
+            "name": "possibleElements",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "element"
+                }
+              }
+            }
+          },
+          {
+            "name": "elementProbabilityInBasisPoints",
+            "type": {
+              "vec": "u16"
+            }
+          },
+          {
+            "name": "distributablePoints",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "solamonPrototypeAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "totalSpecies",
+            "type": "u8"
+          },
+          {
+            "name": "solamonPrototypes",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "solamonPrototype"
+                }
+              }
+            }
           }
         ]
       }
