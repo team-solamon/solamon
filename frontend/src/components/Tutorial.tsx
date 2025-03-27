@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import Button from './Button'
 import { CardData } from '@/data/card'
 import Card from './Card'
@@ -60,6 +60,12 @@ const Tutorial: React.FC = () => {
     ),
     []
   )
+
+  useEffect(() => {
+    return () => {
+      EventBridge.reset()
+    }
+  }, [])
 
   return (
     <div className='flex flex-col h-full'>

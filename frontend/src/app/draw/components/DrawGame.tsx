@@ -17,6 +17,12 @@ const DrawGame: React.FC<DrawGameProps> = ({ onClose, drawableCards }) => {
     EventBridge.loadDrawData(drawableCards)
   }
 
+  useEffect(() => {
+    return () => {
+      EventBridge.reset()
+    }
+  }, [])
+
   return (
     <div className='relative w-full max-w-[1200px] mx-auto'>
       <PhaserGame scenes={[DrawScene]} onGameReady={handleGameReady} />
