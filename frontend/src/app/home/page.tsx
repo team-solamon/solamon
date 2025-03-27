@@ -3,8 +3,6 @@
 import React, { useState } from 'react'
 import Button from '../../components/Button'
 import Card from '../../components/Card'
-import Tutorial from '../../components/Tutorial'
-
 import dynamic from 'next/dynamic'
 import Modal from '../../components/Modal'
 import { DrawableCards } from '@/data/draw'
@@ -14,6 +12,11 @@ import CardStack from '@/components/CardStack'
 import { BattleStatus } from '@/data/battle'
 
 const DrawGame = dynamic(() => import('../draw/components/DrawGame'), {
+  ssr: false,
+})
+
+// Dynamic import for Tutorial component because it contains phaser game scene
+const Tutorial = dynamic(() => import('../../components/Tutorial'), {
   ssr: false,
 })
 
@@ -170,7 +173,7 @@ const HomePage = () => {
                 )
             )}
           </div>
-          <div className='card-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4'>
+          <div className='card-list grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4'>
             {myCards.map((card, index) => (
               <div
                 key={index}

@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react'
 import PhaserGame from '@/components/PhaserGame'
 import { DrawScene } from '@/app/draw/scenes/DrawScene'
-import { EventBridge } from '../util/EventBridge'
+import { EventBridge } from '../utils/EventBridge'
 import { DrawableCards } from '@/data/draw'
 
 interface DrawGameProps {
@@ -16,6 +16,12 @@ const DrawGame: React.FC<DrawGameProps> = ({ onClose, drawableCards }) => {
     console.log('Game is ready, setting draw data', drawableCards)
     EventBridge.loadDrawData(drawableCards)
   }
+
+  useEffect(() => {
+    return () => {
+      EventBridge.reset()
+    }
+  }, [])
 
   return (
     <div className='relative w-full max-w-[1200px] mx-auto'>

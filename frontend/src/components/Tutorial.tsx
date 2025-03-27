@@ -1,7 +1,11 @@
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import Button from './Button'
 import { CardData } from '@/data/card'
 import Card from './Card'
+import { BattleReplay } from '@/data/replay'
+import PhaserGame from './PhaserGame'
+import { CardBattleScene } from '@/app/game/scenes/CardBattleScene'
+import { EventBridge } from '@/app/game/utils/EventBridge'
 
 const cards: CardData[] = [
   { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
@@ -16,10 +20,57 @@ const cards: CardData[] = [
   { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
 ]
 
+const playerCardData: CardData[] = [
+  { name: 'WATER', attack: 4, health: 10, element: 'WATER' },
+  { name: 'FIRE', attack: 8, health: 6, element: 'FIRE' },
+  { name: 'METAL', attack: 6, health: 12, element: 'METAL' },
+]
+
+const opponentCardData: CardData[] = [
+  { name: 'EARTH', attack: 4, health: 8, element: 'EARTH' },
+  { name: 'WOOD', attack: 7, health: 7, element: 'WOOD' },
+  { name: 'METAL', attack: 9, health: 9, element: 'METAL' },
+]
+
+const sampleBattleReplay: BattleReplay = {
+  id: 'battle-001',
+  playerCards: playerCardData,
+  opponentCards: opponentCardData,
+  actions: [
+    { isPlayer: true, atkIdx: 0, defIdx: 0, damage: 4, attackType: 'CRITICAL' },
+    { isPlayer: false, atkIdx: 0, defIdx: 0, damage: 4, attackType: 'HALVED' },
+    { isPlayer: true, atkIdx: 0, defIdx: 0, damage: 4, attackType: 'NONE' },
+    { isPlayer: true, atkIdx: 0, defIdx: 1, damage: 4, attackType: 'NONE' },
+    { isPlayer: false, atkIdx: 1, defIdx: 0, damage: 7, attackType: 'NONE' },
+    { isPlayer: true, atkIdx: 1, defIdx: 1, damage: 8, attackType: 'NONE' },
+    { isPlayer: true, atkIdx: 1, defIdx: 2, damage: 8, attackType: 'NONE' },
+    { isPlayer: false, atkIdx: 2, defIdx: 1, damage: 9, attackType: 'NONE' },
+    { isPlayer: true, atkIdx: 2, defIdx: 2, damage: 6, attackType: 'NONE' },
+  ],
+}
+
 const Tutorial: React.FC = () => {
+  const handleGameReady = () => {
+    EventBridge.loadReplay(sampleBattleReplay)
+  }
+
+  const phaserGame = useMemo(
+    () => (
+      <PhaserGame scenes={[CardBattleScene]} onGameReady={handleGameReady} />
+    ),
+    []
+  )
+
+  useEffect(() => {
+    return () => {
+      EventBridge.reset()
+    }
+  }, [])
+
   return (
     <div className='flex flex-col h-full'>
       <div className='text-white overflow-y-auto max-h-[60vh] pr-2'>
+        {phaserGame}
         <ol className='list-decimal list-inside space-y-4'>
           <li>
             <strong>Cards make the battle.</strong>

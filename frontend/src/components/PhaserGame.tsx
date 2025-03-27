@@ -52,7 +52,12 @@ const PhaserGame: React.FC<PhaserGameProps> = ({ scenes, onGameReady }) => {
 
     return () => {
       if (gameInstanceRef.current) {
-        gameInstanceRef.current.destroy(true)
+        const game = gameInstanceRef.current
+        game.scene.scenes.forEach((scene: any) => {
+          scene.tweens?.killAll()
+          scene.time?.removeAllEvents()
+        })
+        game.destroy(true)
       }
     }
   }, [scenes, onGameReady])

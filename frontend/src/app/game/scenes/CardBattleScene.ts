@@ -121,7 +121,7 @@ export class CardBattleScene extends Phaser.Scene {
         return
       }
 
-      EventBridge.onReplayLoaded = (replay: BattleReplay) => {
+      EventBridge.setOnReplayDataLoaded((replay: BattleReplay) => {
         this.battleConfig = replay
 
         if (this.backgroundContainer) {
@@ -136,7 +136,7 @@ export class CardBattleScene extends Phaser.Scene {
         this.time.delayedCall(1500, this.startAutomaticBattles, [], this)
 
         resolve()
-      }
+      })
     })
   }
 
@@ -185,8 +185,6 @@ export class CardBattleScene extends Phaser.Scene {
       }
 
       this.addBattleLog('⚔️ Battle begins! ⚔️')
-
-      await this.delay(1000)
 
       await this.startBattle()
     }
@@ -346,7 +344,6 @@ export class CardBattleScene extends Phaser.Scene {
   }
 
   addBattleLog(message: string) {
-    console.log(message)
     EventBridge.addLog(message)
   }
 
