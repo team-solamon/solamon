@@ -186,8 +186,6 @@ export class CardBattleScene extends Phaser.Scene {
 
       this.addBattleLog('⚔️ Battle begins! ⚔️')
 
-      await this.delay(1000)
-
       await this.startBattle()
     }
   }
@@ -346,7 +344,6 @@ export class CardBattleScene extends Phaser.Scene {
   }
 
   addBattleLog(message: string) {
-    console.log(message)
     EventBridge.addLog(message)
   }
 
