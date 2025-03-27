@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import Button from '../../components/Button'
 import Card from '../../components/Card'
+import Tutorial from '../../components/Tutorial'
 
 import dynamic from 'next/dynamic'
 import Modal from '../../components/Modal'
@@ -122,6 +123,7 @@ const HomePage = () => {
         </Button>
         <Button>Open Match</Button>
         <Button>Choose Fighter</Button>
+        <Button onClick={() => openModal('tutorial')}>Tutorial</Button>
       </div>
 
       <section className='battle-section mb-8'>
@@ -246,6 +248,15 @@ const HomePage = () => {
             <p>Health: {selectedCard.health}</p>
           </div>
         )}
+      </Modal>
+
+      <Modal
+        isOpen={modals['tutorial']}
+        onClose={() => closeModal('tutorial')}
+        title='Tutorial'
+        maxWidth='600px'
+      >
+        <Tutorial />
       </Modal>
     </div>
   )
