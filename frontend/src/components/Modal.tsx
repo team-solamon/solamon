@@ -1,6 +1,6 @@
 'use client'
 
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useEffect, useRef } from 'react'
 
 interface ModalProps {
   isOpen: boolean
@@ -19,10 +19,32 @@ const Modal: React.FC<ModalProps> = ({
   maxWidth = '800px',
   maxHeight = '700px',
 }) => {
+  const modalRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      modalRef.current?.focus()
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+    <div
+      className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'
+      tabIndex={-1}
+      ref={modalRef}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onClose()
+      }}
+    >
       <div
         className='relative w-full max-w-[1200px] mx-auto bg-[#978578] rounded-lg shadow-2xl overflow-hidden'
         style={{
