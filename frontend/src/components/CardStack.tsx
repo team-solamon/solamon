@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { CardData } from '@/game/data/card'
+import { CardData } from '@/data/card'
 import CardImage from './Card'
 
 const TRANSITION_DURATION = 300

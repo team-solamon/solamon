@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 import PhaserGame from '@/components/PhaserGame'
 import { DrawScene } from '@/app/draw/scenes/DrawScene'
 import { EventBridge } from '../util/EventBridge'
-import { DrawableCards } from '@/game/data/draw'
+import { DrawableCards } from '@/data/draw'
 
 interface DrawGameProps {
   onClose?: () => void

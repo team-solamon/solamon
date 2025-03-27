@@ -6,11 +6,11 @@ import Card from '../../components/Card'
 
 import dynamic from 'next/dynamic'
 import Modal from '../../components/Modal'
-import { DrawableCards } from '@/game/data/draw'
-import { CardData, CardElement, getElementEmoji } from '@/game/data/card'
+import { DrawableCards } from '@/data/draw'
+import { CardData, CardElement, getElementEmoji } from '@/data/card'
 import { useRouter } from 'next/navigation'
 import CardStack from '@/components/CardStack'
-import { BattleStatus } from '@/game/data/battle'
+import { BattleStatus } from '@/data/battle'
 
 const DrawGame = dynamic(() => import('../draw/components/DrawGame'), {
   ssr: false,

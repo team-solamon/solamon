@@ -1,5 +1,5 @@
 import React from 'react'
-import { CardData, getCardTexture, getElementEmoji } from '@/game/data/card'
+import { CardData, getCardTexture, getElementEmoji } from '@/data/card'
 
 interface CardImageProps {
   card: CardData

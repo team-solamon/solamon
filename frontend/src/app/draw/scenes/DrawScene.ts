@@ -4,10 +4,10 @@ import { Button } from '../../../game/gameObjects/Button'
 import { Background } from '../gameObjects/Background'
 import { CardPack } from '../gameObjects/CardPack'
 import { createElegantRings } from '../util/effects'
-import { getCardColor } from '@/game/data/card'
+import { getCardColor } from '@/data/card'
 import { Card } from '@/game/gameObjects/Card'
 import { EventBridge } from '../util/EventBridge'
-import { DrawableCards } from '@/game/data/draw'
+import { DrawableCards } from '@/data/draw'
 
 const LAYOUT = {
   CARD_Y: 250,
