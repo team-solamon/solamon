@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react'
 import PhaserGame from '@/components/PhaserGame'
 import { DrawScene } from '@/app/draw/scenes/DrawScene'
-import { EventBridge } from '../util/EventBridge'
+import { EventBridge } from '../utils/EventBridge'
 import { DrawableCards } from '@/data/draw'
 
 interface DrawGameProps {

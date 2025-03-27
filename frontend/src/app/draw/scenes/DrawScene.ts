@@ -3,10 +3,10 @@ import * as Phaser from 'phaser'
 import { Button } from '../../../gameObjects/Button'
 import { Background } from '../gameObjects/Background'
 import { CardPack } from '../gameObjects/CardPack'
-import { createElegantRings } from '../util/effects'
+import { createElegantRings } from '../utils/effects'
 import { getCardColor } from '@/data/card'
 import { Card } from '@/gameObjects/Card'
-import { EventBridge } from '../util/EventBridge'
+import { EventBridge } from '../utils/EventBridge'
 import { DrawableCards } from '@/data/draw'
 
 const LAYOUT = {
