@@ -10,7 +10,7 @@ import {
   getElementEmoji,
 } from '@/data/card'
 import { FloatingText } from './FloatingText'
-import { AttackEvent } from '../../data/replay'
+import { AttackEvent } from '../data/replay'
 
 export class Card extends Phaser.GameObjects.Container {
   public name: string

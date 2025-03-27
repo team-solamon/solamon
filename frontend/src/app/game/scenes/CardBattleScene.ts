@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser'
 
 import { BackgroundContainer } from '../gameObjects/Background'
-import { Card } from '../../../game/gameObjects/Card'
+import { Card } from '../../../gameObjects/Card'
 import { GameResult } from '../gameObjects/GameResult'
 import { performSingleAttack } from '../utils/BattleAnimations'
 import { EventBridge } from '../utils/EventBridge'

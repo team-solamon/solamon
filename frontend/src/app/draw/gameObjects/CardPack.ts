@@ -1,4 +1,4 @@
-import { Card } from '@/game/gameObjects/Card'
+import { Card } from '@/gameObjects/Card'
 import * as Phaser from 'phaser'
 
 export class CardPack extends Phaser.GameObjects.Container {

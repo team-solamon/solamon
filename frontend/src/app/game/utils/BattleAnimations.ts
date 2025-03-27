@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser'
 
-import { Card } from '../../../game/gameObjects/Card'
+import { Card } from '../../../gameObjects/Card'
 import { AttackEvent } from '@/data/replay'
 
 function createChargeUpEffect(
