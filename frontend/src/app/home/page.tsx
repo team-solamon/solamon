@@ -2,13 +2,15 @@
 
 import React, { useState } from 'react'
 import Button from '../../components/Button'
-import CardImage from '../../components/CardImage'
+import Card from '../../components/Card'
 
 import dynamic from 'next/dynamic'
 import Modal from '../../components/Modal'
 import { DrawableCards } from '@/game/data/draw'
 import { CardData, CardElement, getElementEmoji } from '@/game/data/card'
 import { useRouter } from 'next/navigation'
+import CardStack from '@/components/CardStack'
+import { BattleStatus } from '@/game/data/battle'
 
 const DrawGame = dynamic(() => import('../draw/components/DrawGame'), {
   ssr: false,
@@ -32,6 +34,30 @@ const myCards: CardData[] = [
   { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
   { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
   { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
+]
+
+const cardStackData: BattleStatus[] = [
+  {
+    status: 'pending',
+    myCards: [
+      { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
+      { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
+      { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
+    ],
+  },
+  {
+    status: 'result',
+    myCards: [
+      { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
+      { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
+      { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
+    ],
+    opponentCards: [
+      { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
+      { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
+      { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
+    ],
+  },
 ]
 
 const HomePage = () => {
@@ -104,11 +130,25 @@ const HomePage = () => {
             Battle
           </h2>
           <div className='battle-cards flex gap-4'>
-            <div className='card bg-gray-700 p-4 rounded-lg'>
-              <Button onClick={() => router.push('/game')}>
-                배틀 결과 보기
-              </Button>
-            </div>
+            {cardStackData.map((battle, index) => (
+              <div key={index} className='card bg-gray-700 p-4 rounded-lg'>
+                <div className='flex justify-around'>
+                  <div>
+                    <h4 className='text-center text-sm text-gray-400 mb-2'>
+                      My Cards
+                    </h4>
+                    <CardStack cards={battle.myCards} className='mx-auto' />
+                  </div>
+                </div>
+                {battle.status === 'result' ? (
+                  <Button onClick={() => router.push('/game')}>
+                    {battle.status}
+                  </Button>
+                ) : (
+                  <Button>{battle.status}</Button>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -134,7 +174,7 @@ const HomePage = () => {
                 key={index}
                 className='card bg-gray-700 p-4 rounded-lg flex flex-col items-center'
               >
-                <CardImage card={card} className='mx-auto' />
+                <Card card={card} className='mx-auto' />
                 <Button onClick={() => openModal('cardDetails', card)}>
                   Stats
                 </Button>
@@ -183,7 +223,7 @@ const HomePage = () => {
               key={index}
               className='card bg-gray-700 p-2 rounded-lg flex-shrink-0 w-24'
             >
-              <CardImage card={card} className='mx-auto' />
+              <Card card={card} className='mx-auto' />
             </div>
           ))}
         </div>
@@ -199,7 +239,7 @@ const HomePage = () => {
           <div className='card-details text-center'>
             <h3 className='text-2xl font-bold mb-4'>{selectedCard.name}</h3>
             <div className='flex justify-center mb-4'>
-              <CardImage card={selectedCard} />
+              <Card card={selectedCard} />
             </div>
             <p>Element: {selectedCard.element}</p>
             <p>Attack: {selectedCard.attack}</p>

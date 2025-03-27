@@ -10,7 +10,7 @@ interface CardImageProps {
   className?: string
 }
 
-const CardImage: React.FC<CardImageProps> = ({
+const Card: React.FC<CardImageProps> = ({
   card,
   width = '100%',
   height = 'auto',
@@ -39,4 +39,4 @@ const CardImage: React.FC<CardImageProps> = ({
   )
 }
 
-export default CardImage
+export default Card
