@@ -3,8 +3,6 @@
 import React, { useState } from 'react'
 import Button from '../../components/Button'
 import Card from '../../components/Card'
-import Tutorial from '../../components/Tutorial'
-
 import dynamic from 'next/dynamic'
 import Modal from '../../components/Modal'
 import { DrawableCards } from '@/data/draw'
@@ -14,6 +12,11 @@ import CardStack from '@/components/CardStack'
 import { BattleStatus } from '@/data/battle'
 
 const DrawGame = dynamic(() => import('../draw/components/DrawGame'), {
+  ssr: false,
+})
+
+// Dynamic import for Tutorial component because it contains phaser game scene
+const Tutorial = dynamic(() => import('../../components/Tutorial'), {
   ssr: false,
 })
 
