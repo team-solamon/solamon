@@ -1,10 +1,9 @@
 import React from 'react'
 import Button from './Button'
-import Modal from './Modal'
 import { CardData } from '@/data/card'
+import Card from './Card'
 
 const cards: CardData[] = [
-  { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
   { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
   { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
   { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
@@ -72,35 +71,15 @@ const Tutorial: React.FC = () => {
             </li>
           </ul>
         </div>
-        <div className='text-center mt-4'>
-          <p className='text-sm text-gray-400'>Tip! Each mode has its edge.</p>
-          <ul className='list-disc list-inside text-sm text-gray-400'>
-            <li>Open Match gives you the first move.</li>
-            <li>
-              Choose Fighter lets you see your opponent's squad before you
-              fight.
-            </li>
-          </ul>
-        </div>
-        <div className='text-center mt-4'>
-          <p className='text-sm text-gray-400'>Tip! Each mode has its edge.</p>
-          <ul className='list-disc list-inside text-sm text-gray-400'>
-            <li>Open Match gives you the first move.</li>
-            <li>
-              Choose Fighter lets you see your opponent's squad before you
-              fight.
-            </li>
-          </ul>
-        </div>
-        <div className='text-center mt-4'>
-          <p className='text-sm text-gray-400'>Tip! Each mode has its edge.</p>
-          <ul className='list-disc list-inside text-sm text-gray-400'>
-            <li>Open Match gives you the first move.</li>
-            <li>
-              Choose Fighter lets you see your opponent's squad before you
-              fight.
-            </li>
-          </ul>
+        <div className='grid grid-cols-5 gap-4 p-2'>
+          {cards.map((card, index) => (
+            <div
+              key={index}
+              className='card bg-gray-700 p-2 rounded-lg flex-shrink-0'
+            >
+              <Card card={card} className='mx-auto' />
+            </div>
+          ))}
         </div>
       </div>
       <div className='mt-4 flex justify-around sticky bottom-0 bg-[#978578] py-3'>
