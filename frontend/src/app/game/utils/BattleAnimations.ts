@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser'
 
 import { Card } from '../../../game/gameObjects/Card'
-import { AttackEvent } from '@/game/data/replay'
+import { AttackEvent } from '@/data/replay'
 
 function createChargeUpEffect(
   scene: Phaser.Scene,

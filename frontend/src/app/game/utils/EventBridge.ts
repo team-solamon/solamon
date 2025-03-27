@@ -1,4 +1,4 @@
-import { BattleReplay } from '@/game/data/replay'
+import { BattleReplay } from '@/data/replay'
 
 const noop = () => {
   return undefined

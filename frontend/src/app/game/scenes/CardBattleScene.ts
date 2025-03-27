@@ -5,8 +5,8 @@ import { Card } from '../../../game/gameObjects/Card'
 import { GameResult } from '../gameObjects/GameResult'
 import { performSingleAttack } from '../utils/BattleAnimations'
 import { EventBridge } from '../utils/EventBridge'
-import { BattleAction, BattleReplay } from '@/game/data/replay'
-import { CardElement } from '@/game/data/card'
+import { BattleAction, BattleReplay } from '@/data/replay'
+import { CardElement } from '@/data/card'
 
 export class CardBattleScene extends Phaser.Scene {
   private playerCards: Card[] = []

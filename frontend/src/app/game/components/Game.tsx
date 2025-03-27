@@ -6,8 +6,8 @@ import GameLogs from './GameLogs'
 import ScoreDisplay from './ScoreDisplay'
 import { CardBattleScene } from '../scenes/CardBattleScene'
 import { EventBridge } from '../utils/EventBridge'
-import { CardData } from '../../../game/data/card'
-import { BattleReplay } from '@/game/data/replay'
+import { CardData } from '../../../data/card'
+import { BattleReplay } from '@/data/replay'
 
 const playerCardData: CardData[] = [
   { name: 'WATER', attack: 4, health: 10, element: 'WATER' },

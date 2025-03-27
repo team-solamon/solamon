@@ -1,4 +1,4 @@
-import { DrawableCards } from '@/game/data/draw'
+import { DrawableCards } from '@/data/draw'
 
 const noop = () => {
   return undefined
