@@ -8,9 +8,16 @@ const ANIMATION_TIMEOUT = TRANSITION_DURATION
 interface CardStackProps {
   cards: CardData[]
   className?: string
+  width?: string
+  height?: string
 }
 
-const CardStack: React.FC<CardStackProps> = ({ cards, className = '' }) => {
+const CardStack: React.FC<CardStackProps> = ({
+  cards,
+  className = '',
+  width = '120px',
+  height = '160px',
+}) => {
   const [displayedCards, setDisplayedCards] = useState<
     { id: number; card: CardData; position: number }[]
   >([])
@@ -64,7 +71,8 @@ const CardStack: React.FC<CardStackProps> = ({ cards, className = '' }) => {
 
   return (
     <div
-      className={`relative w-[120px] h-[160px] ${className} cursor-pointer`}
+      className={`relative ${className} cursor-pointer`}
+      style={{ width, height }}
       onClick={rotateCards}
     >
       {displayedCards.map((item) => {
