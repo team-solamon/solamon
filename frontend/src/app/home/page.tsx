@@ -10,6 +10,7 @@ import { CardData, CardElement, getElementEmoji } from '@/data/card'
 import { useRouter } from 'next/navigation'
 import CardStack from '@/components/CardStack'
 import { BattleStatus } from '@/data/battle'
+import GameResult from '@/components/GameResult'
 
 const DrawGame = dynamic(() => import('../draw/components/DrawGame'), {
   ssr: false,
@@ -51,6 +52,21 @@ const cardStackData: BattleStatus[] = [
   },
   {
     status: 'result',
+    isPlayerWinner: true,
+    myCards: [
+      { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
+      { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
+      { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
+    ],
+    opponentCards: [
+      { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
+      { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
+      { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
+    ],
+  },
+  {
+    status: 'result',
+    isPlayerWinner: false,
     myCards: [
       { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
       { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
@@ -69,6 +85,9 @@ const HomePage = () => {
 
   const [modals, setModals] = useState<{ [key: string]: boolean }>({})
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null)
+  const [selectedBattle, setSelectedBattle] = useState<BattleStatus | null>(
+    null
+  )
 
   const openModal = (modalKey: string, card?: CardData) => {
     setModals((prev) => ({ ...prev, [modalKey]: true }))
@@ -146,7 +165,12 @@ const HomePage = () => {
                   </div>
                 </div>
                 {battle.status === 'result' ? (
-                  <Button onClick={() => router.push('/game')}>
+                  <Button
+                    onClick={() => {
+                      setSelectedBattle(battle)
+                      openModal('result')
+                    }}
+                  >
                     {battle.status}
                   </Button>
                 ) : (
@@ -261,6 +285,20 @@ const HomePage = () => {
       >
         <Tutorial />
       </Modal>
+
+      {selectedBattle && selectedBattle.status === 'result' && (
+        <Modal
+          isOpen={modals['result']}
+          onClose={() => closeModal('result')}
+          title={selectedBattle.isPlayerWinner ? 'Win' : 'Lose'}
+          maxWidth='600px'
+        >
+          <GameResult
+            battleStatus={selectedBattle}
+            isPlayerWinner={selectedBattle.isPlayerWinner || false}
+          />
+        </Modal>
+      )}
     </div>
   )
 }
