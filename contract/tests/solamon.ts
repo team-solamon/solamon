@@ -1,391 +1,416 @@
 import * as anchor from "@coral-xyz/anchor"
-import { BN, Program } from "@coral-xyz/anchor"
-import { Solamon } from "../target/types/solamon"
-import { Connection, LAMPORTS_PER_SOL, Transaction } from "@solana/web3.js"
-import { expect } from "chai"
+import { BN, IdlTypes, Program } from "@coral-xyz/anchor"
 import {
-	getBattleAccount,
-	getBattleAccountPDA,
-	getAllBattleAccounts,
-	getBattleAccountsByUser,
-	getConfigAccount,
-	getConfigPDA,
-	getUserAccount,
-	getBattleLogs,
-	SolamonPrototype,
-	getSolamonPrototypeAccount,
-	getOrCreateNativeMintATA,
-	wrapSolAndOpenBattleTx,
-	wrapSolAndJoinBattleTx,
-	cancelBattleAndUnwrapSolTx,
-	claimBattleAndUnwrapSolTx,
-	BattleStatus,
-} from "./helper"
+	ASSOCIATED_TOKEN_PROGRAM_ID,
+	createAssociatedTokenAccountInstruction,
+	createCloseAccountInstruction,
+	createSyncNativeInstruction,
+	getAccount,
+	getAssociatedTokenAddress,
+	getAssociatedTokenAddressSync,
+	NATIVE_MINT,
+	TOKEN_2022_PROGRAM_ID,
+	TOKEN_PROGRAM_ID,
+} from "@solana/spl-token"
+import {
+	Connection,
+	PublicKey,
+	SystemProgram,
+	Transaction,
+	TransactionInstruction,
+} from "@solana/web3.js"
 
-describe("solamon", () => {
-	// Configure the client to use the local cluster.
-	anchor.setProvider(anchor.AnchorProvider.env())
-	const program = anchor.workspace.solamon as Program<Solamon>
-	const connection = new Connection("http://localhost:8899", "confirmed")
-	const provider = anchor.AnchorProvider.env()
-	const admin = anchor.web3.Keypair.generate()
-	const player = anchor.web3.Keypair.generate()
-	const player2 = anchor.web3.Keypair.generate()
-	const player3 = anchor.web3.Keypair.generate()
-	const battleStake = LAMPORTS_PER_SOL * 0.1
+import { Solamon } from "../target/types/solamon"
 
-	console.log({
-		player: player.publicKey.toBase58(),
-		player2: player2.publicKey.toBase58(),
-		player3: player3.publicKey.toBase58(),
-		admin: admin.publicKey.toBase58(),
-	})
+export type SolamonPrototype = IdlTypes<Solamon>["solamonPrototype"]
+export type Element = IdlTypes<Solamon>["element"]
+export type BattleStatus = IdlTypes<Solamon>["battleStatus"]
 
-	beforeEach(async () => {
-		const txs = await Promise.all([
-			connection.requestAirdrop(admin.publicKey, LAMPORTS_PER_SOL),
-			connection.requestAirdrop(player.publicKey, LAMPORTS_PER_SOL),
-			connection.requestAirdrop(player2.publicKey, LAMPORTS_PER_SOL),
-			connection.requestAirdrop(player3.publicKey, LAMPORTS_PER_SOL),
-		])
-		await Promise.all(txs.map((tx) => connection.confirmTransaction(tx)))
-	})
+export const getConfigPDA = (program: Program<Solamon>) => {
+	const [configPDA, _bump] = anchor.web3.PublicKey.findProgramAddressSync(
+		[Buffer.from("config_account")],
+		program.programId
+	)
 
-	it("Is initialized", async () => {
-		// Derive the PDA for the config account
-		const spawnFee = LAMPORTS_PER_SOL * 0.01
-		const feePercentageInBasisPoints = 100
-		const tx = await program.methods
-			.initialize(
-				admin.publicKey,
-				admin.publicKey,
-				feePercentageInBasisPoints,
-				new BN(spawnFee)
-			)
-			.accounts({
-				signer: admin.publicKey,
-			})
-			.signers([admin])
-			.rpc()
+	return configPDA
+}
 
-		console.log("Your transaction signature", tx)
+export const getConfigAccount = async (program: Program<Solamon>) => {
+	const configPDA = await getConfigPDA(program)
 
-		const configAccount = await getConfigAccount(program)
+	const configAccount = await program.account.configAccount.fetch(configPDA)
 
-		expect(configAccount.feeAccount.toBase58()).to.equal(
-			admin.publicKey.toBase58()
+	return configAccount
+}
+
+export const getSolamonPrototypeAccountPDA = (program: Program<Solamon>) => {
+	const [solamonPrototypeAccountPDA, _bump] =
+		anchor.web3.PublicKey.findProgramAddressSync(
+			[Buffer.from("solamon_prototype_account")],
+			program.programId
 		)
-		expect(configAccount.admin.toBase58()).to.equal(
-			admin.publicKey.toBase58()
-		)
-		expect(configAccount.feePercentageInBasisPoints).to.equal(100)
-	})
 
-	it("Creates solamon prototype", async () => {
-		const solamonPrototype: SolamonPrototype[] = [
-			{
-				imageUrl: "https://example.com/image.png",
-				possibleElements: [{ fire: {} }, { water: {} }],
-				elementProbabilityInBasisPoints: [8000, 2000],
-				distributablePoints: 15,
+	return solamonPrototypeAccountPDA
+}
+
+export const getSolamonPrototypeAccount = async (program: Program<Solamon>) => {
+	const solamonPrototypeAccountPDA = getSolamonPrototypeAccountPDA(program)
+
+	const solamonPrototypeAccount =
+		await program.account.solamonPrototypeAccount.fetch(
+			solamonPrototypeAccountPDA
+		)
+
+	return solamonPrototypeAccount
+}
+
+export const getUserAccountPDA = (
+	program: Program<Solamon>,
+	user: PublicKey
+) => {
+	const [userAccountPDA, _bump] =
+		anchor.web3.PublicKey.findProgramAddressSync(
+			[Buffer.from("user_account"), user.toBuffer()],
+			program.programId
+		)
+
+	return userAccountPDA
+}
+
+export const getUserAccount = async (
+	program: Program<Solamon>,
+	user: PublicKey
+) => {
+	const userAccountPDA = await getUserAccountPDA(program, user)
+
+	const userAccount = await program.account.userAccount.fetch(userAccountPDA)
+
+	return userAccount
+}
+
+export const getBattleAccountPDA = (
+	program: Program<Solamon>,
+	battleId: number
+) => {
+	const [battleAccountPDA, _bump] =
+		anchor.web3.PublicKey.findProgramAddressSync(
+			[
+				Buffer.from("battle_account"),
+				new BN(battleId).toArrayLike(Buffer, "le", 8),
+			],
+			program.programId
+		)
+
+	return battleAccountPDA
+}
+
+export const getBattleAccount = async (
+	program: Program<Solamon>,
+	battleId: number
+) => {
+	const battleAccountPDA = getBattleAccountPDA(program, battleId)
+	const battleAccount = await program.account.battleAccount.fetch(
+		battleAccountPDA
+	)
+	return battleAccount
+}
+
+export const getAllBattleAccounts = async (program: Program<Solamon>) => {
+	const battleAccounts = await program.account.battleAccount.all()
+	return battleAccounts
+}
+
+export const getBattleAccountsByUser = async (
+	program: Program<Solamon>,
+	user: PublicKey
+) => {
+	// Create promises for fetching battle accounts
+	const player1BattleAccountsPromise = program.account.battleAccount.all([
+		{
+			memcmp: {
+				offset: 17, // Adjust this offset based on your account structure
+				bytes: user.toBase58(),
 			},
-			{
-				imageUrl: "https://example.com/image2.png",
-				possibleElements: [{ wood: {} }, { earth: {} }],
-				elementProbabilityInBasisPoints: [8000, 2000],
-				distributablePoints: 15,
+		},
+	])
+
+	const player2BattleAccountsPromise = program.account.battleAccount.all([
+		{
+			memcmp: {
+				offset: 49, // Adjust this offset based on your account structure
+				bytes: user.toBase58(),
 			},
-			{
-				imageUrl: "https://example.com/image3.png",
-				possibleElements: [{ earth: {} }, { metal: {} }],
-				elementProbabilityInBasisPoints: [8000, 2000],
-				distributablePoints: 15,
-			},
-			{
-				imageUrl: "https://example.com/image4.png",
-				possibleElements: [{ metal: {} }, { water: {} }],
-				elementProbabilityInBasisPoints: [8000, 2000],
-				distributablePoints: 15,
-			},
-			{
-				imageUrl: "https://example.com/image5.png",
-				possibleElements: [{ wood: {} }, { fire: {} }],
-				elementProbabilityInBasisPoints: [8000, 2000],
-				distributablePoints: 15,
-			},
-		]
+		},
+	])
 
-		const txSig = await program.methods
-			.createSolamonPrototype(solamonPrototype)
-			.accounts({
-				admin: admin.publicKey,
-			})
-			.signers([admin])
-			.rpc()
+	// Await both promises using Promise.all
+	const [player1BattleAccounts, player2BattleAccounts] = await Promise.all([
+		player1BattleAccountsPromise,
+		player2BattleAccountsPromise,
+	])
 
-		await connection.confirmTransaction(txSig)
+	return { player1BattleAccounts, player2BattleAccounts }
+}
 
-		const solamonPrototypeAccount = await getSolamonPrototypeAccount(
-			program
-		)
-		expect(solamonPrototypeAccount.solamonPrototypes.length).to.equal(
-			solamonPrototype.length
-		)
-	})
-
-	it("Spawns solamons", async () => {
-		// Spawn elements
-		const solamonCount = 5
-		const txHash = await program.methods
-			.spawnSolamons(solamonCount)
-			.accounts({
-				player: player.publicKey,
-				feeAccount: (await getConfigAccount(program)).feeAccount,
-			})
-			.signers([player])
-			.rpc()
-
-		await connection.confirmTransaction(txHash)
-
-		const tx = await connection.getTransaction(txHash, {
-			commitment: "confirmed",
-		})
-
-		console.log("Solamon spawn tx logs")
-		console.log(tx.meta?.logMessages)
-
-		// Fetch the user account to verify elements were added
-		const userAccount = await getUserAccount(program, player.publicKey)
-		expect(userAccount.solamons.length).to.equal(solamonCount)
-
-		const solamonCount2 = 3
-
-		await program.methods
-			.spawnSolamons(solamonCount2)
-			.accounts({
-				player: player2.publicKey,
-				feeAccount: (await getConfigAccount(program)).feeAccount,
-			})
-			.signers([player2])
-			.rpc()
-
-		const userAccount2 = await getUserAccount(program, player2.publicKey)
-		expect(userAccount2.solamons.length).to.equal(solamonCount2)
-
-		const solamonCount3 = 9
-
-		await program.methods
-			.spawnSolamons(solamonCount3)
-			.accounts({
-				player: player3.publicKey,
-				feeAccount: (await getConfigAccount(program)).feeAccount,
-			})
-			.signers([player3])
-			.rpc()
-
-		const userAccount3 = await getUserAccount(program, player3.publicKey)
-		expect(userAccount3.solamons.length).to.equal(solamonCount3)
-	})
-
-	it("Player 1 opens battle", async () => {
-		// Fetch the user account to get solamons
-		const userAccount = await getUserAccount(program, player.publicKey)
-
-		// Get the first 3 solamon IDs
-		const solamonIds = userAccount.solamons
-			.map((solamon) => solamon.id)
-			.slice(0, 3)
-
-		const openBattleTx = await wrapSolAndOpenBattleTx(
-			connection,
-			program,
-			player.publicKey,
-			battleStake,
-			solamonIds
-		)
-
-		const txSig = await connection.sendTransaction(openBattleTx, [player])
-
-		await connection.confirmTransaction(txSig)
-
-		const battleAccount = await getBattleAccount(program, 0)
-
-		expect(battleAccount.player1.toBase58()).to.equal(
-			player.publicKey.toBase58()
-		)
-		expect(battleAccount.player1Solamons.length).to.equal(3)
-		expect(battleAccount.player2Solamons.length).to.equal(0)
-
-		const configAccount = await getConfigAccount(program)
-
-		expect(configAccount.battleCount.toNumber()).to.equal(1)
-		expect(configAccount.availableBattleIds.length).to.equal(1)
-		expect(configAccount.availableBattleIds[0].toNumber()).to.equal(0)
-
-		const userAccountAfter = await getUserAccount(program, player.publicKey)
-		expect(userAccountAfter.battleCount.toNumber()).to.equal(1)
-
-		const { tokenAccount: configAccountATA } =
-			await getOrCreateNativeMintATA(
-				connection,
-				getConfigPDA(program),
-				getConfigPDA(program)
-			)
-
-		const stakeBalance = await connection.getTokenAccountBalance(
-			configAccountATA
-		)
-
-		expect(stakeBalance.value.amount).to.equal(battleStake.toString())
-	})
-
-	it("Player 2 joins battle", async () => {
-		// Fetch the user account to get solamons
-		const userAccount = await getUserAccount(program, player2.publicKey)
-
-		// Get the first 3 solamon IDs
-		const solamonIds = userAccount.solamons
-			.map((solamon) => solamon.id)
-			.slice(0, 3)
-
-		const battleId = 0 // Example battle ID
-
-		const joinBattleTx = await wrapSolAndJoinBattleTx(
-			connection,
-			program,
-			player2.publicKey,
-			battleId,
-			solamonIds
-		)
-		const txSig = await connection.sendTransaction(joinBattleTx, [player2])
-
-		await connection.confirmTransaction(txSig)
-
-		const battleLogs = await getBattleLogs(
-			connection,
-			getBattleAccountPDA(program, battleId)
-		)
-
-		expect(battleLogs.length).to.be.greaterThan(0)
-
-		const battleAccountsByUser = await getBattleAccountsByUser(
-			program,
-			player2.publicKey
-		)
-	})
-
-	it("Winner claims battle", async () => {
-		const battleId = 0
-		const battleAccount = await getBattleAccount(program, battleId)
-		const winner =
-			JSON.stringify(battleAccount.battleStatus) ===
-			JSON.stringify({ player1Wins: {} })
-				? player
-				: player2
-
-		const winnerBalanceBefore = await connection.getBalance(
-			winner.publicKey
-		)
-
-		const claimBattleTx = await claimBattleAndUnwrapSolTx(
-			connection,
-			program,
-			winner.publicKey,
-			battleId
-		)
-
-		const txSig = await connection.sendTransaction(claimBattleTx, [winner])
-		await connection.confirmTransaction(txSig)
-
-		const winnerBalanceAfter = await connection.getBalance(winner.publicKey)
-		expect(winnerBalanceAfter).to.be.greaterThan(winnerBalanceBefore)
-	})
-
-	it("Player 3 opens multiple battles", async () => {
-		// Fetch the user account to get solamons
-		const userAccountBefore = await getUserAccount(
-			program,
-			player3.publicKey
-		)
-		const configAccountBefore = await getConfigAccount(program)
-		const numberOfBattlesToOpen = 3
-
-		const balance1 = await connection.getBalance(player.publicKey)
-		const balance2 = await connection.getBalance(player2.publicKey)
-		const balance3 = await connection.getBalance(player3.publicKey)
-
-		for (let i = 0; i < numberOfBattlesToOpen; i++) {
-			const solamonIds = userAccountBefore.solamons
-				.map((solamon) => solamon.id)
-				.slice(0 + i * 3, 3 + i * 3)
-
-			const openBattleTx = await wrapSolAndOpenBattleTx(
-				connection,
-				program,
-				player3.publicKey,
-				battleStake,
-				solamonIds
-			)
-			const txSig = await connection.sendTransaction(openBattleTx, [
-				player3,
-			])
-			await connection.confirmTransaction(txSig)
+export const getBattleLogs = async (
+	connection: Connection,
+	battleAccountPDA: anchor.web3.PublicKey
+) => {
+	const signature = await connection.getSignaturesForAddress(
+		battleAccountPDA,
+		{
+			limit: 1,
 		}
+	)
+	const battleLogs = await connection.getParsedTransaction(
+		signature[0].signature,
+		{
+			commitment: "confirmed",
+		}
+	)
 
-		const configAccountAfter = await getConfigAccount(program)
-		expect(configAccountAfter.battleCount.toNumber()).to.equal(
-			numberOfBattlesToOpen + configAccountBefore.battleCount.toNumber()
+	return battleLogs?.meta?.logMessages
+}
+
+export async function isToken2022Mint(
+	connection: Connection,
+	mint: PublicKey
+): Promise<boolean> {
+	const accountInfo = await connection.getAccountInfo(mint)
+	if (accountInfo?.owner.toString() == TOKEN_2022_PROGRAM_ID.toString()) {
+		return true
+	}
+	return false
+}
+
+export async function getOrCreateTokenAccountTx(
+	connection: Connection,
+	mint: PublicKey,
+	payer: PublicKey,
+	owner: PublicKey
+): Promise<{
+	tokenAccount: PublicKey
+	tx: Transaction | null
+	tokenProgram: PublicKey
+}> {
+	const programId = (await isToken2022Mint(connection, mint))
+		? TOKEN_2022_PROGRAM_ID
+		: TOKEN_PROGRAM_ID
+	const tokenAccount = await getAssociatedTokenAddress(
+		mint,
+		owner,
+		true,
+		programId
+	)
+	try {
+		await getAccount(connection, tokenAccount, "confirmed", programId)
+		return { tokenAccount: tokenAccount, tx: null, tokenProgram: programId }
+	} catch (error) {
+		const transaction = new Transaction()
+		transaction.add(
+			createAssociatedTokenAccountInstruction(
+				payer,
+				tokenAccount,
+				owner,
+				mint,
+				programId,
+				ASSOCIATED_TOKEN_PROGRAM_ID
+			)
 		)
+		return {
+			tokenAccount: tokenAccount,
+			tx: transaction,
+			tokenProgram: programId,
+		}
+	}
+}
 
-		expect(configAccountAfter.availableBattleIds.length).to.equal(
-			numberOfBattlesToOpen
-		)
+export async function getOrCreateNativeMintATA(
+	connection: Connection,
+	payer: PublicKey,
+	owner: PublicKey
+): Promise<{ tokenAccount: PublicKey; tx: Transaction | null }> {
+	const { tokenAccount, tx } = await getOrCreateTokenAccountTx(
+		connection,
+		new PublicKey(NATIVE_MINT),
+		payer,
+		owner
+	)
+	return { tokenAccount, tx }
+}
 
-		const userAccountAfter = await getUserAccount(
-			program,
-			player3.publicKey
-		)
-		expect(userAccountAfter.battleCount.toNumber()).to.equal(
-			numberOfBattlesToOpen
-		)
+export function wrapSOLInstruction(
+	recipient: PublicKey,
+	amount: number
+): TransactionInstruction[] {
+	const ixs: TransactionInstruction[] = []
+	const ata = getAssociatedTokenAddressSync(NATIVE_MINT, recipient)
+	ixs.push(
+		SystemProgram.transfer({
+			fromPubkey: recipient,
+			toPubkey: ata,
+			lamports: amount,
+		}),
+		createSyncNativeInstruction(ata)
+	)
+	return ixs
+}
 
-		const battleAccounts = await getAllBattleAccounts(program)
+export function unwrapSolIx(
+	acc: PublicKey,
+	destination: PublicKey,
+	authority: PublicKey
+): TransactionInstruction {
+	return createCloseAccountInstruction(acc, destination, authority)
+}
 
-		const battleAccountsByUser = await getBattleAccountsByUser(
-			program,
-			player3.publicKey
-		)
+export async function wrapSolAndOpenBattleTx(
+	connection: Connection,
+	program: Program<Solamon>,
+	player: PublicKey,
+	battleStake: number,
+	solamonIds: number[]
+) {
+	const openBattleTx = new Transaction()
 
-		expect(battleAccountsByUser.player1BattleAccounts.length).to.equal(
-			numberOfBattlesToOpen
-		)
-		expect(battleAccountsByUser.player2BattleAccounts.length).to.equal(0)
-	})
+	const { tokenAccount, tx } = await getOrCreateNativeMintATA(
+		connection,
+		player,
+		player
+	)
 
-	it("Player 3 cancels one battle", async () => {
-		const balanceBefore = await connection.getBalance(player3.publicKey)
+	if (tx) {
+		openBattleTx.add(tx)
+	}
 
-		const battleAccountsByUser = await getBattleAccountsByUser(
-			program,
-			player3.publicKey
-		)
+	const wrapSolIxs = wrapSOLInstruction(player, battleStake)
+	openBattleTx.add(...wrapSolIxs)
 
-		const battleAccount = battleAccountsByUser.player1BattleAccounts[0]
+	const openBattle = await program.methods
+		.openBattle(solamonIds, new BN(battleStake))
+		.accounts({
+			player: player,
+			playerTokenAccount: tokenAccount,
+		})
+		.transaction()
 
-		const cancelBattleTx = await cancelBattleAndUnwrapSolTx(
+	openBattleTx.add(openBattle)
+
+	return openBattleTx
+}
+
+export async function wrapSolAndJoinBattleTx(
+	connection: Connection,
+	program: Program<Solamon>,
+	player: PublicKey,
+	battleId: number,
+	solamonIds: number[]
+) {
+	const joinBattleTx = new Transaction()
+
+	const battleAccount = await getBattleAccount(program, battleId)
+
+	const { tokenAccount: playerATA, tx: playerCreateATATx } =
+		await getOrCreateNativeMintATA(connection, player, player)
+
+	if (playerCreateATATx) {
+		joinBattleTx.add(playerCreateATATx)
+	}
+
+	const wrapSolIxs = wrapSOLInstruction(
+		player,
+		battleAccount.battleStake.toNumber()
+	)
+	joinBattleTx.add(...wrapSolIxs)
+
+	const joinBattle = await program.methods
+		.joinBattle(solamonIds)
+		.accountsPartial({
+			player,
+			configAccount: getConfigPDA(program),
+			battleAccount: getBattleAccountPDA(program, battleId),
+			userAccount: getUserAccountPDA(program, player),
+			playerTokenAccount: playerATA,
+		})
+		.transaction()
+
+	joinBattleTx.add(joinBattle)
+	return joinBattleTx
+}
+
+export async function cancelBattleAndUnwrapSolTx(
+	connection: Connection,
+	program: Program<Solamon>,
+	player: PublicKey,
+	battleId: number
+) {
+	const cancelBattleTx = new Transaction()
+
+	const { tokenAccount: playerATA, tx: playerCreateATATx } =
+		await getOrCreateNativeMintATA(connection, player, player)
+
+	if (playerCreateATATx) {
+		cancelBattleTx.add(playerCreateATATx)
+	}
+
+	const cancelBattle = await program.methods
+		.cancelBattle()
+		.accountsPartial({
+			player,
+			battleAccount: getBattleAccountPDA(program, battleId),
+			playerTokenAccount: playerATA,
+		})
+		.transaction()
+
+	cancelBattleTx.add(cancelBattle)
+
+	const unwrapSolIxs = unwrapSolIx(playerATA, player, player)
+	cancelBattleTx.add(unwrapSolIxs)
+
+	return cancelBattleTx
+}
+
+export async function claimBattleAndUnwrapSolTx(
+	connection: Connection,
+	program: Program<Solamon>,
+	player: PublicKey,
+	battleId: number
+) {
+	const claimBattleTx = new Transaction()
+
+	const { tokenAccount: playerATA, tx: playerCreateATATx } =
+		await getOrCreateNativeMintATA(connection, player, player)
+
+	const configAccount = await getConfigAccount(program)
+	const { tokenAccount: feeTokenAccount, tx: feeTokenCreateATATx } =
+		await getOrCreateNativeMintATA(
 			connection,
-			program,
-			player3.publicKey,
-			battleAccount.account.battleId.toNumber()
+			player,
+			configAccount.feeAccount
 		)
 
-		const txSig = await connection.sendTransaction(cancelBattleTx, [
-			player3,
-		])
-		await connection.confirmTransaction(txSig)
+	if (playerCreateATATx) {
+		claimBattleTx.add(playerCreateATATx)
+	}
 
-		const balanceAfter = await connection.getBalance(player3.publicKey)
+	if (feeTokenCreateATATx) {
+		claimBattleTx.add(feeTokenCreateATATx)
+	}
 
-		expect(balanceAfter).to.be.greaterThan(balanceBefore)
-	})
-})
+	const claimBattle = await program.methods
+		.claimBattle()
+		.accountsPartial({
+			player,
+			battleAccount: getBattleAccountPDA(program, battleId),
+			feeTokenAccount: feeTokenAccount,
+			playerTokenAccount: playerATA,
+		})
+		.transaction()
+
+	claimBattleTx.add(claimBattle)
+
+	const unwrapSolIxs = unwrapSolIx(playerATA, player, player)
+	claimBattleTx.add(unwrapSolIxs)
+
+	return claimBattleTx
+}

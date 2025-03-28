@@ -1,16 +1,20 @@
 'use client'
 
-import React, { useState } from 'react'
+import dynamic from 'next/dynamic'
+import React, { useEffect, useState } from 'react'
+
+import { BattleStatus } from '@/data/battle'
+import { CardData, CardElement, getElementEmoji } from '@/data/card'
+import { DrawableCards } from '@/data/draw'
+
+import CardStack from '@/components/CardStack'
+import GameResult from '@/components/GameResult'
+
 import Button from '../../components/Button'
 import Card from '../../components/Card'
-import dynamic from 'next/dynamic'
 import Modal from '../../components/Modal'
-import { DrawableCards } from '@/data/draw'
-import { CardData, CardElement, getElementEmoji } from '@/data/card'
-import { useRouter } from 'next/navigation'
-import CardStack from '@/components/CardStack'
-import { BattleStatus } from '@/data/battle'
-import GameResult from '@/components/GameResult'
+import { getConnection, getKeypairFromLocalStorage } from '@/lib/helper'
+import { Keypair, LAMPORTS_PER_SOL } from '@solana/web3.js'
 
 const DrawGame = dynamic(() => import('../draw/components/DrawGame'), {
   ssr: false,
@@ -86,6 +90,19 @@ const HomePage = () => {
   const [selectedBattle, setSelectedBattle] = useState<BattleStatus | null>(
     null
   )
+  const [balance, setBalance] = useState<number | null>(null)
+  const keypair = getKeypairFromLocalStorage()
+
+  useEffect(() => {
+    fetchBalance()
+  }, [])
+
+  const fetchBalance = async () => {
+    const connection = getConnection()
+    if (!keypair?.publicKey) return
+    const balance = await connection.getBalance(keypair.publicKey)
+    setBalance(balance / LAMPORTS_PER_SOL)
+  }
 
   const openModal = (modalKey: string, card?: CardData) => {
     setModals((prev) => ({ ...prev, [modalKey]: true }))
@@ -132,8 +149,12 @@ const HomePage = () => {
       <header className='header flex justify-between items-center mb-6'>
         <h1 className='text-4xl font-bold'>SOLAMON</h1>
         <div className='wallet-info text-right'>
-          <span className='block text-sm text-gray-400'>0x637b...1c8a</span>
-          <span className='block text-lg text-blue-400'>3.6416</span>
+          <span className='block text-sm text-gray-400'>
+            {keypair?.publicKey.toBase58()}
+          </span>
+          <span className='block text-lg text-blue-400'>
+            {balance ? balance : '0.00'}
+          </span>
         </div>
       </header>
 
