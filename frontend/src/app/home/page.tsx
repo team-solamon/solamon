@@ -81,8 +81,6 @@ const cardStackData: BattleStatus[] = [
 ]
 
 const HomePage = () => {
-  const router = useRouter()
-
   const [modals, setModals] = useState<{ [key: string]: boolean }>({})
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null)
   const [selectedBattle, setSelectedBattle] = useState<BattleStatus | null>(
@@ -295,7 +293,8 @@ const HomePage = () => {
         >
           <GameResult
             battleStatus={selectedBattle}
-            isPlayerWinner={selectedBattle.isPlayerWinner || false}
+            isPlayerWinner={selectedBattle.isPlayerWinner}
+            reward={selectedBattle.isPlayerWinner ? 0.1 : undefined}
           />
         </Modal>
       )}

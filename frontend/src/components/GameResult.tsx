@@ -1,6 +1,8 @@
 import React from 'react'
+import { useRouter } from 'next/navigation'
 import CardStack from './CardStack'
 import { BattleStatus } from '@/data/battle'
+import Button from './Button'
 
 interface GameResultProps {
   battleStatus: BattleStatus
@@ -13,6 +15,8 @@ const GameResult: React.FC<GameResultProps> = ({
   isPlayerWinner,
   reward,
 }) => {
+  const router = useRouter()
+
   const { myCards, opponentCards } = battleStatus
 
   return (
@@ -34,20 +38,28 @@ const GameResult: React.FC<GameResultProps> = ({
         </div>
       </div>
       <div className='mt-4 text-center'>
-        <button className='text-yellow-500 underline'>
+        <button
+          className='text-yellow-500 underline'
+          onClick={() => {
+            router.push('/game')
+          }}
+        >
           Battle replay &gt;
         </button>
-        {reward !== undefined && (
-          <div className='mt-2 flex items-center justify-center gap-2'>
-            <span className='text-lg font-bold'>{reward}</span>
-            <span className='text-sm'>SOL</span>
-            <button className='px-4 py-2 bg-yellow-500 text-white rounded'>
-              Claim
-            </button>
+        {reward !== undefined ? (
+          <div className='mt-2 flex flex-col items-center justify-center gap-2'>
+            <div className='flex items-center gap-2'>
+              <span className='text-lg font-bold'>{reward}</span>
+              <span className='text-sm'>SOL</span>
+            </div>
+            <Button>Claim</Button>
+          </div>
+        ) : (
+          <div className='mt-2'>
+            <Button>Close</Button>
           </div>
         )}
       </div>
-      <button className='mt-4 px-6 py-2 bg-gray-300 rounded'>Close</button>
     </div>
   )
 }
