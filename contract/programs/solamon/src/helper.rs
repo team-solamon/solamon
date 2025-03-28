@@ -3,6 +3,7 @@ use crate::BattleStatus;
 use crate::Element;
 use crate::Solamon;
 use anchor_lang::prelude::*;
+use anchor_spl::token::{self, TokenAccount, Transfer};
 
 pub fn pseudorandom_u64(seed: u64) -> u64 {
     let clock = Clock::get().unwrap();
@@ -142,4 +143,58 @@ pub fn calculate_damage(attacker: Solamon, defender: Solamon) -> (u8, String) {
     }
 
     (damage, event)
+}
+
+pub fn transfer_token<'info>(
+    from: &AccountInfo<'info>,
+    to: &AccountInfo<'info>,
+    authority: &AccountInfo<'info>,
+    token_program: &AccountInfo<'info>,
+    amount: u64,
+) -> Result<()> {
+    if amount == 0 {
+        return Ok(());
+    }
+
+    let from_token_info = from.to_account_info();
+
+    token::transfer(
+        CpiContext::new(
+            token_program.to_account_info(),
+            token::Transfer {
+                from: from_token_info,
+                to: to.to_account_info(),
+                authority: authority.to_account_info(),
+            },
+        ),
+        amount,
+    )
+}
+
+pub fn transfer_token_with_signer<'info>(
+    from: &AccountInfo<'info>,
+    to: &AccountInfo<'info>,
+    authority: &AccountInfo<'info>,
+    token_program: &AccountInfo<'info>,
+    amount: u64,
+    signer_seeds: &[&[&[u8]]],
+) -> Result<()> {
+    if amount == 0 {
+        return Ok(());
+    }
+
+    let from_token_info = from.to_account_info();
+
+    token::transfer(
+        CpiContext::new_with_signer(
+            token_program.to_account_info(),
+            token::Transfer {
+                from: from_token_info,
+                to: to.to_account_info(),
+                authority: authority.to_account_info(),
+            },
+            signer_seeds,
+        ),
+        amount,
+    )
 }

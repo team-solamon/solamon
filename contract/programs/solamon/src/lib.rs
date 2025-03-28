@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
-
+use anchor_spl::associated_token::AssociatedToken;
+use anchor_spl::token::{self, Mint, Token, TokenAccount};
 declare_id!("BcH8K2v6nUU72y3CctTH2zR7W2ZFpA94qqWZQerdAEnd");
 
 mod errors;
@@ -9,6 +10,8 @@ use constant::*;
 mod helper;
 use helper::*;
 
+//@TODO: user or player, choose one
+//@TODO: refactor this file
 #[program]
 pub mod solamon {
     use super::*;
@@ -108,7 +111,11 @@ pub mod solamon {
     }
 
     // TODO: Add fight money logic
-    pub fn open_battle(ctx: Context<OpenBattle>, solamon_ids: Vec<u16>) -> Result<()> {
+    pub fn open_battle(
+        ctx: Context<OpenBattle>,
+        solamon_ids: Vec<u16>,
+        battle_stake: u64,
+    ) -> Result<()> {
         require!(
             solamon_ids.len() == BATTLE_PARTICIPANTS,
             SolamonError::InvalidBattleParticipants
@@ -140,6 +147,16 @@ pub mod solamon {
             })
             .collect();
         battle_account.battle_status = BattleStatus::Pending;
+        battle_account.battle_stake = battle_stake;
+
+        transfer_token(
+            &ctx.accounts.player_token_account.to_account_info(),
+            &ctx.accounts.battle_stake_account.to_account_info(),
+            &ctx.accounts.player.to_account_info(),
+            &ctx.accounts.token_program.to_account_info(),
+            battle_stake,
+        )?;
+
         config_account.available_battle_ids.push(battle_id);
 
         user_account.battle_count += 1;
@@ -147,7 +164,6 @@ pub mod solamon {
         Ok(())
     }
 
-    // @TODO: add cancel battle logic
     pub fn cancel_battle(ctx: Context<CancelBattle>) -> Result<()> {
         let battle_account = &mut ctx.accounts.battle_account;
         let user_account = &mut ctx.accounts.user_account;
@@ -172,6 +188,16 @@ pub mod solamon {
                 .is_available = true;
         }
 
+        // return battle stake
+        transfer_token_with_signer(
+            &ctx.accounts.battle_stake_account.to_account_info(),
+            &ctx.accounts.player_token_account.to_account_info(),
+            &config_account.to_account_info(),
+            &ctx.accounts.token_program.to_account_info(),
+            battle_account.battle_stake,
+            &[&[CONFIG_ACCOUNT.as_ref(), &[config_account.bump]]],
+        )?;
+
         // remove battle from available battles
         config_account
             .available_battle_ids
@@ -181,7 +207,6 @@ pub mod solamon {
         Ok(())
     }
 
-    // TODO: Add fight money logic
     pub fn join_battle(ctx: Context<JoinBattle>, solamon_ids: Vec<u16>) -> Result<()> {
         require!(
             solamon_ids.len() == BATTLE_PARTICIPANTS,
@@ -210,6 +235,14 @@ pub mod solamon {
             })
             .collect();
 
+        transfer_token(
+            &ctx.accounts.player_token_account.to_account_info(),
+            &ctx.accounts.battle_stake_account.to_account_info(),
+            &ctx.accounts.player.to_account_info(),
+            &ctx.accounts.token_program.to_account_info(),
+            battle_account.battle_stake,
+        )?;
+
         let battle_status = execute_battle(&mut battle_account.clone());
         battle_account.battle_status = battle_status;
         user_account.battle_count += 1;
@@ -231,6 +264,67 @@ pub mod solamon {
             });
         Ok(())
     }
+
+    pub fn claim_battle(ctx: Context<ClaimBattle>) -> Result<()> {
+        let battle_account = &mut ctx.accounts.battle_account;
+        let config_account = &mut ctx.accounts.config_account;
+
+        let winner = match battle_account.battle_status {
+            BattleStatus::Player1Wins => battle_account.player_1,
+            BattleStatus::Player2Wins => battle_account.player_2,
+            _ => return Err(SolamonError::InvalidBattleStatus.into()),
+        };
+
+        require!(
+            winner == ctx.accounts.player.key(),
+            SolamonError::InvalidBattleWinner
+        );
+
+        require!(
+            battle_account.claim_timestamp == 0,
+            SolamonError::BattleAlreadyClaimed
+        );
+
+        let claimable_amount = battle_account.battle_stake * 2;
+        let fee = claimable_amount * config_account.fee_percentage_in_basis_points as u64
+            / MAX_BASIS_POINTS as u64;
+
+        msg!("Claimable amount: {}", claimable_amount);
+        msg!("Fee: {}", fee);
+        msg!(
+            "Current Balance of Battle Stake Account: {}",
+            ctx.accounts.battle_stake_account.amount
+        );
+
+        // transfer prize money
+        transfer_token_with_signer(
+            &ctx.accounts.battle_stake_account.to_account_info(),
+            &ctx.accounts.player_token_account.to_account_info(),
+            &config_account.to_account_info(),
+            &ctx.accounts.token_program.to_account_info(),
+            claimable_amount - fee,
+            &[&[CONFIG_ACCOUNT.as_ref(), &[config_account.bump]]],
+        )?;
+
+        msg!("Transferred prize money: {}", claimable_amount - fee);
+        msg!(
+            "Current Balance of Battle Stake Account: {}",
+            ctx.accounts.battle_stake_account.amount
+        );
+
+        // transfer fee to fee account
+        transfer_token_with_signer(
+            &ctx.accounts.battle_stake_account.to_account_info(),
+            &ctx.accounts.fee_token_account.to_account_info(),
+            &config_account.to_account_info(),
+            &ctx.accounts.token_program.to_account_info(),
+            fee,
+            &[&[CONFIG_ACCOUNT.as_ref(), &[config_account.bump]]],
+        )?;
+
+        battle_account.claim_timestamp = Clock::get()?.unix_timestamp;
+        Ok(())
+    }
 }
 
 #[derive(Accounts)]
@@ -241,6 +335,18 @@ pub struct Initialize<'info> {
     #[account(init, payer = signer, space = ConfigAccount::INIT_SPACE, seeds = [CONFIG_ACCOUNT], bump)]
     pub config_account: Account<'info, ConfigAccount>,
 
+    #[account(address = NATIVE_MINT)]
+    pub mint: Account<'info, Mint>,
+
+    #[account(init,
+        payer = signer,
+        associated_token::mint = mint,
+        associated_token::authority = config_account,
+    )]
+    pub battle_stake_account: Account<'info, TokenAccount>,
+
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
 }
 
@@ -398,6 +504,25 @@ pub struct OpenBattle<'info> {
     )]
     pub battle_account: Account<'info, BattleAccount>,
 
+    #[account(
+        mut,
+        token::mint = mint,
+        token::authority = player
+    )]
+    pub player_token_account: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = config_account
+    )]
+    pub battle_stake_account: Account<'info, TokenAccount>,
+
+    #[account(address = NATIVE_MINT)]
+    pub mint: Account<'info, Mint>,
+
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
 }
 
@@ -410,8 +535,8 @@ pub struct BattleAccount {
     pub player_1_solamons: Vec<Solamon>,
     pub player_2_solamons: Vec<Solamon>,
     pub battle_status: BattleStatus,
-    pub fight_money: u64,
-    pub claim_timestamp: u64,
+    pub battle_stake: u64,
+    pub claim_timestamp: i64,
 }
 
 impl Space for BattleAccount {
@@ -452,6 +577,27 @@ pub struct JoinBattle<'info> {
 
     #[account(mut, seeds = [USER_ACCOUNT, battle_account.player_1.as_ref()], bump = opponent_user_account.bump)]
     pub opponent_user_account: Account<'info, UserAccount>,
+
+    #[account(
+        mut,
+        token::mint = mint,
+        token::authority = player
+    )]
+    pub player_token_account: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = config_account
+    )]
+    pub battle_stake_account: Account<'info, TokenAccount>,
+
+    #[account(address = NATIVE_MINT)]
+    pub mint: Account<'info, Mint>,
+
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -467,4 +613,64 @@ pub struct CancelBattle<'info> {
 
     #[account(mut, seeds = [USER_ACCOUNT, player.key().as_ref()], bump = user_account.bump)]
     pub user_account: Account<'info, UserAccount>,
+
+    #[account(
+        mut,
+        token::mint = mint,
+        token::authority = player
+    )]
+    pub player_token_account: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = config_account
+    )]
+    pub battle_stake_account: Account<'info, TokenAccount>,
+
+    #[account(address = NATIVE_MINT)]
+    pub mint: Account<'info, Mint>,
+
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct ClaimBattle<'info> {
+    #[account(mut)]
+    pub player: Signer<'info>,
+
+    #[account(mut, seeds = [CONFIG_ACCOUNT], bump = config_account.bump)]
+    pub config_account: Account<'info, ConfigAccount>,
+    #[account(mut, seeds = [BATTLE_ACCOUNT, &battle_account.battle_id.to_le_bytes()], bump = battle_account.bump)]
+    pub battle_account: Account<'info, BattleAccount>,
+
+    #[account(
+        mut,
+        token::mint = mint,
+        token::authority = config_account.fee_account
+    )]
+    pub fee_token_account: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        token::mint = mint,
+        token::authority = player
+    )]
+    pub player_token_account: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = config_account
+    )]
+    pub battle_stake_account: Account<'info, TokenAccount>,
+
+    #[account(address = NATIVE_MINT)]
+    pub mint: Account<'info, Mint>,
+
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub system_program: Program<'info, System>,
 }

@@ -1,7 +1,7 @@
 import * as anchor from "@coral-xyz/anchor"
 import { BN, Program } from "@coral-xyz/anchor"
 import { Solamon } from "../target/types/solamon"
-import { Connection, LAMPORTS_PER_SOL } from "@solana/web3.js"
+import { Connection, LAMPORTS_PER_SOL, Transaction } from "@solana/web3.js"
 import { expect } from "chai"
 import {
 	getBattleAccount,
@@ -11,11 +11,15 @@ import {
 	getConfigAccount,
 	getConfigPDA,
 	getUserAccount,
-	getUserAccountPDA,
 	getBattleLogs,
-	Element,
 	SolamonPrototype,
 	getSolamonPrototypeAccount,
+	getOrCreateNativeMintATA,
+	wrapSolAndOpenBattleTx,
+	wrapSolAndJoinBattleTx,
+	cancelBattleAndUnwrapSolTx,
+	claimBattleAndUnwrapSolTx,
+	BattleStatus,
 } from "./helper"
 
 describe("solamon", () => {
@@ -28,6 +32,14 @@ describe("solamon", () => {
 	const player = anchor.web3.Keypair.generate()
 	const player2 = anchor.web3.Keypair.generate()
 	const player3 = anchor.web3.Keypair.generate()
+	const battleStake = LAMPORTS_PER_SOL * 0.1
+
+	console.log({
+		player: player.publicKey.toBase58(),
+		player2: player2.publicKey.toBase58(),
+		player3: player3.publicKey.toBase58(),
+		admin: admin.publicKey.toBase58(),
+	})
 
 	beforeEach(async () => {
 		const txs = await Promise.all([
@@ -41,8 +53,7 @@ describe("solamon", () => {
 
 	it("Is initialized", async () => {
 		// Derive the PDA for the config account
-
-		const spawnFee = LAMPORTS_PER_SOL * 0.1
+		const spawnFee = LAMPORTS_PER_SOL * 0.01
 		const feePercentageInBasisPoints = 100
 		const tx = await program.methods
 			.initialize(
@@ -185,13 +196,15 @@ describe("solamon", () => {
 			.map((solamon) => solamon.id)
 			.slice(0, 3)
 
-		const txSig = await program.methods
-			.openBattle(solamonIds)
-			.accounts({
-				player: player.publicKey,
-			})
-			.signers([player])
-			.rpc()
+		const openBattleTx = await wrapSolAndOpenBattleTx(
+			connection,
+			program,
+			player.publicKey,
+			battleStake,
+			solamonIds
+		)
+
+		const txSig = await connection.sendTransaction(openBattleTx, [player])
 
 		await connection.confirmTransaction(txSig)
 
@@ -211,6 +224,19 @@ describe("solamon", () => {
 
 		const userAccountAfter = await getUserAccount(program, player.publicKey)
 		expect(userAccountAfter.battleCount.toNumber()).to.equal(1)
+
+		const { tokenAccount: configAccountATA } =
+			await getOrCreateNativeMintATA(
+				connection,
+				getConfigPDA(program),
+				getConfigPDA(program)
+			)
+
+		const stakeBalance = await connection.getTokenAccountBalance(
+			configAccountATA
+		)
+
+		expect(stakeBalance.value.amount).to.equal(battleStake.toString())
 	})
 
 	it("Player 2 joins battle", async () => {
@@ -224,16 +250,14 @@ describe("solamon", () => {
 
 		const battleId = 0 // Example battle ID
 
-		const txSig = await program.methods
-			.joinBattle(solamonIds)
-			.accountsPartial({
-				player: player2.publicKey,
-				configAccount: getConfigPDA(program),
-				battleAccount: getBattleAccountPDA(program, battleId),
-				userAccount: getUserAccountPDA(program, player2.publicKey),
-			})
-			.signers([player2])
-			.rpc()
+		const joinBattleTx = await wrapSolAndJoinBattleTx(
+			connection,
+			program,
+			player2.publicKey,
+			battleId,
+			solamonIds
+		)
+		const txSig = await connection.sendTransaction(joinBattleTx, [player2])
 
 		await connection.confirmTransaction(txSig)
 
@@ -242,15 +266,39 @@ describe("solamon", () => {
 			getBattleAccountPDA(program, battleId)
 		)
 
-		console.log({ battleLogs })
-
 		expect(battleLogs.length).to.be.greaterThan(0)
 
 		const battleAccountsByUser = await getBattleAccountsByUser(
 			program,
 			player2.publicKey
 		)
-		console.log({ battleAccountsByUser })
+	})
+
+	it("Winner claims battle", async () => {
+		const battleId = 0
+		const battleAccount = await getBattleAccount(program, battleId)
+		const winner =
+			JSON.stringify(battleAccount.battleStatus) ===
+			JSON.stringify({ player1Wins: {} })
+				? player
+				: player2
+
+		const winnerBalanceBefore = await connection.getBalance(
+			winner.publicKey
+		)
+
+		const claimBattleTx = await claimBattleAndUnwrapSolTx(
+			connection,
+			program,
+			winner.publicKey,
+			battleId
+		)
+
+		const txSig = await connection.sendTransaction(claimBattleTx, [winner])
+		await connection.confirmTransaction(txSig)
+
+		const winnerBalanceAfter = await connection.getBalance(winner.publicKey)
+		expect(winnerBalanceAfter).to.be.greaterThan(winnerBalanceBefore)
 	})
 
 	it("Player 3 opens multiple battles", async () => {
@@ -262,17 +310,25 @@ describe("solamon", () => {
 		const configAccountBefore = await getConfigAccount(program)
 		const numberOfBattlesToOpen = 3
 
+		const balance1 = await connection.getBalance(player.publicKey)
+		const balance2 = await connection.getBalance(player2.publicKey)
+		const balance3 = await connection.getBalance(player3.publicKey)
+
 		for (let i = 0; i < numberOfBattlesToOpen; i++) {
 			const solamonIds = userAccountBefore.solamons
 				.map((solamon) => solamon.id)
 				.slice(0 + i * 3, 3 + i * 3)
 
-			const txSig = await program.methods
-				.openBattle(solamonIds)
-				.accounts({ player: player3.publicKey })
-				.signers([player3])
-				.rpc()
-
+			const openBattleTx = await wrapSolAndOpenBattleTx(
+				connection,
+				program,
+				player3.publicKey,
+				battleStake,
+				solamonIds
+			)
+			const txSig = await connection.sendTransaction(openBattleTx, [
+				player3,
+			])
 			await connection.confirmTransaction(txSig)
 		}
 
@@ -294,7 +350,6 @@ describe("solamon", () => {
 		)
 
 		const battleAccounts = await getAllBattleAccounts(program)
-		console.log({ battleAccounts })
 
 		const battleAccountsByUser = await getBattleAccountsByUser(
 			program,
@@ -308,30 +363,29 @@ describe("solamon", () => {
 	})
 
 	it("Player 3 cancels one battle", async () => {
+		const balanceBefore = await connection.getBalance(player3.publicKey)
+
 		const battleAccountsByUser = await getBattleAccountsByUser(
 			program,
 			player3.publicKey
 		)
 
 		const battleAccount = battleAccountsByUser.player1BattleAccounts[0]
-		console.log({ battleAccount })
-		console.log(battleAccount.publicKey)
 
-		const txSig = await program.methods
-			.cancelBattle()
-			.accountsPartial({
-				player: player3.publicKey,
-				battleAccount: battleAccount.publicKey,
-			})
-			.signers([player3])
-			.rpc()
-
-		await connection.confirmTransaction(txSig)
-
-		const battleAccountAfter = await getBattleAccount(
+		const cancelBattleTx = await cancelBattleAndUnwrapSolTx(
+			connection,
 			program,
+			player3.publicKey,
 			battleAccount.account.battleId.toNumber()
 		)
-		console.log({ battleAccountAfter })
+
+		const txSig = await connection.sendTransaction(cancelBattleTx, [
+			player3,
+		])
+		await connection.confirmTransaction(txSig)
+
+		const balanceAfter = await connection.getBalance(player3.publicKey)
+
+		expect(balanceAfter).to.be.greaterThan(balanceBefore)
 	})
 })
