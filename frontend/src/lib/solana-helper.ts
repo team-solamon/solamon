@@ -25,6 +25,7 @@ import { Solamon } from "../target/types/solamon"
 export type SolamonPrototype = IdlTypes<Solamon>["solamonPrototype"]
 export type Element = IdlTypes<Solamon>["element"]
 export type BattleStatus = IdlTypes<Solamon>["battleStatus"]
+export type CardData = IdlTypes<Solamon>["solamon"]
 
 export const getConfigPDA = (program: Program<Solamon>) => {
 	const [configPDA, _bump] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -299,16 +300,7 @@ export async function spawnSolamonsTx(
 export async function showSpawnResult(
 	connection: Connection,
 	txSig: string
-): Promise<
-	{
-		id: number
-		species: number
-		element: string
-		attack: number
-		health: number
-		isAvailable: boolean
-	}[]
-> {
+): Promise<CardData[]> {
 	const tx = await connection.getTransaction(txSig, {
 		commitment: "confirmed",
 	})
@@ -323,14 +315,41 @@ export async function showSpawnResult(
 	return logs
 }
 
-export function parseSolamonLog(logString: string): {
-	id: number
-	species: number
-	element: string
-	attack: number
-	health: number
-	isAvailable: boolean
-} {
+export function stringToElement(elementStr: string): Element {
+	switch (elementStr.toLowerCase()) {
+		case "fire":
+			return { fire: {} }
+		case "wood":
+			return { wood: {} }
+		case "earth":
+			return { earth: {} }
+		case "water":
+			return { water: {} }
+		case "metal":
+			return { metal: {} }
+		default:
+			throw new Error(`Unknown element: ${elementStr}`)
+	}
+}
+
+export function elementToString(element: Element): string {
+	switch (JSON.stringify(element)) {
+		case JSON.stringify({ fire: {} }):
+			return "fire"
+		case JSON.stringify({ wood: {} }):
+			return "wood"
+		case JSON.stringify({ earth: {} }):
+			return "earth"
+		case JSON.stringify({ water: {} }):
+			return "water"
+		case JSON.stringify({ metal: {} }):
+			return "metal"
+		default:
+			throw new Error(`Unknown element: ${JSON.stringify(element)}`)
+	}
+}
+
+export function parseSolamonLog(logString: string): CardData {
 	// Handle the specific format from the logs
 	// Convert from "{ id: 0, species: 3, element: Metal, attack: 3, health: 12, is_available: true }"
 	// to a proper JavaScript object
@@ -348,6 +367,9 @@ export function parseSolamonLog(logString: string): {
 		/isAvailable:\s*(true|false)/
 	)
 
+	// Map the string to the enum
+	const element = stringToElement(elementMatch[1])
+
 	if (
 		!idMatch ||
 		!speciesMatch ||
@@ -362,7 +384,7 @@ export function parseSolamonLog(logString: string): {
 	return {
 		id: parseInt(idMatch[1]),
 		species: parseInt(speciesMatch[1]),
-		element: elementMatch[1],
+		element,
 		attack: parseInt(attackMatch[1]),
 		health: parseInt(healthMatch[1]),
 		isAvailable: isAvailableMatch[1] === "true",

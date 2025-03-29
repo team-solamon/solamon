@@ -4,7 +4,7 @@ import React from 'react'
 import Modal from '../Modal'
 import Card from '../Card'
 import { useModal } from '@/contexts/ModalContext'
-import { CardData } from '@/data/card'
+import { CardData, elementToString } from '@/lib/solana-helper'
 
 interface CardDetailsModalProps {
   selectedCard: CardData | null
@@ -28,7 +28,7 @@ const CardDetailsModal: React.FC<CardDetailsModalProps> = ({
           <div className='flex justify-center mb-4'>
             <Card card={selectedCard} />
           </div>
-          <p>Element: {selectedCard.element}</p>
+          <p>Element: {elementToString(selectedCard.element)}</p>
           <p>Attack: {selectedCard.attack}</p>
           <p>Health: {selectedCard.health}</p>
         </div>
