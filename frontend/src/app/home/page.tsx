@@ -1,27 +1,22 @@
 'use client'
 
-import dynamic from 'next/dynamic'
 import React, { useState } from 'react'
-
-import { BattleStatus } from '@/data/battle'
 import { CardData, CardElement, getElementEmoji } from '@/data/card'
 import { DrawableCards } from '@/data/draw'
-
 import CardStack from '@/components/CardStack'
-import GameResult from '@/components/GameResult'
 import Nav from '@/components/Nav'
-
 import Button from '../../components/Button'
 import Card from '../../components/Card'
-import Modal from '../../components/Modal'
+import { ModalProvider, useModal } from '@/contexts/ModalContext'
 
-const DrawGame = dynamic(() => import('../draw/components/DrawGame'), {
-  ssr: false,
-})
-
-const Tutorial = dynamic(() => import('../../components/Tutorial'), {
-  ssr: false,
-})
+// Import modal components
+import TutorialModal from '@/components/modals/TutorialModal'
+import PurchaseCardModal from '@/components/modals/PurchaseCardModal'
+import NewCardModal from '@/components/modals/NewCardModal'
+import ViewAllCardsModal from '@/components/modals/ViewAllCardsModal'
+import CardDetailsModal from '@/components/modals/CardDetailsModal'
+import ResultModal from '@/components/modals/ResultModal'
+import { BattleStatus } from '@/data/battle'
 
 const drawableCards: DrawableCards = {
   cards: [
@@ -82,21 +77,16 @@ const cardStackData: BattleStatus[] = [
   },
 ]
 
-const HomePage = () => {
-  const [modals, setModals] = useState<{ [key: string]: boolean }>({})
+const HomePageContent = () => {
+  const { openModal, closeModal } = useModal()
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null)
   const [selectedBattle, setSelectedBattle] = useState<BattleStatus | null>(
     null
   )
 
-  const openModal = (modalKey: string, card?: CardData) => {
-    setModals((prev) => ({ ...prev, [modalKey]: true }))
-    if (card) setSelectedCard(card)
-  }
-
-  const closeModal = (modalKey: string) => {
-    setModals((prev) => ({ ...prev, [modalKey]: false }))
-    if (modalKey === 'cardDetails') setSelectedCard(null)
+  const handleNewCardFromTutorial = () => {
+    closeModal('tutorial')
+    openModal('purchaseCard')
   }
 
   const handlePurchase = () => {
@@ -107,11 +97,6 @@ const HomePage = () => {
   const handleViewAllCards = () => {
     closeModal('newCard')
     openModal('viewAllCards')
-  }
-
-  const handleNewCardFromTutorial = () => {
-    closeModal('tutorial')
-    openModal('purchaseCard')
   }
 
   const getElementCounts = () => {
@@ -204,7 +189,12 @@ const HomePage = () => {
                 className='card bg-gray-700 p-4 rounded-lg flex flex-col items-center'
               >
                 <Card card={card} className='mx-auto' />
-                <Button onClick={() => openModal('cardDetails', card)}>
+                <Button
+                  onClick={() => {
+                    setSelectedCard(card)
+                    openModal('cardDetails')
+                  }}
+                >
                   Stats
                 </Button>
               </div>
@@ -213,94 +203,25 @@ const HomePage = () => {
         </div>
       </section>
 
-      <Modal
-        isOpen={modals['tutorial']}
-        onClose={() => closeModal('tutorial')}
-        title='Tutorial'
-        maxWidth='600px'
-      >
-        <Tutorial onNewCard={handleNewCardFromTutorial} />
-      </Modal>
-
-      <Modal
-        isOpen={modals['purchaseCard']}
-        onClose={() => closeModal('purchaseCard')}
-        title='Purchase Card'
-        maxWidth='400px'
-      >
-        <div className='purchase-modal text-center flex flex-col items-center'>
-          <img
-            src='/images/game/cardpack.png'
-            alt='Card Pack'
-            className='w-32 h-auto mb-4'
-          />
-          <div className='flex justify-center gap-4'>
-            <Button onClick={handlePurchase}>+ New Card (0.1)</Button>
-          </div>
-        </div>
-      </Modal>
-
-      <Modal
-        isOpen={modals['newCard']}
-        onClose={() => closeModal('newCard')}
-        title='+ New Card'
-      >
-        <DrawGame drawableCards={drawableCards} />
-        <Button onClick={handleViewAllCards}>Open All</Button>
-      </Modal>
-
-      <Modal
-        isOpen={modals['viewAllCards']}
-        onClose={() => closeModal('viewAllCards')}
-        title='Result'
-        maxWidth='600px'
-      >
-        <div className='flex justify-center overflow-x-auto gap-4 p-2'>
-          {drawableCards.cards.map((card, index) => (
-            <div
-              key={index}
-              className='card bg-gray-700 p-2 rounded-lg flex-shrink-0 w-24'
-            >
-              <Card card={card} className='mx-auto' />
-            </div>
-          ))}
-        </div>
-      </Modal>
-
-      <Modal
-        isOpen={modals['cardDetails']}
-        onClose={() => closeModal('cardDetails')}
-        title='Card Details'
-        maxWidth='400px'
-      >
-        {selectedCard && (
-          <div className='card-details text-center'>
-            <h3 className='text-2xl font-bold mb-4'>{selectedCard.name}</h3>
-            <div className='flex justify-center mb-4'>
-              <Card card={selectedCard} />
-            </div>
-            <p>Element: {selectedCard.element}</p>
-            <p>Attack: {selectedCard.attack}</p>
-            <p>Health: {selectedCard.health}</p>
-          </div>
-        )}
-      </Modal>
-
-      {selectedBattle && selectedBattle.status === 'result' && (
-        <Modal
-          isOpen={modals['result']}
-          onClose={() => closeModal('result')}
-          title={selectedBattle.isPlayerWinner ? 'Win' : 'Lose'}
-          maxWidth='600px'
-        >
-          <GameResult
-            battleStatus={selectedBattle}
-            isPlayerWinner={selectedBattle.isPlayerWinner}
-            reward={selectedBattle.isPlayerWinner ? 0.1 : undefined}
-          />
-        </Modal>
-      )}
+      {/* Modals */}
+      <TutorialModal onNewCard={handleNewCardFromTutorial} />
+      <PurchaseCardModal onPurchase={handlePurchase} />
+      <NewCardModal
+        drawableCards={drawableCards}
+        onViewAll={handleViewAllCards}
+      />
+      <ViewAllCardsModal drawableCards={drawableCards} />
+      <CardDetailsModal selectedCard={selectedCard} />
+      <ResultModal selectedBattle={selectedBattle} />
     </div>
+  )
+}
+
+const HomePage = () => {
+  return (
+    <ModalProvider>
+      <HomePageContent />
+    </ModalProvider>
   )
 }
 

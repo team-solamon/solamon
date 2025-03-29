@@ -49,6 +49,8 @@ export const metadata: Metadata = {
   // ],
 }
 
+import { ModalProvider } from '@/contexts/ModalContext'
+
 export default function RootLayout({
   children,
 }: {
@@ -56,7 +58,9 @@ export default function RootLayout({
 }) {
   return (
     <html>
-      <body>{children}</body>
+      <body>
+        <ModalProvider>{children}</ModalProvider>
+      </body>
     </html>
   )
 }
