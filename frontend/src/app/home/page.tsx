@@ -17,6 +17,15 @@ import ViewAllCardsModal from '@/components/modals/ViewAllCardsModal'
 import CardDetailsModal from '@/components/modals/CardDetailsModal'
 import ResultModal from '@/components/modals/ResultModal'
 import { BattleStatus } from '@/data/battle'
+import { showSpawnResult, spawnSolamonsTx } from '@/lib/solana-helper'
+import {
+  getConnection,
+  getKeypairFromLocalStorage,
+  getProgram,
+} from '@/lib/helper'
+import { Program } from '@coral-xyz/anchor'
+import { Solamon } from '@/target/types/solamon'
+import { useLoading } from '@/contexts/LoadingContext'
 
 const drawableCards: DrawableCards = {
   cards: [
@@ -83,13 +92,44 @@ const HomePageContent = () => {
   const [selectedBattle, setSelectedBattle] = useState<BattleStatus | null>(
     null
   )
+  const [spawnResult, setSpawnResult] = useState<
+    | {
+        id: number
+        species: number
+        element: string
+        attack: number
+        health: number
+        isAvailable: boolean
+      }[]
+    | null
+  >(null)
+  const { showLoading, hideLoading } = useLoading()
 
   const handleNewCardFromTutorial = () => {
     closeModal('tutorial')
     openModal('purchaseCard')
   }
 
-  const handlePurchase = () => {
+  const handlePurchase = async (amount: number) => {
+    showLoading('Spawning solamons...')
+    const connection = getConnection()
+    const program = getProgram()
+    const player = getKeypairFromLocalStorage()
+    if (!player) {
+      console.error('No player found')
+      return
+    }
+    const tx = await spawnSolamonsTx(
+      connection,
+      program,
+      player.publicKey,
+      amount
+    )
+    const txSig = await connection.sendTransaction(tx, [player])
+    await connection.confirmTransaction(txSig)
+    const spawnResult = await showSpawnResult(connection, txSig)
+    setSpawnResult(spawnResult)
+    hideLoading()
     closeModal('purchaseCard')
     openModal('newCard')
   }

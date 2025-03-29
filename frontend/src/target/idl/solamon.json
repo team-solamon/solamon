@@ -1,10 +1,4 @@
-/**
- * Program IDL in camelCase format in order to be used in JS/TS.
- *
- * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/solamon.json`.
- */
-export type Solamon = {
+{
   "address": "9k156rBEyhLRkf9U4S6ZxKQysB2nVAqNTDVxDSXg57Vt",
   "metadata": {
     "name": "solamon",
@@ -14,7 +8,7 @@ export type Solamon = {
   },
   "instructions": [
     {
-      "name": "cancelBattle",
+      "name": "cancel_battle",
       "discriminator": [
         234,
         61,
@@ -32,7 +26,7 @@ export type Solamon = {
           "signer": true
         },
         {
-          "name": "configAccount",
+          "name": "config_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -59,7 +53,7 @@ export type Solamon = {
           }
         },
         {
-          "name": "battleAccount",
+          "name": "battle_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -85,13 +79,13 @@ export type Solamon = {
               {
                 "kind": "account",
                 "path": "battle_account.battle_id",
-                "account": "battleAccount"
+                "account": "BattleAccount"
               }
             ]
           }
         },
         {
-          "name": "userAccount",
+          "name": "user_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -120,17 +114,17 @@ export type Solamon = {
           }
         },
         {
-          "name": "playerTokenAccount",
+          "name": "player_token_account",
           "writable": true
         },
         {
-          "name": "battleStakeAccount",
+          "name": "battle_stake_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "configAccount"
+                "path": "config_account"
               },
               {
                 "kind": "const",
@@ -218,22 +212,22 @@ export type Solamon = {
           "address": "So11111111111111111111111111111111111111112"
         },
         {
-          "name": "tokenProgram",
+          "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "associatedTokenProgram",
+          "name": "associated_token_program",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
       ],
       "args": []
     },
     {
-      "name": "claimBattle",
+      "name": "claim_battle",
       "discriminator": [
         156,
         179,
@@ -251,7 +245,7 @@ export type Solamon = {
           "signer": true
         },
         {
-          "name": "configAccount",
+          "name": "config_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -278,7 +272,7 @@ export type Solamon = {
           }
         },
         {
-          "name": "battleAccount",
+          "name": "battle_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -304,27 +298,27 @@ export type Solamon = {
               {
                 "kind": "account",
                 "path": "battle_account.battle_id",
-                "account": "battleAccount"
+                "account": "BattleAccount"
               }
             ]
           }
         },
         {
-          "name": "feeTokenAccount",
+          "name": "fee_token_account",
           "writable": true
         },
         {
-          "name": "playerTokenAccount",
+          "name": "player_token_account",
           "writable": true
         },
         {
-          "name": "battleStakeAccount",
+          "name": "battle_stake_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "configAccount"
+                "path": "config_account"
               },
               {
                 "kind": "const",
@@ -412,22 +406,22 @@ export type Solamon = {
           "address": "So11111111111111111111111111111111111111112"
         },
         {
-          "name": "tokenProgram",
+          "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "associatedTokenProgram",
+          "name": "associated_token_program",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
       ],
       "args": []
     },
     {
-      "name": "createSolamonPrototype",
+      "name": "create_solamon_prototype",
       "discriminator": [
         147,
         26,
@@ -445,7 +439,7 @@ export type Solamon = {
           "signer": true
         },
         {
-          "name": "configAccount",
+          "name": "config_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -472,7 +466,7 @@ export type Solamon = {
           }
         },
         {
-          "name": "solamonPrototypeAccount",
+          "name": "solamon_prototype_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -510,17 +504,17 @@ export type Solamon = {
           }
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "solamonPrototypes",
+          "name": "solamon_prototypes",
           "type": {
             "vec": {
               "defined": {
-                "name": "solamonPrototype"
+                "name": "SolamonPrototype"
               }
             }
           }
@@ -546,7 +540,7 @@ export type Solamon = {
           "signer": true
         },
         {
-          "name": "configAccount",
+          "name": "config_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -577,13 +571,13 @@ export type Solamon = {
           "address": "So11111111111111111111111111111111111111112"
         },
         {
-          "name": "battleStakeAccount",
+          "name": "battle_stake_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "configAccount"
+                "path": "config_account"
               },
               {
                 "kind": "const",
@@ -667,21 +661,21 @@ export type Solamon = {
           }
         },
         {
-          "name": "associatedTokenProgram",
+          "name": "associated_token_program",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
-          "name": "tokenProgram",
+          "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "feeAccount",
+          "name": "fee_account",
           "type": "pubkey"
         },
         {
@@ -689,17 +683,17 @@ export type Solamon = {
           "type": "pubkey"
         },
         {
-          "name": "feePercentageInBasisPoints",
+          "name": "fee_percentage_in_basis_points",
           "type": "u16"
         },
         {
-          "name": "spawnFee",
+          "name": "spawn_fee",
           "type": "u64"
         }
       ]
     },
     {
-      "name": "joinBattle",
+      "name": "join_battle",
       "discriminator": [
         126,
         0,
@@ -717,7 +711,7 @@ export type Solamon = {
           "signer": true
         },
         {
-          "name": "configAccount",
+          "name": "config_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -744,7 +738,7 @@ export type Solamon = {
           }
         },
         {
-          "name": "battleAccount",
+          "name": "battle_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -770,13 +764,13 @@ export type Solamon = {
               {
                 "kind": "account",
                 "path": "battle_account.battle_id",
-                "account": "battleAccount"
+                "account": "BattleAccount"
               }
             ]
           }
         },
         {
-          "name": "userAccount",
+          "name": "user_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -805,7 +799,7 @@ export type Solamon = {
           }
         },
         {
-          "name": "opponentUserAccount",
+          "name": "opponent_user_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -829,23 +823,23 @@ export type Solamon = {
               {
                 "kind": "account",
                 "path": "battle_account.player_1",
-                "account": "battleAccount"
+                "account": "BattleAccount"
               }
             ]
           }
         },
         {
-          "name": "playerTokenAccount",
+          "name": "player_token_account",
           "writable": true
         },
         {
-          "name": "battleStakeAccount",
+          "name": "battle_stake_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "configAccount"
+                "path": "config_account"
               },
               {
                 "kind": "const",
@@ -933,21 +927,21 @@ export type Solamon = {
           "address": "So11111111111111111111111111111111111111112"
         },
         {
-          "name": "tokenProgram",
+          "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "associatedTokenProgram",
+          "name": "associated_token_program",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "solamonIds",
+          "name": "solamon_ids",
           "type": {
             "vec": "u16"
           }
@@ -955,7 +949,7 @@ export type Solamon = {
       ]
     },
     {
-      "name": "openBattle",
+      "name": "open_battle",
       "discriminator": [
         191,
         110,
@@ -973,7 +967,7 @@ export type Solamon = {
           "signer": true
         },
         {
-          "name": "configAccount",
+          "name": "config_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1000,7 +994,7 @@ export type Solamon = {
           }
         },
         {
-          "name": "userAccount",
+          "name": "user_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1029,7 +1023,7 @@ export type Solamon = {
           }
         },
         {
-          "name": "battleAccount",
+          "name": "battle_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1055,23 +1049,23 @@ export type Solamon = {
               {
                 "kind": "account",
                 "path": "config_account.battle_count",
-                "account": "configAccount"
+                "account": "ConfigAccount"
               }
             ]
           }
         },
         {
-          "name": "playerTokenAccount",
+          "name": "player_token_account",
           "writable": true
         },
         {
-          "name": "battleStakeAccount",
+          "name": "battle_stake_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "configAccount"
+                "path": "config_account"
               },
               {
                 "kind": "const",
@@ -1159,33 +1153,33 @@ export type Solamon = {
           "address": "So11111111111111111111111111111111111111112"
         },
         {
-          "name": "tokenProgram",
+          "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "associatedTokenProgram",
+          "name": "associated_token_program",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "solamonIds",
+          "name": "solamon_ids",
           "type": {
             "vec": "u16"
           }
         },
         {
-          "name": "battleStake",
+          "name": "battle_stake",
           "type": "u64"
         }
       ]
     },
     {
-      "name": "spawnSolamons",
+      "name": "spawn_solamons",
       "discriminator": [
         130,
         43,
@@ -1203,7 +1197,7 @@ export type Solamon = {
           "signer": true
         },
         {
-          "name": "userAccount",
+          "name": "user_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1232,7 +1226,7 @@ export type Solamon = {
           }
         },
         {
-          "name": "configAccount",
+          "name": "config_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1259,11 +1253,11 @@ export type Solamon = {
           }
         },
         {
-          "name": "feeAccount",
+          "name": "fee_account",
           "writable": true
         },
         {
-          "name": "solamonPrototypeAccount",
+          "name": "solamon_prototype_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1301,7 +1295,7 @@ export type Solamon = {
           }
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
       ],
@@ -1315,7 +1309,7 @@ export type Solamon = {
   ],
   "accounts": [
     {
-      "name": "battleAccount",
+      "name": "BattleAccount",
       "discriminator": [
         151,
         107,
@@ -1328,7 +1322,7 @@ export type Solamon = {
       ]
     },
     {
-      "name": "configAccount",
+      "name": "ConfigAccount",
       "discriminator": [
         189,
         255,
@@ -1341,7 +1335,7 @@ export type Solamon = {
       ]
     },
     {
-      "name": "solamonPrototypeAccount",
+      "name": "SolamonPrototypeAccount",
       "discriminator": [
         1,
         216,
@@ -1354,7 +1348,7 @@ export type Solamon = {
       ]
     },
     {
-      "name": "userAccount",
+      "name": "UserAccount",
       "discriminator": [
         211,
         33,
@@ -1370,53 +1364,53 @@ export type Solamon = {
   "errors": [
     {
       "code": 6000,
-      "name": "maxElementsReached",
+      "name": "MaxElementsReached",
       "msg": "Max elements reached"
     },
     {
       "code": 6001,
-      "name": "invalidSolamonIds",
+      "name": "InvalidSolamonIds",
       "msg": "Invalid solamon ids"
     },
     {
       "code": 6002,
-      "name": "invalidBattleParticipants",
+      "name": "InvalidBattleParticipants",
       "msg": "Invalid battle participants"
     },
     {
       "code": 6003,
-      "name": "battleNotAvailable",
+      "name": "BattleNotAvailable",
       "msg": "Battle not available"
     },
     {
       "code": 6004,
-      "name": "solamonNotAvailable",
+      "name": "SolamonNotAvailable",
       "msg": "Solamon not available"
     },
     {
       "code": 6005,
-      "name": "invalidBattleParticipant",
+      "name": "InvalidBattleParticipant",
       "msg": "Invalid battle participant"
     },
     {
       "code": 6006,
-      "name": "invalidBattleWinner",
+      "name": "InvalidBattleWinner",
       "msg": "Invalid battle winner"
     },
     {
       "code": 6007,
-      "name": "invalidBattleStatus",
+      "name": "InvalidBattleStatus",
       "msg": "Invalid battle status"
     },
     {
       "code": 6008,
-      "name": "battleAlreadyClaimed",
+      "name": "BattleAlreadyClaimed",
       "msg": "Battle already claimed"
     }
   ],
   "types": [
     {
-      "name": "battleAccount",
+      "name": "BattleAccount",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1425,78 +1419,78 @@ export type Solamon = {
             "type": "u8"
           },
           {
-            "name": "battleId",
+            "name": "battle_id",
             "type": "u64"
           },
           {
-            "name": "player1",
+            "name": "player_1",
             "type": "pubkey"
           },
           {
-            "name": "player2",
+            "name": "player_2",
             "type": "pubkey"
           },
           {
-            "name": "player1Solamons",
+            "name": "player_1_solamons",
             "type": {
               "vec": {
                 "defined": {
-                  "name": "solamon"
+                  "name": "Solamon"
                 }
               }
             }
           },
           {
-            "name": "player2Solamons",
+            "name": "player_2_solamons",
             "type": {
               "vec": {
                 "defined": {
-                  "name": "solamon"
+                  "name": "Solamon"
                 }
               }
             }
           },
           {
-            "name": "battleStatus",
+            "name": "battle_status",
             "type": {
               "defined": {
-                "name": "battleStatus"
+                "name": "BattleStatus"
               }
             }
           },
           {
-            "name": "battleStake",
+            "name": "battle_stake",
             "type": "u64"
           },
           {
-            "name": "claimTimestamp",
+            "name": "claim_timestamp",
             "type": "i64"
           }
         ]
       }
     },
     {
-      "name": "battleStatus",
+      "name": "BattleStatus",
       "type": {
         "kind": "enum",
         "variants": [
           {
-            "name": "pending"
+            "name": "Pending"
           },
           {
-            "name": "canceled"
+            "name": "Canceled"
           },
           {
-            "name": "player1Wins"
+            "name": "Player1Wins"
           },
           {
-            "name": "player2Wins"
+            "name": "Player2Wins"
           }
         ]
       }
     },
     {
-      "name": "configAccount",
+      "name": "ConfigAccount",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1505,15 +1499,15 @@ export type Solamon = {
             "type": "u8"
           },
           {
-            "name": "feeAccount",
+            "name": "fee_account",
             "type": "pubkey"
           },
           {
-            "name": "battleCount",
+            "name": "battle_count",
             "type": "u64"
           },
           {
-            "name": "solamonCount",
+            "name": "solamon_count",
             "type": "u16"
           },
           {
@@ -1521,15 +1515,15 @@ export type Solamon = {
             "type": "pubkey"
           },
           {
-            "name": "spawnFee",
+            "name": "spawn_fee",
             "type": "u64"
           },
           {
-            "name": "feePercentageInBasisPoints",
+            "name": "fee_percentage_in_basis_points",
             "type": "u16"
           },
           {
-            "name": "availableBattleIds",
+            "name": "available_battle_ids",
             "type": {
               "vec": "u64"
             }
@@ -1538,30 +1532,30 @@ export type Solamon = {
       }
     },
     {
-      "name": "element",
+      "name": "Element",
       "type": {
         "kind": "enum",
         "variants": [
           {
-            "name": "fire"
+            "name": "Fire"
           },
           {
-            "name": "wood"
+            "name": "Wood"
           },
           {
-            "name": "earth"
+            "name": "Earth"
           },
           {
-            "name": "water"
+            "name": "Water"
           },
           {
-            "name": "metal"
+            "name": "Metal"
           }
         ]
       }
     },
     {
-      "name": "solamon",
+      "name": "Solamon",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1577,7 +1571,7 @@ export type Solamon = {
             "name": "element",
             "type": {
               "defined": {
-                "name": "element"
+                "name": "Element"
               }
             }
           },
@@ -1590,46 +1584,46 @@ export type Solamon = {
             "type": "u8"
           },
           {
-            "name": "isAvailable",
+            "name": "is_available",
             "type": "bool"
           }
         ]
       }
     },
     {
-      "name": "solamonPrototype",
+      "name": "SolamonPrototype",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "imageUrl",
+            "name": "image_url",
             "type": "string"
           },
           {
-            "name": "possibleElements",
+            "name": "possible_elements",
             "type": {
               "vec": {
                 "defined": {
-                  "name": "element"
+                  "name": "Element"
                 }
               }
             }
           },
           {
-            "name": "elementProbabilityInBasisPoints",
+            "name": "element_probability_in_basis_points",
             "type": {
               "vec": "u16"
             }
           },
           {
-            "name": "distributablePoints",
+            "name": "distributable_points",
             "type": "u8"
           }
         ]
       }
     },
     {
-      "name": "solamonPrototypeAccount",
+      "name": "SolamonPrototypeAccount",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1638,15 +1632,15 @@ export type Solamon = {
             "type": "u8"
           },
           {
-            "name": "totalSpecies",
+            "name": "total_species",
             "type": "u8"
           },
           {
-            "name": "solamonPrototypes",
+            "name": "solamon_prototypes",
             "type": {
               "vec": {
                 "defined": {
-                  "name": "solamonPrototype"
+                  "name": "SolamonPrototype"
                 }
               }
             }
@@ -1655,7 +1649,7 @@ export type Solamon = {
       }
     },
     {
-      "name": "userAccount",
+      "name": "UserAccount",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1668,17 +1662,17 @@ export type Solamon = {
             "type": {
               "vec": {
                 "defined": {
-                  "name": "solamon"
+                  "name": "Solamon"
                 }
               }
             }
           },
           {
-            "name": "battleCount",
+            "name": "battle_count",
             "type": "u64"
           }
         ]
       }
     }
   ]
-};
+}

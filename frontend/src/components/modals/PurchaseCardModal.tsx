@@ -6,7 +6,7 @@ import Button from '../Button'
 import { useModal } from '@/contexts/ModalContext'
 
 interface PurchaseCardModalProps {
-  onPurchase: () => void
+  onPurchase: (amount: number) => void
 }
 
 const PurchaseCardModal: React.FC<PurchaseCardModalProps> = ({
@@ -28,7 +28,7 @@ const PurchaseCardModal: React.FC<PurchaseCardModalProps> = ({
           className='w-32 h-auto mb-4'
         />
         <div className='flex justify-center gap-4'>
-          <Button onClick={onPurchase}>+ New Card (0.1)</Button>
+          <Button onClick={() => onPurchase(1)}>+ New Card (0.1)</Button>
         </div>
       </div>
     </Modal>
