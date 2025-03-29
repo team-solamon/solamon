@@ -4,6 +4,7 @@ import { clusterApiUrl, Connection, Keypair } from '@solana/web3.js'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
 import { useState } from 'react'
+import { useLoading } from '@/contexts/LoadingContext'
 
 import {
   getFromLocalStorage,
@@ -16,12 +17,13 @@ import Button from '@/components/Button'
 
 export default function HomePage() {
   const router = useRouter()
+  const { showLoading, hideLoading } = useLoading()
 
   const [isLoading, setIsLoading] = useState(false)
   const pk = getKeypairFromLocalStorage()
   const handleCreateAccount = async () => {
     if (!pk) {
-      setIsLoading(true)
+      showLoading('Creating account...')
       // generate random account
       setKeypairToLocalStorage()
 
@@ -31,6 +33,7 @@ export default function HomePage() {
 
       if (!keypair) {
         console.error('Failed to create keypair')
+        hideLoading()
         return
       }
 
@@ -44,7 +47,7 @@ export default function HomePage() {
       } catch (error) {
         console.error('Airdrop failed', error)
       }
-      setIsLoading(false)
+      hideLoading()
     }
     router.push('/home')
   }
