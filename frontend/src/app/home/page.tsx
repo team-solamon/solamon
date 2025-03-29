@@ -1,10 +1,12 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import CardStack from '@/components/CardStack'
 import Nav from '@/components/Nav'
 import Button from '../../components/Button'
 import { ModalProvider, useModal } from '@/contexts/ModalContext'
+import { ROUTES } from '@/lib/routes'
 
 import TutorialModal from '@/components/modals/TutorialModal'
 import PurchaseCardModal from '@/components/modals/PurchaseCardModal'
@@ -147,6 +149,8 @@ const cardStackData: BattleStatus[] = [
 ]
 
 const HomePageContent = () => {
+  const router = useRouter()
+
   const { openModal, closeModal } = useModal()
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null)
   const [selectedBattle, setSelectedBattle] = useState<BattleStatus | null>(
@@ -222,8 +226,6 @@ const HomePageContent = () => {
     return counts
   }
 
-  const elementCounts = getElementCounts()
-
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
       <Nav />
@@ -231,8 +233,10 @@ const HomePageContent = () => {
         <Button onClick={() => openModal('purchaseCard')}>
           + New Card <span className='text-blue-400'>0.1</span>
         </Button>
-        <Button>Open Match</Button>
-        <Button>Choose Fighter</Button>
+        <Button onClick={() => router.push(ROUTES.OPEN_BATTLE)}>Open Match</Button>
+        <Button onClick={() => router.push(ROUTES.CHOOSE_FIGHTER)}>
+          Choose Fighter
+        </Button>
       </div>
 
       <section className='battle-section mb-8'>
