@@ -9,6 +9,7 @@ import {
 } from "@solana/web3.js"
 import fs from "fs"
 import path from "path"
+import { SolamonPrototype } from "../tests/helper"
 
 async function main() {
 	// Configure the client to use the local cluster
@@ -44,6 +45,54 @@ async function main() {
 		console.log(`Transaction signature: ${tx}`)
 	} catch (error) {
 		console.error("Error initializing Solamon program:", error)
+	}
+
+	try {
+		const solamonPrototype: SolamonPrototype[] = [
+			{
+				imageUrl: "https://example.com/image.png",
+				possibleElements: [{ fire: {} }, { water: {} }],
+				elementProbabilityInBasisPoints: [8000, 2000],
+				distributablePoints: 15,
+			},
+			{
+				imageUrl: "https://example.com/image2.png",
+				possibleElements: [{ wood: {} }, { earth: {} }],
+				elementProbabilityInBasisPoints: [8000, 2000],
+				distributablePoints: 15,
+			},
+			{
+				imageUrl: "https://example.com/image3.png",
+				possibleElements: [{ earth: {} }, { metal: {} }],
+				elementProbabilityInBasisPoints: [8000, 2000],
+				distributablePoints: 15,
+			},
+			{
+				imageUrl: "https://example.com/image4.png",
+				possibleElements: [{ metal: {} }, { water: {} }],
+				elementProbabilityInBasisPoints: [8000, 2000],
+				distributablePoints: 15,
+			},
+			{
+				imageUrl: "https://example.com/image5.png",
+				possibleElements: [{ wood: {} }, { fire: {} }],
+				elementProbabilityInBasisPoints: [8000, 2000],
+				distributablePoints: 15,
+			},
+		]
+
+		const txSig = await program.methods
+			.createSolamonPrototype(solamonPrototype)
+			.accounts({
+				admin: adminPublicKey,
+			})
+			.signers([adminKeypair])
+			.rpc()
+
+		console.log("Solamon prototype created successfully!")
+		console.log(`Transaction signature: ${txSig}`)
+	} catch (error) {
+		console.error("Error creating solamon prototype:", error)
 	}
 }
 

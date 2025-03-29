@@ -16,6 +16,10 @@ const filesToCopy = [
     source: path.resolve(__dirname, '../../contract/target/types/solamon.ts'),
     destination: path.resolve(__dirname, '../src/target/types/solamon.ts'),
   },
+  {
+    source: path.resolve(__dirname, '../../contract/target/idl/solamon.json'),
+    destination: path.resolve(__dirname, '../src/target/idl/solamon.json'),
+  },
 ]
 
 // Function to copy files
