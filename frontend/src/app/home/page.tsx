@@ -29,9 +29,8 @@ import {
   getKeypairFromLocalStorage,
   getProgram,
 } from '@/lib/helper'
-import { Program } from '@coral-xyz/anchor'
-import { Solamon } from '@/target/types/solamon'
 import { useLoading } from '@/contexts/LoadingContext'
+import Typography from '@/components/Typography'
 
 const cardStackData: BattleStatus[] = [
   {
@@ -166,12 +165,15 @@ const HomePageContent = () => {
 
       <section className='battle-section mb-8'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <h2 className='text-2xl font-semibold text-yellow-400 mb-4'>
+          <Typography variant='title-2' color='inverse'>
             Battle
-          </h2>
+          </Typography>
           <div className='battle-cards flex gap-4'>
             {cardStackData.map((battle, index) => (
-              <div key={index} className='card bg-gray-700 p-4 rounded-lg'>
+              <div
+                key={index}
+                className='card bg-[rgba(202,193,185,1)] p-4 rounded-lg'
+              >
                 <div className='flex justify-around'>
                   <div>
                     <h4 className='text-center text-sm text-gray-400 mb-2'>
@@ -200,9 +202,7 @@ const HomePageContent = () => {
 
       <section className='my-card-section'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <h2 className='text-2xl font-semibold text-yellow-400 mb-4'>
-            My Card | {myCards.length}
-          </h2>
+          <Typography variant='title-2'>My Card | {myCards.length}</Typography>
           <div className='card-stats flex gap-4 text-lg mb-4'>
             {Object.entries(elementCounts).map(
               ([element, count]) =>
@@ -217,17 +217,17 @@ const HomePageContent = () => {
             {myCards.map((card, index) => (
               <div
                 key={index}
-                className='card bg-gray-700 p-4 rounded-lg flex flex-col items-center'
+                className='card bg-[rgba(202,193,185,1)]  p-2 rounded-lg flex flex-col items-center relative'
               >
                 <Card card={card} className='mx-auto' />
-                <Button
-                  onClick={() => {
-                    setSelectedCard(card)
-                    openModal('cardDetails')
-                  }}
-                >
-                  Stats
-                </Button>
+                <div className='flex items-end gap-8 bg-[rgba(19,19,19,0.7)] p-2 rounded-2xl absolute bottom-8 '>
+                  <Typography variant='caption-1'>
+                    {`⚔️ ${card.attack}`}
+                  </Typography>
+                  <Typography variant='caption-1'>
+                    {`♥️️ ${card.health}`}
+                  </Typography>
+                </div>
               </div>
             ))}
           </div>
