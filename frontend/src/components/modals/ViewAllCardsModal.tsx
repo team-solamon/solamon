@@ -4,10 +4,10 @@ import React from 'react'
 import Modal from '../Modal'
 import Card from '../Card'
 import { useModal } from '@/contexts/ModalContext'
-import { DrawableCards } from '@/data/draw'
+import { CardData } from '@/lib/solana-helper'
 
 interface ViewAllCardsModalProps {
-  drawableCards: DrawableCards
+  drawableCards: CardData[]
 }
 
 const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
@@ -23,7 +23,7 @@ const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
       maxWidth='600px'
     >
       <div className='flex justify-center overflow-x-auto gap-4 p-2'>
-        {drawableCards.cards.map((card, index) => (
+        {drawableCards.map((card, index) => (
           <div
             key={index}
             className='card bg-gray-700 p-2 rounded-lg flex-shrink-0 w-24'

@@ -1,23 +1,23 @@
 import React, { useEffect, useMemo } from 'react'
 import Button from './Button'
-import { CardData } from '@/data/card'
 import Card from './Card'
 import { BattleReplay } from '@/data/replay'
 import PhaserGame from './PhaserGame'
 import { CardBattleScene } from '@/app/game/scenes/CardBattleScene'
 import { EventBridge } from '@/app/game/utils/EventBridge'
+import { CardData } from '@/lib/solana-helper'
 
 const cards: CardData[] = [
-  { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
-  { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
-  { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
-  { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
-  { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
-  { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
-  { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
-  { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
-  { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
-  { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
+  { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3 },
+  { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3 },
+  { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
+  { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5 },
+  { name: 'METAL', element: { metal: {} }, attack: 6, health: 2 },
+  { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4 },
+  { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
+  { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5 },
+  { name: 'METAL', element: { metal: {} }, attack: 6, health: 2 },
+  { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4 },
 ]
 
 const playerCardData: CardData[] = [

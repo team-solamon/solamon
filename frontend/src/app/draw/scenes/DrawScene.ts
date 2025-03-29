@@ -7,7 +7,7 @@ import { createElegantRings } from '../utils/effects'
 import { getCardColor } from '@/data/card'
 import { Card } from '@/gameObjects/Card'
 import { EventBridge } from '../utils/EventBridge'
-import { DrawableCards } from '@/data/draw'
+import { CardData, elementToString } from '@/lib/solana-helper'
 
 const LAYOUT = {
   CARD_Y: 250,
@@ -31,7 +31,7 @@ export class DrawScene extends Phaser.Scene {
   private loadingText: Phaser.GameObjects.Text | null = null
   private loadingTween: Phaser.Tweens.Tween | null = null
 
-  private config: DrawableCards | null = null
+  private config: { cards: CardData[] } | null = null
 
   constructor() {
     super({ key: 'CardScene' })
@@ -71,8 +71,8 @@ export class DrawScene extends Phaser.Scene {
         return
       }
 
-      EventBridge.setOnDrawDataLoaded((cards: DrawableCards) => {
-        this.config = cards
+      EventBridge.setOnDrawDataLoaded((cards: CardData[]) => {
+        this.config = { cards }
         resolve()
       })
     })
@@ -84,7 +84,7 @@ export class DrawScene extends Phaser.Scene {
       this,
       400,
       LAYOUT.CARD_Y,
-      cards[this.drawsCount].element,
+      elementToString(cards[this.drawsCount].element),
       cards[this.drawsCount].attack,
       cards[this.drawsCount].health,
       cards[this.drawsCount].element,
