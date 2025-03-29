@@ -264,6 +264,38 @@ export function unwrapSolIx(
 	return createCloseAccountInstruction(acc, destination, authority)
 }
 
+export async function spawnSolamonsTx(
+	connection: Connection,
+	program: Program<Solamon>,
+	player: PublicKey,
+	numberToSpawn: number
+) {
+	const spawnSolamonsTx = new Transaction()
+	const feeAccount = (await getConfigAccount(program)).feeAccount
+
+	const { tx: feeTokenCreateATATx } = await getOrCreateNativeMintATA(
+		connection,
+		player,
+		feeAccount
+	)
+
+	if (feeTokenCreateATATx) {
+		spawnSolamonsTx.add(feeTokenCreateATATx)
+	}
+
+	const spawnSolamons = await program.methods
+		.spawnSolamons(numberToSpawn)
+		.accounts({
+			player: player,
+			feeAccount: feeAccount,
+		})
+		.transaction()
+
+	spawnSolamonsTx.add(spawnSolamons)
+
+	return spawnSolamonsTx
+}
+
 export async function wrapSolAndOpenBattleTx(
 	connection: Connection,
 	program: Program<Solamon>,
