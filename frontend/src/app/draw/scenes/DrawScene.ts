@@ -41,11 +41,11 @@ export class DrawScene extends Phaser.Scene {
     this.load.image('cardpack', '/images/game/cardpack.png')
     this.load.image('cardback', '/images/game/cardback.png')
 
-    this.load.image('card-fire', '/images/game/card-fire.png')
-    this.load.image('card-water', '/images/game/card-water.png')
-    this.load.image('card-earth', '/images/game/card-earth.png')
-    this.load.image('card-metal', '/images/game/card-metal.png')
-    this.load.image('card-wood', '/images/game/card-wood.png')
+    this.load.image('species-0', '/images/species/0.png')
+    this.load.image('species-1', '/images/species/1.png')
+    this.load.image('species-2', '/images/species/2.png')
+    this.load.image('species-3', '/images/species/3.png')
+    this.load.image('species-4', '/images/species/4.png')
   }
 
   create() {
@@ -88,6 +88,7 @@ export class DrawScene extends Phaser.Scene {
       cards[this.drawsCount].attack,
       cards[this.drawsCount].health,
       cards[this.drawsCount].element,
+      cards[this.drawsCount].species,
       true
     )
     this.card.scaleX = 2.0
