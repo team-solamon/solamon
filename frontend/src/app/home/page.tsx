@@ -163,11 +163,11 @@ const HomePageContent = () => {
           <Typography variant='title-2' color='inverse'>
             Battle
           </Typography>
-          <div className='battle-cards flex gap-4'>
+          <div className='battle-cards grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
             {cardStackData.map((battle, index) => (
               <div
                 key={index}
-                className='card bg-[rgba(202,193,185,1)] p-4 rounded-lg'
+                className='card bg-[rgba(202,193,185,1)] p-4 rounded-lg max-w-[250px] w-full'
               >
                 <div className='flex justify-around'>
                   <div>
