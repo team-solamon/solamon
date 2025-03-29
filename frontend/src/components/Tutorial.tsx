@@ -49,7 +49,11 @@ const sampleBattleReplay: BattleReplay = {
   ],
 }
 
-const Tutorial: React.FC = () => {
+interface TutorialProps {
+  onNewCard: () => void
+}
+
+const Tutorial: React.FC<TutorialProps> = ({ onNewCard }) => {
   const handleGameReady = () => {
     EventBridge.loadReplay(sampleBattleReplay)
   }
@@ -134,7 +138,7 @@ const Tutorial: React.FC = () => {
         </div>
       </div>
       <div className='mt-4 flex justify-around sticky bottom-0 bg-[#978578] py-3'>
-        <Button>New Card</Button>
+        <Button onClick={onNewCard}>New Card</Button>
         <Button>Open Battle</Button>
       </div>
     </div>

@@ -19,6 +19,10 @@ const DrawGame = dynamic(() => import('../draw/components/DrawGame'), {
   ssr: false,
 })
 
+const Tutorial = dynamic(() => import('../../components/Tutorial'), {
+  ssr: false,
+})
+
 const drawableCards: DrawableCards = {
   cards: [
     { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
@@ -105,6 +109,11 @@ const HomePage = () => {
     openModal('viewAllCards')
   }
 
+  const handleNewCardFromTutorial = () => {
+    closeModal('tutorial')
+    openModal('purchaseCard')
+  }
+
   const getElementCounts = () => {
     const counts: { [key: string]: number } = {
       FIRE: 0,
@@ -127,7 +136,10 @@ const HomePage = () => {
 
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
-      <Nav />
+      <Nav
+        onNewCard={() => openModal('purchaseCard')}
+        onOpenTutorial={() => openModal('tutorial')}
+      />
       <div className='action-buttons flex justify-center gap-4 mb-8'>
         <Button onClick={() => openModal('purchaseCard')}>
           + New Card <span className='text-blue-400'>0.1</span>
@@ -200,6 +212,15 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      <Modal
+        isOpen={modals['tutorial']}
+        onClose={() => closeModal('tutorial')}
+        title='Tutorial'
+        maxWidth='600px'
+      >
+        <Tutorial onNewCard={handleNewCardFromTutorial} />
+      </Modal>
 
       <Modal
         isOpen={modals['purchaseCard']}
