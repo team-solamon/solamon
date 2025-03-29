@@ -1,5 +1,6 @@
 import React from 'react'
-import { CardData, getCardTexture, getElementEmoji } from '@/data/card'
+import { getCardTexture, getElementEmoji } from '@/data/card'
+import { CardData } from '@/lib/solana-helper'
 
 interface CardImageProps {
   card: CardData

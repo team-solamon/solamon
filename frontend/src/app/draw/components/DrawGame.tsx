@@ -4,11 +4,11 @@ import React, { useEffect } from 'react'
 import PhaserGame from '@/components/PhaserGame'
 import { DrawScene } from '@/app/draw/scenes/DrawScene'
 import { EventBridge } from '../utils/EventBridge'
-import { DrawableCards } from '@/data/draw'
+import { CardData } from '@/lib/solana-helper'
 
 interface DrawGameProps {
   onClose?: () => void
-  drawableCards: DrawableCards
+  drawableCards: CardData[]
 }
 
 const DrawGame: React.FC<DrawGameProps> = ({ onClose, drawableCards }) => {

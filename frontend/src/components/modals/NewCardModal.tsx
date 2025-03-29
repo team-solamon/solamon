@@ -5,27 +5,32 @@ import dynamic from 'next/dynamic'
 import Modal from '../Modal'
 import Button from '../Button'
 import { useModal } from '@/contexts/ModalContext'
-import { DrawableCards } from '@/data/draw'
+import { CardData } from '@/lib/solana-helper'
 
 const DrawGame = dynamic(() => import('@/app/draw/components/DrawGame'), {
   ssr: false,
 })
 
 interface NewCardModalProps {
-  drawableCards: DrawableCards
+  drawableCards: CardData[]
   onViewAll: () => void
+  onClose: () => void
 }
 
 const NewCardModal: React.FC<NewCardModalProps> = ({
   drawableCards,
   onViewAll,
+  onClose,
 }) => {
   const { modals, closeModal } = useModal()
 
   return (
     <Modal
       isOpen={modals['newCard']}
-      onClose={() => closeModal('newCard')}
+      onClose={() => {
+        onClose()
+        closeModal('newCard')
+      }}
       title='+ New Card'
     >
       <DrawGame drawableCards={drawableCards} />

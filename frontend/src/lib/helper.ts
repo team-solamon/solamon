@@ -1,4 +1,8 @@
+import { Program } from '@coral-xyz/anchor'
+import { Idl } from '@coral-xyz/anchor'
+import solamon from '@/target/idl/solamon.json'
 import { clusterApiUrl, Connection, Keypair } from '@solana/web3.js'
+import { Solamon } from '@/target/types/solamon'
 
 export function getFromLocalStorage(key: string): string | null {
   if (typeof window !== 'undefined') {
@@ -47,4 +51,10 @@ export function getKeypairFromLocalStorage(): Keypair | null {
 
 export const getConnection = () => {
   return new Connection(clusterApiUrl('devnet'), 'confirmed')
+}
+
+export const getProgram = () => {
+  return new Program<Solamon>(solamon as Solamon, {
+    connection: getConnection(),
+  })
 }

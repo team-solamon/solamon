@@ -1,8 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
-import { CardData, CardElement, getElementEmoji } from '@/data/card'
-import { DrawableCards } from '@/data/draw'
+import React, { useEffect, useState } from 'react'
+import { getElementEmoji } from '@/data/card'
 import CardStack from '@/components/CardStack'
 import Nav from '@/components/Nav'
 import Button from '../../components/Button'
@@ -16,62 +15,57 @@ import ViewAllCardsModal from '@/components/modals/ViewAllCardsModal'
 import CardDetailsModal from '@/components/modals/CardDetailsModal'
 import ResultModal from '@/components/modals/ResultModal'
 import { BattleStatus } from '@/data/battle'
-
-const drawableCards: DrawableCards = {
-  cards: [
-    { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
-    { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
-    { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
-    { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
-    { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
-  ],
-}
-
-const myCards: CardData[] = [
-  { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
-  { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
-  { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
-  { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
-  { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
-  { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
-  { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
-]
+import {
+  CardData,
+  elementToString,
+  getUserAccount,
+  showSpawnResult,
+  spawnSolamonsTx,
+  stringToElement,
+} from '@/lib/solana-helper'
+import {
+  getConnection,
+  getKeypairFromLocalStorage,
+  getProgram,
+} from '@/lib/helper'
+import { useLoading } from '@/contexts/LoadingContext'
+import Typography from '@/components/Typography'
 
 const cardStackData: BattleStatus[] = [
   {
     status: 'pending',
     myCards: [
-      { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
-      { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
-      { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
+      { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3 },
+      { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
+      { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5 },
     ],
   },
   {
     status: 'result',
     isPlayerWinner: true,
     myCards: [
-      { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
-      { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
-      { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
+      { name: 'METAL', element: { metal: {} }, attack: 6, health: 2 },
+      { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4 },
+      { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3 },
     ],
     opponentCards: [
-      { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
-      { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
-      { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
+      { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
+      { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5 },
+      { name: 'METAL', element: { metal: {} }, attack: 6, health: 2 },
     ],
   },
   {
     status: 'result',
     isPlayerWinner: false,
     myCards: [
-      { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
-      { name: 'WOOD', element: 'WOOD', attack: 4, health: 4 },
-      { name: 'FIRE', element: 'FIRE', attack: 5, health: 3 },
+      { name: 'METAL', element: { metal: {} }, attack: 6, health: 2 },
+      { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4 },
+      { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3 },
     ],
     opponentCards: [
-      { name: 'WATER', element: 'WATER', attack: 3, health: 6 },
-      { name: 'EARTH', element: 'EARTH', attack: 4, health: 5 },
-      { name: 'METAL', element: 'METAL', attack: 6, health: 2 },
+      { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
+      { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5 },
+      { name: 'METAL', element: { metal: {} }, attack: 6, health: 2 },
     ],
   },
 ]
@@ -82,13 +76,49 @@ const HomePageContent = () => {
   const [selectedBattle, setSelectedBattle] = useState<BattleStatus | null>(
     null
   )
+  const [spawnResult, setSpawnResult] = useState<CardData[]>([])
+  const [myCards, setMyCards] = useState<CardData[]>([])
+  const { showLoading, hideLoading } = useLoading()
+  const connection = getConnection()
+  const program = getProgram()
+  const player = getKeypairFromLocalStorage()
+
+  useEffect(() => {
+    fetchMyCards()
+  }, [])
+
+  const fetchMyCards = async () => {
+    if (!player) {
+      console.error('No player found')
+      return
+    }
+    const myAccount = await getUserAccount(program, player.publicKey)
+    setMyCards(myAccount.solamons)
+  }
 
   const handleNewCardFromTutorial = () => {
     closeModal('tutorial')
     openModal('purchaseCard')
   }
 
-  const handlePurchase = () => {
+  const handlePurchase = async (amount: number) => {
+    showLoading('Spawning solamons...')
+
+    if (!player) {
+      console.error('No player found')
+      return
+    }
+    const tx = await spawnSolamonsTx(
+      connection,
+      program,
+      player.publicKey,
+      amount
+    )
+    const txSig = await connection.sendTransaction(tx, [player])
+    await connection.confirmTransaction(txSig)
+    const spawnResult = await showSpawnResult(connection, txSig)
+    setSpawnResult(spawnResult)
+    hideLoading()
     closeModal('purchaseCard')
     openModal('newCard')
   }
@@ -100,16 +130,16 @@ const HomePageContent = () => {
 
   const getElementCounts = () => {
     const counts: { [key: string]: number } = {
-      FIRE: 0,
-      WATER: 0,
-      EARTH: 0,
-      METAL: 0,
-      WOOD: 0,
+      fire: 0,
+      water: 0,
+      earth: 0,
+      metal: 0,
+      wood: 0,
     }
 
     myCards.forEach((card) => {
-      if (counts[card.element] !== undefined) {
-        counts[card.element]++
+      if (counts[elementToString(card.element)] !== undefined) {
+        counts[elementToString(card.element)]++
       }
     })
 
@@ -131,12 +161,15 @@ const HomePageContent = () => {
 
       <section className='battle-section mb-8'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <h2 className='text-2xl font-semibold text-yellow-400 mb-4'>
+          <Typography variant='title-2' color='inverse'>
             Battle
-          </h2>
+          </Typography>
           <div className='battle-cards flex gap-4'>
             {cardStackData.map((battle, index) => (
-              <div key={index} className='card bg-gray-700 p-4 rounded-lg'>
+              <div
+                key={index}
+                className='card bg-[rgba(202,193,185,1)] p-4 rounded-lg'
+              >
                 <div className='flex justify-around'>
                   <div>
                     <h4 className='text-center text-sm text-gray-400 mb-2'>
@@ -165,15 +198,13 @@ const HomePageContent = () => {
 
       <section className='my-card-section'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <h2 className='text-2xl font-semibold text-yellow-400 mb-4'>
-            My Card | {myCards.length}
-          </h2>
+          <Typography variant='title-2'>My Card | {myCards.length}</Typography>
           <div className='card-stats flex gap-4 text-lg mb-4'>
             {Object.entries(elementCounts).map(
               ([element, count]) =>
                 count > 0 && (
                   <span key={element}>
-                    {getElementEmoji(element as CardElement)} {count}
+                    {getElementEmoji(stringToElement(element))} {count}
                   </span>
                 )
             )}
@@ -182,17 +213,17 @@ const HomePageContent = () => {
             {myCards.map((card, index) => (
               <div
                 key={index}
-                className='card bg-gray-700 p-4 rounded-lg flex flex-col items-center'
+                className='card bg-[rgba(202,193,185,1)]  p-2 rounded-lg flex flex-col items-center relative'
               >
                 <Card card={card} className='mx-auto' />
-                <Button
-                  onClick={() => {
-                    setSelectedCard(card)
-                    openModal('cardDetails')
-                  }}
-                >
-                  Stats
-                </Button>
+                <div className='flex items-end gap-8 bg-[rgba(19,19,19,0.7)] p-2 rounded-2xl absolute bottom-8 '>
+                  <Typography variant='caption-1'>
+                    {`⚔️ ${card.attack}`}
+                  </Typography>
+                  <Typography variant='caption-1'>
+                    {`♥️️ ${card.health}`}
+                  </Typography>
+                </div>
               </div>
             ))}
           </div>
@@ -203,10 +234,11 @@ const HomePageContent = () => {
       <TutorialModal onNewCard={handleNewCardFromTutorial} />
       <PurchaseCardModal onPurchase={handlePurchase} />
       <NewCardModal
-        drawableCards={drawableCards}
+        drawableCards={spawnResult}
         onViewAll={handleViewAllCards}
+        onClose={fetchMyCards}
       />
-      <ViewAllCardsModal drawableCards={drawableCards} />
+      <ViewAllCardsModal drawableCards={spawnResult} />
       <CardDetailsModal selectedCard={selectedCard} />
       <ResultModal selectedBattle={selectedBattle} />
     </div>

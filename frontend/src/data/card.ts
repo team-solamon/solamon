@@ -1,70 +1,63 @@
-export type CardElement = 'NONE' | 'FIRE' | 'WATER' | 'EARTH' | 'METAL' | 'WOOD'
+import { Element, stringToElement, elementToString } from '@/lib/solana-helper'
 
-export interface CardData {
-  name: string
-  attack: number
-  health: number
-  element: CardElement
+export function getRandomElement(): Element {
+  const elements = ['fire', 'water', 'earth', 'metal', 'wood']
+  return stringToElement(elements[Math.floor(Math.random() * elements.length)])
 }
 
-export function getRandomElement(): CardElement {
-  const elements = ['FIRE', 'WATER', 'EARTH', 'METAL', 'WOOD']
-  return elements[Math.floor(Math.random() * elements.length)] as CardElement
-}
-
-export function getCardColor(element: CardElement): number {
-  switch (element) {
-    case 'FIRE':
+export function getCardColor(element: Element): number {
+  switch (elementToString(element)) {
+    case 'fire':
       return 0xff4500
-    case 'WATER':
+    case 'water':
       return 0x1e90ff
-    case 'EARTH':
+    case 'earth':
       return 0x8b4513
-    case 'METAL':
+    case 'metal':
       return 0xc0c0c0
-    case 'WOOD':
+    case 'wood':
       return 0x228b22
-    case 'NONE':
+    case 'none':
     default:
       return 0x333333
   }
 }
 
-export function getCardColorString(element: CardElement): string {
+export function getCardColorString(element: Element): string {
   return '#' + getCardColor(element).toString(16)
 }
 
-export function getElementEmoji(element: CardElement): string {
-  switch (element) {
-    case 'FIRE':
+export function getElementEmoji(element: Element): string {
+  switch (elementToString(element)) {
+    case 'fire':
       return '🔥'
-    case 'WATER':
+    case 'water':
       return '💧'
-    case 'EARTH':
+    case 'earth':
       return '🌍'
-    case 'METAL':
+    case 'metal':
       return '⚙️'
-    case 'WOOD':
+    case 'wood':
       return '🌳'
-    case 'NONE':
+    case 'none':
     default:
       return '❓'
   }
 }
 
-export function getCardTexture(element: CardElement): string {
-  switch (element) {
-    case 'FIRE':
+export function getCardTexture(element: Element): string {
+  switch (elementToString(element)) {
+    case 'fire':
       return 'card-fire'
-    case 'WATER':
+    case 'water':
       return 'card-water'
-    case 'EARTH':
+    case 'earth':
       return 'card-earth'
-    case 'METAL':
+    case 'metal':
       return 'card-metal'
-    case 'WOOD':
+    case 'wood':
       return 'card-wood'
-    case 'NONE':
+    case 'none':
     default:
       return 'cardback'
   }

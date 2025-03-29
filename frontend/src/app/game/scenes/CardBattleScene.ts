@@ -6,7 +6,7 @@ import { GameResult } from '../gameObjects/GameResult'
 import { performSingleAttack } from '../utils/BattleAnimations'
 import { EventBridge } from '../utils/EventBridge'
 import { BattleAction, BattleReplay } from '@/data/replay'
-import { CardElement } from '@/data/card'
+import { Element } from '@/lib/solana-helper'
 
 export class CardBattleScene extends Phaser.Scene {
   private playerCards: Card[] = []
@@ -21,7 +21,7 @@ export class CardBattleScene extends Phaser.Scene {
   private battleConfig: BattleReplay | null = null
   private currentActionIndex = 0
 
-  private elementColors: Record<CardElement, number> = {
+  private elementColors: Record<Element, number> = {
     FIRE: 0xff3300,
     WATER: 0x0066ff,
     EARTH: 0x996633,

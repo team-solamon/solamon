@@ -3,7 +3,6 @@ import * as Phaser from 'phaser'
 import { DefeatedVisual } from './DefeatedVisual'
 import { HealthBar } from './HealthBar'
 import {
-  CardElement,
   getCardColor,
   getCardColorString,
   getCardTexture,
@@ -11,13 +10,14 @@ import {
 } from '@/data/card'
 import { FloatingText } from './FloatingText'
 import { AttackEvent } from '../data/replay'
+import { CardData, Element } from '@/lib/solana-helper'
 
 export class Card extends Phaser.GameObjects.Container {
   public name: string
   public health: number
   public attack: number
   public initialHealth: number
-  public element: CardElement
+  public element: Element
   public isPlayer: boolean
   public originalX: number
   public originalY: number
@@ -48,7 +48,7 @@ export class Card extends Phaser.GameObjects.Container {
     name: string,
     attack: number,
     health: number,
-    element: CardElement,
+    element: Element,
     isPlayer: boolean
   ) {
     super(scene, x, y)
@@ -332,12 +332,7 @@ export class Card extends Phaser.GameObjects.Container {
     this.healthBar.setVisible(visible)
   }
 
-  updateCardData(data: {
-    name: string
-    attack: number
-    health: number
-    element: CardElement
-  }) {
+  updateCardData(data: CardData) {
     this.name = data.name
     this.attack = data.attack
     this.health = data.health

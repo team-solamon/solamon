@@ -25,6 +25,7 @@ import { Solamon } from "../target/types/solamon"
 export type SolamonPrototype = IdlTypes<Solamon>["solamonPrototype"]
 export type Element = IdlTypes<Solamon>["element"]
 export type BattleStatus = IdlTypes<Solamon>["battleStatus"]
+export type CardData = IdlTypes<Solamon>["solamon"]
 
 export const getConfigPDA = (program: Program<Solamon>) => {
 	const [configPDA, _bump] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -262,6 +263,136 @@ export function unwrapSolIx(
 	authority: PublicKey
 ): TransactionInstruction {
 	return createCloseAccountInstruction(acc, destination, authority)
+}
+
+export async function spawnSolamonsTx(
+	connection: Connection,
+	program: Program<Solamon>,
+	player: PublicKey,
+	numberToSpawn: number
+) {
+	const spawnSolamonsTx = new Transaction()
+	const feeAccount = (await getConfigAccount(program)).feeAccount
+
+	const { tx: feeTokenCreateATATx } = await getOrCreateNativeMintATA(
+		connection,
+		player,
+		feeAccount
+	)
+
+	if (feeTokenCreateATATx) {
+		spawnSolamonsTx.add(feeTokenCreateATATx)
+	}
+
+	const spawnSolamons = await program.methods
+		.spawnSolamons(numberToSpawn)
+		.accounts({
+			player: player,
+			feeAccount: feeAccount,
+		})
+		.transaction()
+
+	spawnSolamonsTx.add(spawnSolamons)
+
+	return spawnSolamonsTx
+}
+
+export async function showSpawnResult(
+	connection: Connection,
+	txSig: string
+): Promise<CardData[]> {
+	const tx = await connection.getTransaction(txSig, {
+		commitment: "confirmed",
+	})
+	console.log('Spawn result')
+  const logs = (tx?.meta?.logMessages ?? [])
+    .filter((log) => log.includes('Spawned'))
+    .map((log) => {
+      const trimmedLog = log.slice(29)
+      return parseSolamonLog(trimmedLog)
+    })
+
+  return logs
+}
+
+export function stringToElement(elementStr: string): Element {
+	switch (elementStr.toLowerCase()) {
+		case "fire":
+			return { fire: {} }
+		case "wood":
+			return { wood: {} }
+		case "earth":
+			return { earth: {} }
+		case "water":
+			return { water: {} }
+		case "metal":
+			return { metal: {} }
+		default:
+			throw new Error(`Unknown element: ${elementStr}`)
+	}
+}
+
+export function elementToString(element: Element): string {
+	switch (JSON.stringify(element)) {
+		case JSON.stringify({ fire: {} }):
+			return "fire"
+		case JSON.stringify({ wood: {} }):
+			return "wood"
+		case JSON.stringify({ earth: {} }):
+			return "earth"
+		case JSON.stringify({ water: {} }):
+			return "water"
+		case JSON.stringify({ metal: {} }):
+			return "metal"
+		default:
+			throw new Error(`Unknown element: ${JSON.stringify(element)}`)
+	}
+}
+
+export function parseSolamonLog(logString: string): CardData {
+	// Handle the specific format from the logs
+	// Convert from "{ id: 0, species: 3, element: Metal, attack: 3, health: 12, is_available: true }"
+	// to a proper JavaScript object
+
+	// Replace is_available with isAvailable to match our TypeScript conventions
+	const normalizedString = logString.replace("is_available", "isAvailable")
+
+	// Extract values using regex
+	const idMatch = normalizedString.match(/id:\s*(\d+)/)
+	const speciesMatch = normalizedString.match(/species:\s*(\d+)/)
+	const elementMatch = normalizedString.match(/element:\s*(\w+)/)
+	const attackMatch = normalizedString.match(/attack:\s*(\d+)/)
+	const healthMatch = normalizedString.match(/health:\s*(\d+)/)
+	const isAvailableMatch = normalizedString.match(
+		/isAvailable:\s*(true|false)/
+	)
+
+	if (!elementMatch) {
+    throw new Error(`Failed to parse element from log: ${logString}`)
+  }
+
+	// Map the string to the enum
+	const element = stringToElement(elementMatch[1])
+
+	if (
+		!idMatch ||
+		!speciesMatch ||
+		!elementMatch ||
+		!attackMatch ||
+		!healthMatch ||
+		!isAvailableMatch
+	) {
+		throw new Error(`Failed to parse Solamon log: ${logString}`)
+	}
+
+	return {
+		id: parseInt(idMatch[1]),
+		species: parseInt(speciesMatch[1]),
+		element,
+		attack: parseInt(attackMatch[1]),
+		health: parseInt(healthMatch[1]),
+		isAvailable: isAvailableMatch[1] === "true",
+	}
 }
 
 export async function wrapSolAndOpenBattleTx(
