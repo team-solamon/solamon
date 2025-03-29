@@ -91,7 +91,10 @@ pub mod solamon {
                 }
             }
 
-            let attack = pseudorandom_u8(i as u64) % solamon_prototype.distributable_points;
+            let mut attack = pseudorandom_u8(i as u64) % solamon_prototype.distributable_points;
+            if attack == 0 {
+                attack = 1;
+            }
             let health = solamon_prototype.distributable_points - attack;
 
             let solamon = Solamon {
