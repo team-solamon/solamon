@@ -7,6 +7,7 @@ import { performSingleAttack } from '../utils/BattleAnimations'
 import { EventBridge } from '../utils/EventBridge'
 import { BattleAction, BattleReplay } from '@/data/replay'
 import { Element } from '@/lib/solana-helper'
+import { loadAllCardAssets } from '@/lib/phaser-utils'
 
 export class CardBattleScene extends Phaser.Scene {
   private playerCards: Card[] = []
@@ -35,15 +36,9 @@ export class CardBattleScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('cardback', '/images/game/cardback.png')
-    this.load.image('starburst', '/images/game/starburst.png')
     this.load.image('battlefield', '/images/game/battlefield.png')
 
-    this.load.image('species-0', '/images/species/0.png')
-    this.load.image('species-1', '/images/species/1.png')
-    this.load.image('species-2', '/images/species/2.png')
-    this.load.image('species-3', '/images/species/3.png')
-    this.load.image('species-4', '/images/species/4.png')
+    loadAllCardAssets(this)
   }
 
   create() {

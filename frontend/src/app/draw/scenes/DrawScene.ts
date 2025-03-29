@@ -8,6 +8,7 @@ import { getCardColor } from '@/data/card'
 import { Card } from '@/gameObjects/Card'
 import { EventBridge } from '../utils/EventBridge'
 import { CardData, elementToString } from '@/lib/solana-helper'
+import { loadAllCardAssets } from '@/lib/phaser-utils'
 
 const LAYOUT = {
   CARD_Y: 250,
@@ -38,14 +39,7 @@ export class DrawScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('cardpack', '/images/game/cardpack.png')
-    this.load.image('cardback', '/images/game/cardback.png')
-
-    this.load.image('species-0', '/images/species/0.png')
-    this.load.image('species-1', '/images/species/1.png')
-    this.load.image('species-2', '/images/species/2.png')
-    this.load.image('species-3', '/images/species/3.png')
-    this.load.image('species-4', '/images/species/4.png')
+    loadAllCardAssets(this)
   }
 
   create() {
