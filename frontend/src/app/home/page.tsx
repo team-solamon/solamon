@@ -9,7 +9,6 @@ import Button from '../../components/Button'
 import Card from '../../components/Card'
 import { ModalProvider, useModal } from '@/contexts/ModalContext'
 
-// Import modal components
 import TutorialModal from '@/components/modals/TutorialModal'
 import PurchaseCardModal from '@/components/modals/PurchaseCardModal'
 import NewCardModal from '@/components/modals/NewCardModal'
@@ -121,10 +120,7 @@ const HomePageContent = () => {
 
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
-      <Nav
-        onNewCard={() => openModal('purchaseCard')}
-        onOpenTutorial={() => openModal('tutorial')}
-      />
+      <Nav />
       <div className='action-buttons flex justify-center gap-4 mb-8'>
         <Button onClick={() => openModal('purchaseCard')}>
           + New Card <span className='text-blue-400'>0.1</span>
