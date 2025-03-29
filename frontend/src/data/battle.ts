@@ -1,4 +1,4 @@
-import { CardData } from './card'
+import { CardData } from '@/lib/solana-helper'
 
 export type BattleStatus =
   | {
