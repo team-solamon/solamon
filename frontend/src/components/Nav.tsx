@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import Button from './Button'
 import { getConnection, getKeypairFromLocalStorage } from '@/lib/helper'
-import { Keypair, LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 
 interface NavProps {
   onNewCard: () => void
@@ -25,13 +24,18 @@ const Nav: React.FC<NavProps> = ({ onNewCard, onOpenTutorial }) => {
 
   return (
     <header className='header flex justify-between items-center mb-6'>
-      <Button onClick={onOpenTutorial}>Tutorial</Button>
+      <span
+        onClick={onOpenTutorial}
+        className='text-[#9FF500] cursor-pointer font-semibold'
+      >
+        Tutorial
+      </span>
       <h1 className='text-4xl font-bold'>SOLAMON</h1>
       <div className='wallet-info text-right'>
-        <span className='block text-sm text-gray-400'>
+        <span className='block text-sm text-[#9FF500]'>
           {keypair?.publicKey.toBase58()}
         </span>
-        <span className='block text-lg text-blue-400'>
+        <span className='block text-lg text-[#9FF500]'>
           {balance ? balance : '0.00'}
         </span>
       </div>
