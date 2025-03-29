@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{self, Mint, Token, TokenAccount};
-declare_id!("BcH8K2v6nUU72y3CctTH2zR7W2ZFpA94qqWZQerdAEnd");
+declare_id!("9k156rBEyhLRkf9U4S6ZxKQysB2nVAqNTDVxDSXg57Vt");
 
 mod errors;
 use errors::SolamonError;
