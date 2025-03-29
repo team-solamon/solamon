@@ -2,35 +2,35 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { CardData } from '@/lib/solana-helper'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Nav from '@/components/Nav'
+import { BattleStatus } from '@/data/battle'
 
-const fighters: { myCards: CardData[]; cost: number }[] = [
+const fighters: BattleStatus[] = [
   {
+    status: 'pending',
     myCards: [
-      { name: 'FIRE', element: 'FIRE', attack: 20, health: 20 },
-      { name: 'WATER', element: 'WATER', attack: 10, health: 30 },
-      { name: 'EARTH', element: 'EARTH', attack: 10, health: 10 },
+      { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3 },
+      { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
+      { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5 },
     ],
-    cost: 0.15,
   },
   {
+    status: 'pending',
     myCards: [
-      { name: 'WATER', element: 'WATER', attack: 20, health: 20 },
-      { name: 'WATER', element: 'WATER', attack: 10, health: 30 },
-      { name: 'WATER', element: 'WATER', attack: 30, health: 10 },
+      { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
+      { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
+      { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
     ],
-    cost: 0.15,
   },
   {
+    status: 'pending',
     myCards: [
-      { name: 'FIRE', element: 'FIRE', attack: 30, health: 10 },
-      { name: 'WATER', element: 'WATER', attack: 20, health: 20 },
-      { name: 'EARTH', element: 'EARTH', attack: 20, health: 30 },
+      { name: 'METAL', element: { metal: {} }, attack: 6, health: 2 },
+      { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4 },
+      { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3 },
     ],
-    cost: 0.15,
   },
 ]
 
@@ -64,8 +64,7 @@ const ChooseFighterPage = () => {
               ))}
             </div>
             <Button>
-              Choose Fighter{' '}
-              <span className='text-blue-400'>{fighter.cost}</span>
+              Choose Fighter <span className='text-blue-400'>0.15</span>
             </Button>
           </div>
         ))}
