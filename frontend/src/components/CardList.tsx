@@ -3,6 +3,7 @@ import Card from '@/components/Card'
 import { CardData, elementToString, stringToElement } from '@/lib/solana-helper'
 import { getElementEmoji } from '@/data/card'
 import Typography from './Typography'
+import CardStats from './CardStats'
 
 interface CardListProps {
   cards: CardData[]
@@ -62,13 +63,7 @@ const CardList: React.FC<CardListProps> = ({
                 </div>
               </div>
             )}
-
-            <div className='flex items-end gap-8 bg-[rgba(19,19,19,0.7)] p-2 rounded-2xl absolute bottom-8 '>
-              <Typography variant='caption-1'>{`⚔️ ${card.attack}`}</Typography>
-              <Typography variant='caption-1'>
-                {`♥️️ ${card.health}`}
-              </Typography>
-            </div>
+            <CardStats attack={card.attack} health={card.health} />
           </div>
         ))}
       </div>
