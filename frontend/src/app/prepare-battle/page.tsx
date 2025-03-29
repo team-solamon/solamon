@@ -123,7 +123,9 @@ const PrepareBattlePage = () => {
   const [pickedCards, setPickedCards] = useState<CardData[]>([])
 
   const handleCardPick = (card: CardData) => {
-    if (pickedCards.length < 3 && !pickedCards.includes(card)) {
+    if (pickedCards.includes(card)) {
+      setPickedCards(pickedCards.filter((c) => c !== card))
+    } else if (pickedCards.length < 3) {
       setPickedCards([...pickedCards, card])
     }
   }
