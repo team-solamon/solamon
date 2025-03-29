@@ -264,6 +264,111 @@ export function unwrapSolIx(
 	return createCloseAccountInstruction(acc, destination, authority)
 }
 
+export async function spawnSolamonsTx(
+	connection: Connection,
+	program: Program<Solamon>,
+	player: PublicKey,
+	numberToSpawn: number
+) {
+	const spawnSolamonsTx = new Transaction()
+	const feeAccount = (await getConfigAccount(program)).feeAccount
+
+	const { tx: feeTokenCreateATATx } = await getOrCreateNativeMintATA(
+		connection,
+		player,
+		feeAccount
+	)
+
+	if (feeTokenCreateATATx) {
+		spawnSolamonsTx.add(feeTokenCreateATATx)
+	}
+
+	const spawnSolamons = await program.methods
+		.spawnSolamons(numberToSpawn)
+		.accounts({
+			player: player,
+			feeAccount: feeAccount,
+		})
+		.transaction()
+
+	spawnSolamonsTx.add(spawnSolamons)
+
+	return spawnSolamonsTx
+}
+
+export async function showSpawnResult(
+	connection: Connection,
+	txSig: string
+): Promise<
+	{
+		id: number
+		species: number
+		element: string
+		attack: number
+		health: number
+		isAvailable: boolean
+	}[]
+> {
+	const tx = await connection.getTransaction(txSig, {
+		commitment: "confirmed",
+	})
+	console.log("Spawn result")
+	const logs = tx?.meta?.logMessages
+		.filter((log) => log.includes("Spawned"))
+		.map((log) => {
+			const trimmedLog = log.slice(29)
+			return parseSolamonLog(trimmedLog)
+		})
+
+	return logs
+}
+
+export function parseSolamonLog(logString: string): {
+	id: number
+	species: number
+	element: string
+	attack: number
+	health: number
+	isAvailable: boolean
+} {
+	// Handle the specific format from the logs
+	// Convert from "{ id: 0, species: 3, element: Metal, attack: 3, health: 12, is_available: true }"
+	// to a proper JavaScript object
+
+	// Replace is_available with isAvailable to match our TypeScript conventions
+	const normalizedString = logString.replace("is_available", "isAvailable")
+
+	// Extract values using regex
+	const idMatch = normalizedString.match(/id:\s*(\d+)/)
+	const speciesMatch = normalizedString.match(/species:\s*(\d+)/)
+	const elementMatch = normalizedString.match(/element:\s*(\w+)/)
+	const attackMatch = normalizedString.match(/attack:\s*(\d+)/)
+	const healthMatch = normalizedString.match(/health:\s*(\d+)/)
+	const isAvailableMatch = normalizedString.match(
+		/isAvailable:\s*(true|false)/
+	)
+
+	if (
+		!idMatch ||
+		!speciesMatch ||
+		!elementMatch ||
+		!attackMatch ||
+		!healthMatch ||
+		!isAvailableMatch
+	) {
+		throw new Error(`Failed to parse Solamon log: ${logString}`)
+	}
+
+	return {
+		id: parseInt(idMatch[1]),
+		species: parseInt(speciesMatch[1]),
+		element: elementMatch[1],
+		attack: parseInt(attackMatch[1]),
+		health: parseInt(healthMatch[1]),
+		isAvailable: isAvailableMatch[1] === "true",
+	}
+}
+
 export async function wrapSolAndOpenBattleTx(
 	connection: Connection,
 	program: Program<Solamon>,

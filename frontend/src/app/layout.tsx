@@ -48,6 +48,7 @@ export const metadata: Metadata = {
 }
 
 import { ModalProvider } from '@/contexts/ModalContext'
+import { LoadingProvider } from '@/contexts/LoadingContext'
 
 export default function RootLayout({
   children,
@@ -57,7 +58,9 @@ export default function RootLayout({
   return (
     <html>
       <body>
-        <ModalProvider>{children}</ModalProvider>
+        <LoadingProvider>
+          <ModalProvider>{children}</ModalProvider>
+        </LoadingProvider>
       </body>
     </html>
   )
