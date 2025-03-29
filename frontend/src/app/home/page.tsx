@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { getElementEmoji } from '@/data/card'
-import { DrawableCards } from '@/data/draw'
 import CardStack from '@/components/CardStack'
 import Nav from '@/components/Nav'
 import Button from '../../components/Button'
@@ -33,16 +32,6 @@ import {
 import { Program } from '@coral-xyz/anchor'
 import { Solamon } from '@/target/types/solamon'
 import { useLoading } from '@/contexts/LoadingContext'
-
-const drawableCards: DrawableCards = {
-  cards: [
-    { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3 },
-    { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
-    { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5 },
-    { name: 'METAL', element: { metal: {} }, attack: 6, health: 2 },
-    { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4 },
-  ],
-}
 
 const cardStackData: BattleStatus[] = [
   {
@@ -89,17 +78,7 @@ const HomePageContent = () => {
   const [selectedBattle, setSelectedBattle] = useState<BattleStatus | null>(
     null
   )
-  const [spawnResult, setSpawnResult] = useState<
-    | {
-        id: number
-        species: number
-        element: string
-        attack: number
-        health: number
-        isAvailable: boolean
-      }[]
-    | null
-  >(null)
+  const [spawnResult, setSpawnResult] = useState<CardData[]>([])
   const [myCards, setMyCards] = useState<CardData[]>([])
   const { showLoading, hideLoading } = useLoading()
   const connection = getConnection()
@@ -259,10 +238,11 @@ const HomePageContent = () => {
       <TutorialModal onNewCard={handleNewCardFromTutorial} />
       <PurchaseCardModal onPurchase={handlePurchase} />
       <NewCardModal
-        drawableCards={drawableCards}
+        drawableCards={spawnResult}
         onViewAll={handleViewAllCards}
+        onClose={fetchMyCards}
       />
-      <ViewAllCardsModal drawableCards={drawableCards} />
+      <ViewAllCardsModal drawableCards={spawnResult} />
       <CardDetailsModal selectedCard={selectedCard} />
       <ResultModal selectedBattle={selectedBattle} />
     </div>
