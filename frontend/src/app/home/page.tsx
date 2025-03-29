@@ -32,6 +32,10 @@ import {
 import { Program } from '@coral-xyz/anchor'
 import { Solamon } from '@/target/types/solamon'
 import { useLoading } from '@/contexts/LoadingContext'
+import {
+  yellowTextWithOutline,
+  yellowTextWithOutlineBold,
+} from '@/styles/textStyles'
 
 const cardStackData: BattleStatus[] = [
   {
@@ -166,7 +170,10 @@ const HomePageContent = () => {
 
       <section className='battle-section mb-8'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <h2 className='text-2xl font-semibold text-yellow-400 mb-4'>
+          <h2
+            className='text-2xl font-semibold mb-4'
+            style={yellowTextWithOutlineBold}
+          >
             Battle
           </h2>
           <div className='battle-cards flex gap-4'>
@@ -200,7 +207,10 @@ const HomePageContent = () => {
 
       <section className='my-card-section'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <h2 className='text-2xl font-semibold text-yellow-400 mb-4'>
+          <h2
+            className='text-2xl font-semibold mb-4'
+            style={yellowTextWithOutlineBold}
+          >
             My Card | {myCards.length}
           </h2>
           <div className='card-stats flex gap-4 text-lg mb-4'>
