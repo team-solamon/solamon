@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import { BattleStatus } from '@/data/battle'
 import { CardData, CardElement, getElementEmoji } from '@/data/card'
@@ -9,19 +9,13 @@ import { DrawableCards } from '@/data/draw'
 
 import CardStack from '@/components/CardStack'
 import GameResult from '@/components/GameResult'
+import Nav from '@/components/Nav'
 
 import Button from '../../components/Button'
 import Card from '../../components/Card'
 import Modal from '../../components/Modal'
-import { getConnection, getKeypairFromLocalStorage } from '@/lib/helper'
-import { Keypair, LAMPORTS_PER_SOL } from '@solana/web3.js'
 
 const DrawGame = dynamic(() => import('../draw/components/DrawGame'), {
-  ssr: false,
-})
-
-// Dynamic import for Tutorial component because it contains phaser game scene
-const Tutorial = dynamic(() => import('../../components/Tutorial'), {
   ssr: false,
 })
 
@@ -90,19 +84,6 @@ const HomePage = () => {
   const [selectedBattle, setSelectedBattle] = useState<BattleStatus | null>(
     null
   )
-  const [balance, setBalance] = useState<number | null>(null)
-  const keypair = getKeypairFromLocalStorage()
-
-  useEffect(() => {
-    fetchBalance()
-  }, [])
-
-  const fetchBalance = async () => {
-    const connection = getConnection()
-    if (!keypair?.publicKey) return
-    const balance = await connection.getBalance(keypair.publicKey)
-    setBalance(balance / LAMPORTS_PER_SOL)
-  }
 
   const openModal = (modalKey: string, card?: CardData) => {
     setModals((prev) => ({ ...prev, [modalKey]: true }))
@@ -146,25 +127,13 @@ const HomePage = () => {
 
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
-      <header className='header flex justify-between items-center mb-6'>
-        <h1 className='text-4xl font-bold'>SOLAMON</h1>
-        <div className='wallet-info text-right'>
-          <span className='block text-sm text-gray-400'>
-            {keypair?.publicKey.toBase58()}
-          </span>
-          <span className='block text-lg text-blue-400'>
-            {balance ? balance : '0.00'}
-          </span>
-        </div>
-      </header>
-
+      <Nav />
       <div className='action-buttons flex justify-center gap-4 mb-8'>
         <Button onClick={() => openModal('purchaseCard')}>
           + New Card <span className='text-blue-400'>0.1</span>
         </Button>
         <Button>Open Match</Button>
         <Button>Choose Fighter</Button>
-        <Button onClick={() => openModal('tutorial')}>Tutorial</Button>
       </div>
 
       <section className='battle-section mb-8'>
@@ -294,15 +263,6 @@ const HomePage = () => {
             <p>Health: {selectedCard.health}</p>
           </div>
         )}
-      </Modal>
-
-      <Modal
-        isOpen={modals['tutorial']}
-        onClose={() => closeModal('tutorial')}
-        title='Tutorial'
-        maxWidth='600px'
-      >
-        <Tutorial />
       </Modal>
 
       {selectedBattle && selectedBattle.status === 'result' && (
