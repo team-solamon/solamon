@@ -1,5 +1,5 @@
-import { yellowTextWithOutline } from '@/styles/textStyles'
 import React, { useState } from 'react'
+import Typography from '@/components/Typography'
 
 const Button = ({
   children,
@@ -23,6 +23,8 @@ const Button = ({
 
   const opacity = disabled ? 0.3 : isHovered ? 0.7 : 1
 
+  const variant = size === 'L' ? 'body-1' : 'body-2'
+
   return (
     <button
       onClick={onClick}
@@ -36,7 +38,6 @@ const Button = ({
         width: '240px',
         height: height,
         opacity,
-        ...yellowTextWithOutline,
       }}
       className='flex items-center justify-center'
     >
@@ -64,7 +65,7 @@ const Button = ({
           </svg>
         </div>
       ) : (
-        children
+        <Typography variant={variant}>{children}</Typography>
       )}
     </button>
   )
