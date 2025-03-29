@@ -2,22 +2,92 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { CardData } from '@/data/card'
+import { CardData, stringToElement } from '@/lib/solana-helper'
 import Nav from '@/components/Nav'
 import PickedCards from '@/components/PickedCards'
 import CardList from '@/components/CardList'
 
 const myCards: CardData[] = [
-  { name: 'FIRE', element: 'FIRE', attack: 20, health: 20 },
-  { name: 'WATER', element: 'WATER', attack: 30, health: 10 },
-  { name: 'EARTH', element: 'EARTH', attack: 10, health: 30 },
-  { name: 'WOOD', element: 'WOOD', attack: 20, health: 20 },
-  { name: 'METAL', element: 'METAL', attack: 10, health: 10 },
-  { name: 'FIRE', element: 'FIRE', attack: 20, health: 20 },
-  { name: 'WATER', element: 'WATER', attack: 30, health: 10 },
-  { name: 'EARTH', element: 'EARTH', attack: 10, health: 30 },
-  { name: 'WOOD', element: 'WOOD', attack: 20, health: 20 },
-  { name: 'METAL', element: 'METAL', attack: 10, health: 10 },
+  {
+    id: 1,
+    species: 101,
+    element: stringToElement('fire'),
+    attack: 20,
+    health: 20,
+    isAvailable: true,
+  },
+  {
+    id: 2,
+    species: 102,
+    element: stringToElement('water'),
+    attack: 30,
+    health: 10,
+    isAvailable: true,
+  },
+  {
+    id: 3,
+    species: 103,
+    element: stringToElement('earth'),
+    attack: 10,
+    health: 30,
+    isAvailable: true,
+  },
+  {
+    id: 4,
+    species: 104,
+    element: stringToElement('wood'),
+    attack: 20,
+    health: 20,
+    isAvailable: true,
+  },
+  {
+    id: 5,
+    species: 105,
+    element: stringToElement('metal'),
+    attack: 10,
+    health: 10,
+    isAvailable: true,
+  },
+  {
+    id: 6,
+    species: 101,
+    element: stringToElement('fire'),
+    attack: 20,
+    health: 20,
+    isAvailable: true,
+  },
+  {
+    id: 7,
+    species: 102,
+    element: stringToElement('water'),
+    attack: 30,
+    health: 10,
+    isAvailable: true,
+  },
+  {
+    id: 8,
+    species: 103,
+    element: stringToElement('earth'),
+    attack: 10,
+    health: 30,
+    isAvailable: true,
+  },
+  {
+    id: 9,
+    species: 104,
+    element: stringToElement('wood'),
+    attack: 20,
+    health: 20,
+    isAvailable: true,
+  },
+  {
+    id: 10,
+    species: 105,
+    element: stringToElement('metal'),
+    attack: 10,
+    health: 10,
+    isAvailable: true,
+  },
 ]
 
 const OpenBattlePage = () => {

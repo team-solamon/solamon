@@ -1,11 +1,9 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { getElementEmoji } from '@/data/card'
 import CardStack from '@/components/CardStack'
 import Nav from '@/components/Nav'
 import Button from '../../components/Button'
-import Card from '../../components/Card'
 import { ModalProvider, useModal } from '@/contexts/ModalContext'
 
 import TutorialModal from '@/components/modals/TutorialModal'
@@ -30,6 +28,7 @@ import {
 } from '@/lib/helper'
 import { useLoading } from '@/contexts/LoadingContext'
 import Typography from '@/components/Typography'
+import CardList from '@/components/CardList'
 
 const cardStackData: BattleStatus[] = [
   {
@@ -198,35 +197,7 @@ const HomePageContent = () => {
 
       <section className='my-card-section'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <Typography variant='title-2'>My Card | {myCards.length}</Typography>
-          <div className='card-stats flex gap-4 text-lg mb-4'>
-            {Object.entries(elementCounts).map(
-              ([element, count]) =>
-                count > 0 && (
-                  <span key={element}>
-                    {getElementEmoji(stringToElement(element))} {count}
-                  </span>
-                )
-            )}
-          </div>
-          <div className='card-list grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4'>
-            {myCards.map((card, index) => (
-              <div
-                key={index}
-                className='card bg-[rgba(202,193,185,1)]  p-2 rounded-lg flex flex-col items-center relative'
-              >
-                <Card card={card} className='mx-auto' />
-                <div className='flex items-end gap-8 bg-[rgba(19,19,19,0.7)] p-2 rounded-2xl absolute bottom-8 '>
-                  <Typography variant='caption-1'>
-                    {`⚔️ ${card.attack}`}
-                  </Typography>
-                  <Typography variant='caption-1'>
-                    {`♥️️ ${card.health}`}
-                  </Typography>
-                </div>
-              </div>
-            ))}
-          </div>
+          <CardList cards={myCards} />
         </div>
       </section>
 

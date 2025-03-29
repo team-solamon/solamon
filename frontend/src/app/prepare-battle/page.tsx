@@ -2,29 +2,120 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { CardData } from '@/data/card'
 import Nav from '@/components/Nav'
 import PickedCards from '@/components/PickedCards'
 import CardList from '@/components/CardList'
 import Card from '@/components/Card'
+import { CardData, stringToElement } from '@/lib/solana-helper'
 
 const myCards: CardData[] = [
-  { name: 'FIRE', element: 'FIRE', attack: 20, health: 20 },
-  { name: 'WATER', element: 'WATER', attack: 30, health: 10 },
-  { name: 'EARTH', element: 'EARTH', attack: 10, health: 30 },
-  { name: 'WOOD', element: 'WOOD', attack: 20, health: 20 },
-  { name: 'METAL', element: 'METAL', attack: 10, health: 10 },
-  { name: 'FIRE', element: 'FIRE', attack: 20, health: 20 },
-  { name: 'WATER', element: 'WATER', attack: 30, health: 10 },
-  { name: 'EARTH', element: 'EARTH', attack: 10, health: 30 },
-  { name: 'WOOD', element: 'WOOD', attack: 20, health: 20 },
-  { name: 'METAL', element: 'METAL', attack: 10, health: 10 },
+  {
+    id: 1,
+    species: 101,
+    element: stringToElement('fire'),
+    attack: 20,
+    health: 20,
+    isAvailable: true,
+  },
+  {
+    id: 2,
+    species: 102,
+    element: stringToElement('water'),
+    attack: 30,
+    health: 10,
+    isAvailable: true,
+  },
+  {
+    id: 3,
+    species: 103,
+    element: stringToElement('earth'),
+    attack: 10,
+    health: 30,
+    isAvailable: true,
+  },
+  {
+    id: 4,
+    species: 104,
+    element: stringToElement('wood'),
+    attack: 20,
+    health: 20,
+    isAvailable: true,
+  },
+  {
+    id: 5,
+    species: 105,
+    element: stringToElement('metal'),
+    attack: 10,
+    health: 10,
+    isAvailable: true,
+  },
+  {
+    id: 6,
+    species: 101,
+    element: stringToElement('fire'),
+    attack: 20,
+    health: 20,
+    isAvailable: true,
+  },
+  {
+    id: 7,
+    species: 102,
+    element: stringToElement('water'),
+    attack: 30,
+    health: 10,
+    isAvailable: true,
+  },
+  {
+    id: 8,
+    species: 103,
+    element: stringToElement('earth'),
+    attack: 10,
+    health: 30,
+    isAvailable: true,
+  },
+  {
+    id: 9,
+    species: 104,
+    element: stringToElement('wood'),
+    attack: 20,
+    health: 20,
+    isAvailable: true,
+  },
+  {
+    id: 10,
+    species: 105,
+    element: stringToElement('metal'),
+    attack: 10,
+    health: 10,
+    isAvailable: true,
+  },
 ]
 
 const enemyCards: CardData[] = [
-  { name: 'WATER', element: 'WATER', attack: 20, health: 20 },
-  { name: 'EARTH', element: 'EARTH', attack: 20, health: 20 },
-  { name: 'FIRE', element: 'FIRE', attack: 20, health: 20 },
+  {
+    id: 11,
+    species: 201,
+    element: stringToElement('water'),
+    attack: 20,
+    health: 20,
+    isAvailable: true,
+  },
+  {
+    id: 12,
+    species: 202,
+    element: stringToElement('earth'),
+    attack: 20,
+    health: 20,
+    isAvailable: true,
+  },
+  {
+    id: 13,
+    species: 203,
+    element: stringToElement('fire'),
+    attack: 20,
+    health: 20,
+    isAvailable: true,
+  },
 ]
 
 const PrepareBattlePage = () => {
