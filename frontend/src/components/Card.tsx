@@ -9,6 +9,7 @@ interface CardImageProps {
   maxWidth?: string | number
   maxHeight?: string | number
   className?: string
+  onClick?: () => void
 }
 
 const Card: React.FC<CardImageProps> = ({
@@ -18,6 +19,7 @@ const Card: React.FC<CardImageProps> = ({
   maxWidth = '300px',
   maxHeight = '400px',
   className = '',
+  onClick,
 }) => {
   const getImageSrc = (card: CardData) => {
     return `/images/game/${getCardTexture(card.element)}.png`
@@ -27,6 +29,7 @@ const Card: React.FC<CardImageProps> = ({
     <div
       className={`card-image aspect-[4/5] bg-gray-500 rounded-lg mb-2 relative ${className}`}
       style={{ width, height, maxWidth, maxHeight }}
+      onClick={onClick}
     >
       <img
         src={getImageSrc(card)}

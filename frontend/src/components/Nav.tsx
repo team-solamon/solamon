@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { getConnection, getKeypairFromLocalStorage } from '@/lib/helper'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { useModal } from '@/contexts/ModalContext'
 
-interface NavProps {
-  onNewCard: () => void
-  onOpenTutorial: () => void
-}
+const Nav: React.FC = () => {
+  const { openModal } = useModal()
 
-const Nav: React.FC<NavProps> = ({ onNewCard, onOpenTutorial }) => {
   const [balance, setBalance] = useState<number | null>(null)
   const keypair = getKeypairFromLocalStorage()
 
@@ -25,7 +23,9 @@ const Nav: React.FC<NavProps> = ({ onNewCard, onOpenTutorial }) => {
   return (
     <header className='header flex justify-between items-center mb-6'>
       <span
-        onClick={onOpenTutorial}
+        onClick={() => {
+          openModal('tutorial')
+        }}
         className='text-solamon-green cursor-pointer font-semibold'
       >
         Tutorial
