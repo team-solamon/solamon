@@ -304,15 +304,15 @@ export async function showSpawnResult(
 	const tx = await connection.getTransaction(txSig, {
 		commitment: "confirmed",
 	})
-	console.log("Spawn result")
-	const logs = tx?.meta?.logMessages
-		.filter((log) => log.includes("Spawned"))
-		.map((log) => {
-			const trimmedLog = log.slice(29)
-			return parseSolamonLog(trimmedLog)
-		})
+	console.log('Spawn result')
+  const logs = (tx?.meta?.logMessages ?? [])
+    .filter((log) => log.includes('Spawned'))
+    .map((log) => {
+      const trimmedLog = log.slice(29)
+      return parseSolamonLog(trimmedLog)
+    })
 
-	return logs
+  return logs
 }
 
 export function stringToElement(elementStr: string): Element {
@@ -366,6 +366,10 @@ export function parseSolamonLog(logString: string): CardData {
 	const isAvailableMatch = normalizedString.match(
 		/isAvailable:\s*(true|false)/
 	)
+
+	if (!elementMatch) {
+    throw new Error(`Failed to parse element from log: ${logString}`)
+  }
 
 	// Map the string to the enum
 	const element = stringToElement(elementMatch[1])
