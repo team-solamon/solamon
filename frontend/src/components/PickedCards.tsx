@@ -1,7 +1,7 @@
 import React from 'react'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
-import { CardData } from '@/data/card'
+import { CardData } from '@/lib/solana-helper'
 
 interface PickedCardsProps {
   pickedCards: CardData[]
