@@ -1,5 +1,5 @@
-import type { Config } from 'tailwindcss';
-import defaultTheme from 'tailwindcss/defaultTheme';
+import type { Config } from 'tailwindcss'
+import defaultTheme from 'tailwindcss/defaultTheme'
 
 export default {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
@@ -24,6 +24,7 @@ export default {
           950: 'rgb(var(--tw-color-primary-950) / <alpha-value>)',
         },
         dark: '#222222',
+        'solamon-green': 'rgb(var(--tw-color-solamon-green) / <alpha-value>)',
       },
       keyframes: {
         flicker: {
@@ -53,4 +54,4 @@ export default {
     },
   },
   plugins: [require('@tailwindcss/forms')],
-} satisfies Config;
+} satisfies Config
