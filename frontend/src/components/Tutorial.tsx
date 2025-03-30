@@ -7,18 +7,94 @@ import { CardBattleScene } from '@/app/game/scenes/CardBattleScene'
 import { EventBridge } from '@/app/game/utils/EventBridge'
 import { CardData, stringToElement } from '@/lib/solana-helper'
 import Typography from './Typography'
+import CardElementProbabilities from './CardElementProbabilities'
 
-const cards: CardData[] = [
-  { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3, species: 0 },
-  { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3, species: 1 },
-  { name: 'WATER', element: { water: {} }, attack: 3, health: 6, species: 2 },
-  { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5, species: 3 },
-  { name: 'METAL', element: { metal: {} }, attack: 6, health: 2, species: 4 },
-  { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4, species: 5 },
-  { name: 'WATER', element: { water: {} }, attack: 3, health: 6, species: 6 },
-  { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5, species: 7 },
-  { name: 'METAL', element: { metal: {} }, attack: 6, health: 2, species: 8 },
-  { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4, species: 9 },
+interface CardWithProbabilities {
+  species: number
+  probabilities: { element: Element; probability: number }[]
+}
+
+const cards: CardWithProbabilities[] = [
+  {
+    species: 0,
+    probabilities: [
+      { element: stringToElement('fire'), probability: 80 },
+      { element: stringToElement('water'), probability: 10 },
+      { element: stringToElement('earth'), probability: 10 },
+    ],
+  },
+  {
+    species: 1,
+    probabilities: [
+      { element: stringToElement('fire'), probability: 80 },
+      { element: stringToElement('water'), probability: 10 },
+      { element: stringToElement('earth'), probability: 10 },
+    ],
+  },
+  {
+    species: 2,
+    probabilities: [
+      { element: stringToElement('water'), probability: 70 },
+      { element: stringToElement('fire'), probability: 20 },
+      { element: stringToElement('earth'), probability: 10 },
+    ],
+  },
+  {
+    species: 3,
+    probabilities: [
+      { element: stringToElement('earth'), probability: 60 },
+      { element: stringToElement('fire'), probability: 20 },
+      { element: stringToElement('water'), probability: 20 },
+    ],
+  },
+  {
+    species: 4,
+    probabilities: [
+      { element: stringToElement('metal'), probability: 50 },
+      { element: stringToElement('fire'), probability: 30 },
+      { element: stringToElement('water'), probability: 20 },
+    ],
+  },
+  {
+    species: 5,
+    probabilities: [
+      { element: stringToElement('wood'), probability: 40 },
+      { element: stringToElement('fire'), probability: 30 },
+      { element: stringToElement('water'), probability: 30 },
+    ],
+  },
+  {
+    species: 6,
+    probabilities: [
+      { element: stringToElement('water'), probability: 70 },
+      { element: stringToElement('fire'), probability: 20 },
+      { element: stringToElement('earth'), probability: 10 },
+    ],
+  },
+  {
+    species: 7,
+    probabilities: [
+      { element: stringToElement('earth'), probability: 60 },
+      { element: stringToElement('fire'), probability: 20 },
+      { element: stringToElement('water'), probability: 20 },
+    ],
+  },
+  {
+    species: 8,
+    probabilities: [
+      { element: stringToElement('metal'), probability: 50 },
+      { element: stringToElement('fire'), probability: 30 },
+      { element: stringToElement('water'), probability: 20 },
+    ],
+  },
+  {
+    species: 9,
+    probabilities: [
+      { element: stringToElement('wood'), probability: 40 },
+      { element: stringToElement('fire'), probability: 30 },
+      { element: stringToElement('water'), probability: 30 },
+    ],
+  },
 ]
 
 const playerCardData: CardData[] = [
@@ -189,9 +265,10 @@ const Tutorial: React.FC<TutorialProps> = ({ onNewCard }) => {
           {cards.map((card, index) => (
             <div
               key={index}
-              className='card bg-gray-700 p-2 rounded-lg flex-shrink-0'
+              className='card bg-gray-700 p-2 rounded-lg flex-shrink-0 relative'
             >
-              <Card card={card} className='mx-auto' />
+              <Card species={card.species} className='mx-auto' />
+              <CardElementProbabilities data={card.probabilities} />
             </div>
           ))}
         </div>
