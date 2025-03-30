@@ -89,7 +89,7 @@ const Game: React.FC = () => {
 
   const handleGameReady = () => {
     EventBridge.onLogUpdate = (message: string) => {
-      setBattleLogs((prevLogs) => [message, ...prevLogs.slice(0, 19)])
+      setBattleLogs((prevLogs) => [message, ...prevLogs])
     }
 
     EventBridge.onScoreUpdate = (
