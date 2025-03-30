@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { getConnection, getKeypairFromLocalStorage } from '@/lib/helper'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { useModal } from '@/contexts/ModalContext'
+import { getExplorerUrl } from '@/lib/url-helper'
 
 const Nav: React.FC = () => {
   const { openModal } = useModal()
@@ -32,9 +33,14 @@ const Nav: React.FC = () => {
       </span>
       <h1 className='text-4xl font-bold'>SOLAMON</h1>
       <div className='wallet-info text-right'>
-        <span className='block text-sm text-solamon-green'>
+        <a
+          href={`${getExplorerUrl(keypair?.publicKey.toBase58() || '')}`}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='block text-sm text-solamon-green no-underline'
+        >
           {keypair?.publicKey.toBase58()}
-        </span>
+        </a>
         <span className='block text-lg text-solamon-green'>
           {balance ? balance : '0.00'}
         </span>
