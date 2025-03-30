@@ -32,7 +32,6 @@ export class DrawScene extends Phaser.Scene {
   private loadingText: Phaser.GameObjects.Text | null = null
   private loadingTween: Phaser.Tweens.Tween | null = null
 
-  // Background music property
   private backgroundMusic: Phaser.Sound.BaseSound | null = null
 
   private config: { cards: CardData[] } | null = null
@@ -44,7 +43,13 @@ export class DrawScene extends Phaser.Scene {
   preload() {
     loadAllCardAssets(this)
 
-    this.load.audio('bgm-draw', '/sounds/bgm-draw.mp3')
+    // this.load.audio('bgm-draw', '/sounds/bgm-draw.mp3')
+
+    this.load.audio('sfx-get', '/sounds/sfx-get.mp3')
+    this.load.audio('sfx-loading', '/sounds/sfx-loading.mp3')
+    this.load.audio('sfx-long_blip', '/sounds/sfx-long_blip.mp3')
+    this.load.audio('sfx-fall_down', '/sounds/sfx-fall_down.mp3')
+    this.load.audio('sfx-select', '/sounds/sfx-select.mp3')
   }
 
   create() {
@@ -55,11 +60,13 @@ export class DrawScene extends Phaser.Scene {
     this.drawsCount = 0
     this.originalCameraZoom = this.cameras.main.zoom
 
+    /*
     this.backgroundMusic = this.sound.add('bgm-draw', {
       volume: 0.5,
       loop: true,
     })
     this.backgroundMusic.play()
+    */
 
     this.showLoadingAnimation()
 
@@ -67,13 +74,6 @@ export class DrawScene extends Phaser.Scene {
       this.clearLoadingAnimation()
       this.createCardAndPack()
     })
-  }
-
-  shutdown() {
-    if (this.backgroundMusic) {
-      this.backgroundMusic.stop()
-    }
-    this.sound.stopAll()
   }
 
   private async loadDrawConfiguration() {
@@ -137,6 +137,8 @@ export class DrawScene extends Phaser.Scene {
   revealCard() {
     this.cardRevealed = true
 
+    this.sound.play('sfx-loading', { volume: 0.7 })
+
     if (this.instructionText) {
       this.tweens.add({
         targets: this.instructionText,
@@ -174,6 +176,8 @@ export class DrawScene extends Phaser.Scene {
 
   startCardExtraction() {
     if (!this.card || !this.cardPack) return
+
+    this.sound.play('sfx-long_blip', { volume: 0.6 })
 
     if (this.cardPack) {
       this.card.x = 400
@@ -230,6 +234,8 @@ export class DrawScene extends Phaser.Scene {
           this.card.y -= 150
         }
 
+        this.sound.play('sfx-fall_down', { volume: 0.6 })
+
         this.tweens.add({
           targets: this.card,
           scaleX: { from: 0, to: 2 },
@@ -246,6 +252,8 @@ export class DrawScene extends Phaser.Scene {
               this.time.delayedCall(50, () => {
                 this.card?.flipCard()
                 this.card?.startIdleAnimation()
+
+                this.sound.play('sfx-get', { volume: 0.8 })
               })
             }
 
@@ -325,6 +333,7 @@ export class DrawScene extends Phaser.Scene {
     })
 
     this.redrawButton.setOnClick(() => {
+      this.sound.play('sfx-select', { volume: 0.8 })
       this.redrawCard()
     })
 
