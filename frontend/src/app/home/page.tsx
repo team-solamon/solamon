@@ -160,7 +160,7 @@ const HomePageContent = () => {
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
       <Nav />
-      <div className='action-buttons flex justify-center gap-4 mb-8'>
+      <div className='action-buttons flex flex-col items-center sm:flex-row justify-center gap-4 mb-16'>
         <Button onClick={() => openModal('purchaseCard')}>
           + New Card <span className='text-blue-400'>0.1</span>
         </Button>
