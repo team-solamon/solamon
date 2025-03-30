@@ -40,6 +40,11 @@ const PhaserGame: React.FC<PhaserGameProps> = ({ scenes, onGameReady }) => {
           },
           scene: scenes,
           transparent: true,
+          input: {
+            mouse: {
+              preventDefaultWheel: false,
+            },
+          },
         }
 
         gameInstanceRef.current = new Phaser.Game(config)
