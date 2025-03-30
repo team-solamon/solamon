@@ -28,7 +28,7 @@ const Game: React.FC = () => {
   const player = getKeypairFromLocalStorage()
   const [battleLogs, setBattleLogs] = useState<string[]>([])
   const [battleActions, setBattleActions] = useState<ParsedBattleAction[]>([])
-  const [scores, setScores] = useState({ player: 3, opponent: 3 })
+  const [scores, setScores] = useState({ player: 0, opponent: 0 })
   const [battleAccount, setBattleAccount] = useState<BattleAccount | null>(null)
 
   useEffect(() => {
@@ -70,6 +70,18 @@ const Game: React.FC = () => {
           attackType: action.event as AttackEvent,
         })),
       }
+      const playerInitialHealth = battleReplay.playerCards.reduce(
+        (acc, card) => acc + card.health,
+        0
+      )
+      const opponentInitialHealth = battleReplay.opponentCards.reduce(
+        (acc, card) => acc + card.health,
+        0
+      )
+      setScores({
+        player: playerInitialHealth,
+        opponent: opponentInitialHealth,
+      })
       const timer = setTimeout(() => {
         EventBridge.loadReplay(battleReplay)
       }, 2000)
