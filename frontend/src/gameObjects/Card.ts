@@ -55,7 +55,7 @@ export class Card extends Phaser.GameObjects.Container {
 
     this.originalX = x
     this.originalY = y
-    //this.name = name
+    this.name = name
     this.attack = attack
     this.health = health
     this.initialHealth = health
@@ -346,7 +346,7 @@ export class Card extends Phaser.GameObjects.Container {
   }
 
   updateCardData(data: CardData) {
-    this.name = data.name
+    //this.name = data.name
     this.attack = data.attack
     this.health = data.health
     this.initialHealth = data.health
