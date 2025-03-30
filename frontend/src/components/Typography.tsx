@@ -10,6 +10,9 @@ type TypographyProps = {
     | 'body-2'
     | 'body-3'
     | 'caption-1'
+    | 'caption-2'
+    | 'caption-3'
+    | 'caption-4'
   color?: 'default' | 'primary' | 'secondary' | 'accent' | 'inverse'
   outline?: boolean
   children: React.ReactNode
@@ -50,6 +53,9 @@ const Typography = ({
     'body-2': '20px',
     'body-3': '16px',
     'caption-1': '12px',
+    'caption-2': '10px',
+    'caption-3': '8px',
+    'caption-4': '6px',
   }
 
   const lineHeight = {
@@ -60,6 +66,9 @@ const Typography = ({
     'body-2': '150%',
     'body-3': '150%',
     'caption-1': '150%',
+    'caption-2': '150%',
+    'caption-3': '150%',
+    'caption-4': '150%',
   }
 
   return (
