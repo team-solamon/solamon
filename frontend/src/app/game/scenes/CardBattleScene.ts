@@ -308,7 +308,8 @@ export class CardBattleScene extends Phaser.Scene {
 
     if (!attackerCard.isActive) {
       attackerCard.setActiveCard(true)
-      this.addBattleLog(`🗡️ ${attackerCard.name} enters the battlefield!`)
+      const attackerName = isPlayerAttacking ? 'Your card' : "Opponent's card"
+      this.addBattleLog(`🗡️ ${attackerName} enters the battlefield!`)
       this.sound.play('sfx-card_flip', { volume: 0.7 })
       await attackerCard.moveToPosition(
         isPlayerAttacking ? centerX - cardOffset : centerX + cardOffset,
@@ -319,7 +320,8 @@ export class CardBattleScene extends Phaser.Scene {
 
     if (!defenderCard.isActive) {
       defenderCard.setActiveCard(true)
-      this.addBattleLog(`⚔️ ${defenderCard.name} enters the battlefield!`)
+      const defenderName = isPlayerAttacking ? "Opponent's card" : 'Your card'
+      this.addBattleLog(`⚔️ ${defenderName} enters the battlefield!`)
       this.sound.play('sfx-card_flip', { volume: 0.7 })
       await defenderCard.moveToPosition(
         isPlayerAttacking ? centerX + cardOffset : centerX - cardOffset,

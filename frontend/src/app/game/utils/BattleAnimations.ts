@@ -452,7 +452,9 @@ export const performSingleAttack = async (
 
     scene.sound.play('stx-attack', { volume: 0.8 })
     addBattleLog(
-      `⚔️ ${attackerCard.name} attacks ${defenderCard.name} for ${damage} damage!`
+      `⚔️ ${
+        attackerCard.isPlayer ? 'You attack' : 'Opponent attacks'
+      } for ${damage} damage!`
     )
 
     createAttackProjectile(
