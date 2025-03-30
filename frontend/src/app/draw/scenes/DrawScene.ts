@@ -78,7 +78,7 @@ export class DrawScene extends Phaser.Scene {
       this,
       400,
       LAYOUT.CARD_Y,
-      elementToString(cards[this.drawsCount].element),
+      cards[this.drawsCount].element,
       cards[this.drawsCount].attack,
       cards[this.drawsCount].health,
       cards[this.drawsCount].element,

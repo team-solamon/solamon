@@ -5,7 +5,7 @@ import { BattleReplay } from '@/data/replay'
 import PhaserGame from './PhaserGame'
 import { CardBattleScene } from '@/app/game/scenes/CardBattleScene'
 import { EventBridge } from '@/app/game/utils/EventBridge'
-import { CardData } from '@/lib/solana-helper'
+import { CardData, stringToElement } from '@/lib/solana-helper'
 
 const cards: CardData[] = [
   { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3 },
@@ -21,15 +21,51 @@ const cards: CardData[] = [
 ]
 
 const playerCardData: CardData[] = [
-  { name: 'WATER', attack: 4, health: 10, element: 'WATER' },
-  { name: 'FIRE', attack: 8, health: 6, element: 'FIRE' },
-  { name: 'METAL', attack: 6, health: 12, element: 'METAL' },
+  {
+    name: 'WATER',
+    attack: 4,
+    health: 10,
+    element: stringToElement('water'),
+    species: 1,
+  },
+  {
+    name: 'FIRE',
+    attack: 8,
+    health: 6,
+    element: stringToElement('fire'),
+    species: 2,
+  },
+  {
+    name: 'METAL',
+    attack: 6,
+    health: 12,
+    element: stringToElement('metal'),
+    species: 3,
+  },
 ]
 
 const opponentCardData: CardData[] = [
-  { name: 'EARTH', attack: 4, health: 8, element: 'EARTH' },
-  { name: 'WOOD', attack: 7, health: 7, element: 'WOOD' },
-  { name: 'METAL', attack: 9, health: 9, element: 'METAL' },
+  {
+    name: 'EARTH',
+    attack: 4,
+    health: 8,
+    element: stringToElement('earth'),
+    species: 4,
+  },
+  {
+    name: 'WOOD',
+    attack: 7,
+    health: 7,
+    element: stringToElement('wood'),
+    species: 5,
+  },
+  {
+    name: 'METAL',
+    attack: 9,
+    health: 9,
+    element: stringToElement('metal'),
+    species: 6,
+  },
 ]
 
 const sampleBattleReplay: BattleReplay = {
