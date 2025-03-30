@@ -11,9 +11,13 @@ const Tutorial = dynamic(() => import('../Tutorial'), {
 
 interface TutorialModalProps {
   onNewCard: () => void
+  onOpenBattle: () => void
 }
 
-const TutorialModal: React.FC<TutorialModalProps> = ({ onNewCard }) => {
+const TutorialModal: React.FC<TutorialModalProps> = ({
+  onNewCard,
+  onOpenBattle,
+}) => {
   const { modals, closeModal } = useModal()
 
   return (
@@ -23,7 +27,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onNewCard }) => {
       title='Tutorial'
       maxWidth='600px'
     >
-      <Tutorial onNewCard={onNewCard} />
+      <Tutorial onNewCard={onNewCard} onOpenBattle={onOpenBattle} />
     </Modal>
   )
 }

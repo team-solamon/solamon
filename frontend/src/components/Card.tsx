@@ -3,7 +3,8 @@ import { getElementEmoji } from '@/data/card'
 import { CardData } from '@/lib/solana-helper'
 
 interface CardImageProps {
-  card: CardData
+  species: number
+  element?: number
   width?: string | number
   height?: string | number
   maxWidth?: string | number
@@ -13,7 +14,8 @@ interface CardImageProps {
 }
 
 const Card: React.FC<CardImageProps> = ({
-  card,
+  species,
+  element,
   width = '100%',
   height = 'auto',
   maxWidth = '300px',
@@ -21,8 +23,8 @@ const Card: React.FC<CardImageProps> = ({
   className = '',
   onClick,
 }) => {
-  const getImageSrc = (card: CardData) => {
-    return `/images/species/${card.species}.png`
+  const getImageSrc = (species: number) => {
+    return `/images/species/${species}.png`
   }
 
   return (
@@ -32,13 +34,14 @@ const Card: React.FC<CardImageProps> = ({
       onClick={onClick}
     >
       <img
-        src={getImageSrc(card)}
-        alt={`Card ${card.name}`}
+        src={getImageSrc(species)}
         className='w-full h-full object-cover rounded-lg'
       />
-      <div className='absolute top-1 left-1 bg-white bg-opacity-75 rounded-full p-1 text-sm'>
-        {getElementEmoji(card.element)}
-      </div>
+      {element !== undefined && (
+        <div className='absolute top-1 left-1 bg-white bg-opacity-75 rounded-full p-1 text-sm'>
+          {getElementEmoji(element)}
+        </div>
+      )}
     </div>
   )
 }

@@ -51,7 +51,11 @@ const ChooseFighterPage = () => {
             <div className='cards flex gap-2 mb-4'>
               {battleAccount.player1Solamons.map(
                 (card: CardData, cardIndex: number) => (
-                  <Card key={cardIndex} card={card} />
+                  <Card
+                    key={index}
+                    species={card.species}
+                    element={card.element}
+                  />
                 )
               )}
             </div>

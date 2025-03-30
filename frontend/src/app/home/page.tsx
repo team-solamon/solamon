@@ -83,6 +83,11 @@ const HomePageContent = () => {
     openModal('purchaseCard')
   }
 
+  const handleOpenBattleFromTutorial = () => {
+    closeModal('tutorial')
+    router.push(ROUTES.OPEN_BATTLE)
+  }
+
   const handlePurchase = async (amount: number) => {
     if (!player) {
       console.error('No player found')
@@ -231,7 +236,10 @@ const HomePageContent = () => {
       </section>
 
       {/* Modals */}
-      <TutorialModal onNewCard={handleNewCardFromTutorial} />
+      <TutorialModal
+        onNewCard={handleNewCardFromTutorial}
+        onOpenBattle={handleOpenBattleFromTutorial}
+      />
       <PurchaseCardModal onPurchase={handlePurchase} />
       <NewCardModal
         drawableCards={spawnResult}
