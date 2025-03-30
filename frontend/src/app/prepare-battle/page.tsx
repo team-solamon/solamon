@@ -19,6 +19,7 @@ import {
   getProgram,
 } from '@/lib/helper'
 import { Keypair, sendAndConfirmTransaction } from '@solana/web3.js'
+import { useLoading } from '@/contexts/LoadingContext'
 
 const PrepareBattleContent = () => {
   const searchParams = useSearchParams()
@@ -31,6 +32,7 @@ const PrepareBattleContent = () => {
   const [pickedCards, setPickedCards] = useState<CardData[]>([])
   const [loading, setLoading] = useState(false)
   const [battleAccount, setBattleAccount] = useState<BattleAccount | null>(null)
+  const { showLoading, hideLoading } = useLoading()
 
   useEffect(() => {
     console.log({ battleId })
@@ -82,7 +84,7 @@ const PrepareBattleContent = () => {
       return
     }
 
-    setLoading(true)
+    showLoading('Joining battle...')
     try {
       console.log('Starting battle with cards:', pickedCards)
       const tx = await wrapSolAndJoinBattleTx(
@@ -93,11 +95,11 @@ const PrepareBattleContent = () => {
         pickedCards.map((card) => card.id)
       )
       await sendAndConfirmTransaction(connection, tx, [player])
+      router.push(`/game?battleId=${battleId}`)
     } catch (error) {
-      console.error('Battle error:', error)
-    } finally {
-      setLoading(false)
+      alert('Battle error: ' + error)
     }
+    hideLoading()
   }
 
   return (

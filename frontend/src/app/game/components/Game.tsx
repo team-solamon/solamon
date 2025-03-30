@@ -6,89 +6,104 @@ import GameLogs from './GameLogs'
 import ScoreDisplay from './ScoreDisplay'
 import { CardBattleScene } from '../scenes/CardBattleScene'
 import { EventBridge } from '../utils/EventBridge'
-import { CardData, stringToElement } from '@/lib/solana-helper'
-import { BattleReplay } from '@/data/replay'
-
-const playerCardData: CardData[] = [
-  {
-    name: 'WATER',
-    attack: 4,
-    health: 10,
-    element: stringToElement('water'),
-    species: 1,
-  },
-  {
-    name: 'FIRE',
-    attack: 8,
-    health: 6,
-    element: stringToElement('fire'),
-    species: 2,
-  },
-  {
-    name: 'METAL',
-    attack: 6,
-    health: 12,
-    element: stringToElement('metal'),
-    species: 3,
-  },
-]
-
-const opponentCardData: CardData[] = [
-  {
-    name: 'EARTH',
-    attack: 4,
-    health: 8,
-    element: stringToElement('earth'),
-    species: 4,
-  },
-  {
-    name: 'WOOD',
-    attack: 7,
-    health: 7,
-    element: stringToElement('wood'),
-    species: 5,
-  },
-  {
-    name: 'METAL',
-    attack: 9,
-    health: 9,
-    element: stringToElement('metal'),
-    species: 6,
-  },
-]
-
-const sampleBattleReplay: BattleReplay = {
-  id: 'battle-001',
-  playerCards: playerCardData,
-  opponentCards: opponentCardData,
-  actions: [
-    { isPlayer: true, atkIdx: 0, defIdx: 0, damage: 4, attackType: 'CRITICAL' },
-    { isPlayer: false, atkIdx: 0, defIdx: 0, damage: 4, attackType: 'HALVED' },
-    { isPlayer: true, atkIdx: 0, defIdx: 0, damage: 4, attackType: 'NONE' },
-    { isPlayer: true, atkIdx: 0, defIdx: 1, damage: 4, attackType: 'NONE' },
-    { isPlayer: false, atkIdx: 1, defIdx: 0, damage: 7, attackType: 'NONE' },
-    { isPlayer: true, atkIdx: 1, defIdx: 1, damage: 8, attackType: 'NONE' },
-    { isPlayer: true, atkIdx: 1, defIdx: 2, damage: 8, attackType: 'NONE' },
-    { isPlayer: false, atkIdx: 2, defIdx: 1, damage: 9, attackType: 'NONE' },
-    { isPlayer: true, atkIdx: 2, defIdx: 2, damage: 6, attackType: 'NONE' },
-  ],
-}
+import {
+  BattleAccount,
+  ParsedBattleAction,
+  getBattleAccount,
+  getBattleAccountPDA,
+  getBattleActions,
+} from '@/lib/solana-helper'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { getKeypairFromLocalStorage } from '@/lib/helper'
+import { getConnection } from '@/lib/helper'
+import { getProgram } from '@/lib/helper'
+import { AttackEvent, BattleReplay } from '@/data/replay'
 
 const Game: React.FC = () => {
+  const searchParams = useSearchParams()
+  const battleId = searchParams.get('battleId')
+  const router = useRouter()
+  const program = getProgram()
+  const connection = getConnection()
+  const player = getKeypairFromLocalStorage()
   const [battleLogs, setBattleLogs] = useState<string[]>([])
-  const [scores, setScores] = useState({
-    player: playerCardData.reduce((sum, card) => sum + card.health, 0),
-    opponent: opponentCardData.reduce((sum, card) => sum + card.health, 0),
-  })
+  const [battleActions, setBattleActions] = useState<ParsedBattleAction[]>([])
+  const [scores, setScores] = useState({ player: 0, opponent: 0 })
+  const [battleAccount, setBattleAccount] = useState<BattleAccount | null>(null)
 
-  // TODO Test setup
   useEffect(() => {
-    const timer = setTimeout(() => {
-      EventBridge.loadReplay(sampleBattleReplay)
-    }, 2000)
+    if (!battleId) {
+      return
+    }
+    fetchBattleAccount(battleId)
+    fetchBattleActions(battleId)
+  }, [battleId])
 
-    return () => clearTimeout(timer)
-  }, [])
+  useEffect(() => {
+    if (!player) {
+      alert('Please create account first')
+      router.push('/')
+      return
+    }
+
+    const isPlayer1 =
+      battleAccount?.player2.toString() === player.publicKey.toString()
+
+    if (battleAccount && battleActions) {
+      const battleReplay: BattleReplay = {
+        id: battleAccount.battleId,
+        playerCards: isPlayer1
+          ? battleAccount.player1Solamons
+          : battleAccount.player2Solamons,
+        opponentCards: isPlayer1
+          ? battleAccount.player2Solamons
+          : battleAccount.player1Solamons,
+        actions: battleActions.map((action) => ({
+          isPlayer:
+            action.player ===
+            (isPlayer1
+              ? battleAccount.player1.toString()
+              : battleAccount.player2.toString()),
+          atkIdx: action.atkIdx,
+          defIdx: action.defIdx,
+          damage: action.damage,
+          attackType: action.event as AttackEvent,
+        })),
+      }
+      const playerInitialHealth = battleReplay.playerCards.reduce(
+        (acc, card) => acc + card.health,
+        0
+      )
+      const opponentInitialHealth = battleReplay.opponentCards.reduce(
+        (acc, card) => acc + card.health,
+        0
+      )
+      setScores({
+        player: playerInitialHealth,
+        opponent: opponentInitialHealth,
+      })
+      const timer = setTimeout(() => {
+        EventBridge.loadReplay(battleReplay)
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [battleAccount, battleActions])
+
+  const fetchBattleAccount = async (battleId: string) => {
+    const battleAccount = await getBattleAccount(program, parseInt(battleId))
+    console.log({ battleAccount })
+    setBattleAccount(battleAccount)
+  }
+
+  const fetchBattleActions = async (battleId: string) => {
+    const battleActions = await getBattleActions(
+      connection,
+      getBattleAccountPDA(program, parseInt(battleId))
+    )
+    if (battleActions) {
+      setBattleActions(battleActions)
+    }
+  }
 
   const handleGameReady = () => {
     EventBridge.onLogUpdate = (message: string) => {

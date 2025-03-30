@@ -1347,6 +1347,22 @@
   dependencies:
     "@solana/errors" "2.0.0-rc.1"
 
+"@solana/codecs-core@2.1.1-canary-20250328154651":
+  version "2.1.1-canary-20250328154651"
+  resolved "https://registry.yarnpkg.com/@solana/codecs-core/-/codecs-core-2.1.1-canary-20250328154651.tgz#4b1f49726d7fd68e2f7994d6de34e4e7a1a0d25e"
+  integrity sha512-xTSMk1UwBAQeQpKsXS1GuJ3vxOATQw6/jInYO8f8Njsul/zHP1KpdG79K5cQTPhLUXWb/W0655cHOhOp5cpRug==
+  dependencies:
+    "@solana/errors" "2.1.1-canary-20250328154651"
+
+"@solana/codecs-data-structures@0.2.1":
+  version "2.1.1-canary-20250328154651"
+  resolved "https://registry.yarnpkg.com/@solana/codecs-data-structures/-/codecs-data-structures-2.1.1-canary-20250328154651.tgz#f9d664b36577017ec983941c949a8750584bdcd0"
+  integrity sha512-JGesyEVRyyBrElVuUGLj1lCn9ovztsTEEk8RFCSA2hM8L0nz+mTCeQv8kbOnC/A1FV4/6T0uMnFfB3MwtiiuAA==
+  dependencies:
+    "@solana/codecs-core" "2.1.1-canary-20250328154651"
+    "@solana/codecs-numbers" "2.1.1-canary-20250328154651"
+    "@solana/errors" "2.1.1-canary-20250328154651"
+
 "@solana/codecs-data-structures@2.0.0-rc.1":
   version "2.0.0-rc.1"
   resolved "https://registry.yarnpkg.com/@solana/codecs-data-structures/-/codecs-data-structures-2.0.0-rc.1.tgz#d47b2363d99fb3d643f5677c97d64a812982b888"
@@ -1363,6 +1379,14 @@
   dependencies:
     "@solana/codecs-core" "2.0.0-rc.1"
     "@solana/errors" "2.0.0-rc.1"
+
+"@solana/codecs-numbers@2.1.1-canary-20250328154651":
+  version "2.1.1-canary-20250328154651"
+  resolved "https://registry.yarnpkg.com/@solana/codecs-numbers/-/codecs-numbers-2.1.1-canary-20250328154651.tgz#2bca35eedddd1bd1905013531e9385206d0ce21a"
+  integrity sha512-za5BcQXeT9C8H+1RPT5ki1f/MjSJtcYRZpBbGZYQiC23U149pG7TCAmomxIA3RknHamamSt7Jdgi+OnGYM46aA==
+  dependencies:
+    "@solana/codecs-core" "2.1.1-canary-20250328154651"
+    "@solana/errors" "2.1.1-canary-20250328154651"
 
 "@solana/codecs-strings@2.0.0-rc.1":
   version "2.0.0-rc.1"
@@ -1391,6 +1415,14 @@
   dependencies:
     chalk "^5.3.0"
     commander "^12.1.0"
+
+"@solana/errors@2.1.1-canary-20250328154651":
+  version "2.1.1-canary-20250328154651"
+  resolved "https://registry.yarnpkg.com/@solana/errors/-/errors-2.1.1-canary-20250328154651.tgz#b09914f17820a9888c33379c7b6fca360a7085cc"
+  integrity sha512-bPrTF8c6QqvSJifKpdtYkr4X54Y9BG9r2VuUcDpC5UMkWr448kuX5GR3Z8kZPutZ2k1TXD9WULtzfIcbU8fiOQ==
+  dependencies:
+    chalk "^5.4.1"
+    commander "^13.1.0"
 
 "@solana/options@2.0.0-rc.1":
   version "2.0.0-rc.1"
@@ -2407,7 +2439,7 @@ chalk@^4.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
-chalk@^5.3.0:
+chalk@^5.3.0, chalk@^5.4.1:
   version "5.4.1"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-5.4.1.tgz#1b48bf0963ec158dce2aacf69c093ae2dd2092d8"
   integrity sha512-zgVZuo2WcZgfUEmsn6eO3kINexW8RAE4maiQ8QNs8CtpPCSyMiYsULR3HQYkm3w8FIA3SberyMJMSldGsW+U3w==
@@ -2495,6 +2527,11 @@ commander@^12.1.0:
   version "12.1.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-12.1.0.tgz#01423b36f501259fdaac4d0e4d60c96c991585d3"
   integrity sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==
+
+commander@^13.1.0:
+  version "13.1.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-13.1.0.tgz#776167db68c78f38dcce1f9b8d7b8b9a488abf46"
+  integrity sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw==
 
 commander@^2.20.3:
   version "2.20.3"
@@ -5866,10 +5903,15 @@ typed-array-length@^1.0.7:
     possible-typed-array-names "^1.0.0"
     reflect.getprototypeof "^1.0.6"
 
-typescript@^4.4.3, typescript@^4.9.5:
+typescript@^4.4.3:
   version "4.9.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
+
+typescript@^5.8.2:
+  version "5.8.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.8.2.tgz#8170b3702f74b79db2e5a96207c15e65807999e4"
+  integrity sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ==
 
 unbox-primitive@^1.1.0:
   version "1.1.0"
