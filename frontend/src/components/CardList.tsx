@@ -37,7 +37,7 @@ const CardList: React.FC<CardListProps> = ({
   onCardPick,
 }) => {
   return (
-    <section className='my-card-section bg-[#978578] p-4 rounded-lg'>
+    <section className='my-card-section bg-[#978578] p-4 rounded-lg max-w-[1000px] mx-auto'>
       <Typography variant='title-2'>My Card | {cards.length}</Typography>
       <div className='card-stats flex gap-4 text-lg mb-4'>
         {Object.entries(getElementCounts(cards)).map(
@@ -54,7 +54,11 @@ const CardList: React.FC<CardListProps> = ({
           <div
             key={index}
             className='card bg-[rgba(202,193,185,1)]  p-2 rounded-lg flex flex-col items-center relative'
-            onClick={() => onCardPick && onCardPick(card)}
+            onClick={() => {
+              if (card.isAvailable) {
+                onCardPick && onCardPick(card)
+              }
+            }}
           >
             <Card
               species={card.species}

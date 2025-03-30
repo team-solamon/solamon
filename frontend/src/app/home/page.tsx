@@ -156,7 +156,6 @@ const HomePageContent = () => {
     return counts
   }
 
-  console.log({ myBattles })
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
       <Nav />
@@ -172,7 +171,7 @@ const HomePageContent = () => {
         </Button>
       </div>
 
-      <section className='battle-section mb-8'>
+      <section className='battle-section mb-8 max-w-[1000px] mx-auto'>
         <div className='bg-[#978578] p-4 rounded-lg'>
           <Typography variant='title-2'>Battle</Typography>
           <div className='battle-cards grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
@@ -257,7 +256,7 @@ const HomePageContent = () => {
         </div>
       </section>
 
-      <section className='my-card-section'>
+      <section className='my-card-section max-w-[1000px] mx-auto'>
         <div className='bg-[#978578] p-4 rounded-lg'>
           <CardList cards={myCards} />
         </div>

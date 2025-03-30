@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState, Suspense } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Nav from '@/components/Nav'
 import PickedCards from '@/components/PickedCards'
@@ -17,11 +17,15 @@ import {
   getConnection,
   getKeypairFromLocalStorage,
   getProgram,
+  trimAddress,
 } from '@/lib/helper'
 import { Keypair, sendAndConfirmTransaction } from '@solana/web3.js'
 import { useLoading } from '@/contexts/LoadingContext'
+import { ROUTES } from '@/lib/routes'
+import CardStats from '@/components/CardStats'
+import Typography from '@/components/Typography'
 
-const PrepareBattleContent = () => {
+const PrepareBattlePage = () => {
   const searchParams = useSearchParams()
   const battleId = searchParams.get('battleId')
   const router = useRouter()
@@ -85,6 +89,7 @@ const PrepareBattleContent = () => {
     }
 
     showLoading('Joining battle...')
+
     try {
       console.log('Starting battle with cards:', pickedCards)
       const tx = await wrapSolAndJoinBattleTx(
@@ -95,7 +100,7 @@ const PrepareBattleContent = () => {
         pickedCards.map((card) => card.id)
       )
       await sendAndConfirmTransaction(connection, tx, [player])
-      router.push(`/game?battleId=${battleId}`)
+      router.push(`${ROUTES.GAME}?battleId=${battleId}`)
     } catch (error) {
       alert('Battle error: ' + error)
     }
@@ -111,16 +116,21 @@ const PrepareBattleContent = () => {
       >
         &lt;
       </button>
-      <h1 className='text-2xl font-semibold text-yellow-400 mb-4 text-center'>
-        Pick Squad
-      </h1>
+      <Typography variant='body-1' className='text-center mb-4'>
+        Pick your card
+      </Typography>
 
-      <div className='enemy-cards bg-gray-800 p-4 rounded-lg mb-4'>
-        <h2 className='text-yellow-400 text-xl mb-2'>Enemy Card</h2>
+      <div className='enemy-cards bg-[rgba(127,14,16,1)] p-4 rounded-lg mb-4 max-w-fit mx-auto'>
+        <Typography variant='caption-1'>
+          {trimAddress(battleAccount?.player1.toString())}
+        </Typography>
         <div className='flex space-x-4'>
           {battleAccount?.player1Solamons.map(
             (card: CardData, index: number) => (
-              <Card key={index} species={card.species} element={card.element} />
+              <div key={index} className='relative flex justify-center'>
+                <Card key={index} species={card.species} className='mx-auto' />
+                <CardStats attack={card.attack} health={card.health} />
+              </div>
             )
           )}
         </div>
@@ -134,7 +144,6 @@ const PrepareBattleContent = () => {
         loading={loading}
         buttonDisabled={pickedCards.length < 3}
       />
-
       <CardList
         cards={myCards}
         pickedCards={pickedCards}
@@ -142,14 +151,6 @@ const PrepareBattleContent = () => {
         onCardPick={handleCardPick}
       />
     </div>
-  )
-}
-
-const PrepareBattlePage = () => {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <PrepareBattleContent />
-    </Suspense>
   )
 }
 
