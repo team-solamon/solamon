@@ -214,7 +214,7 @@ const HomePageContent = () => {
                     <Button
                       onClick={() => handleCancelBattle(battleAccount.battleId)}
                     >
-                      Cancle
+                      cancel
                     </Button>
                   )}
                 </div>
