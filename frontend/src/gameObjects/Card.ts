@@ -5,7 +5,7 @@ import { HealthBar } from './HealthBar'
 import { getCardColor, getCardColorString, getElementEmoji } from '@/data/card'
 import { FloatingText } from './FloatingText'
 import { AttackEvent } from '../data/replay'
-import { CardData, Element, stringToElement } from '@/lib/solana-helper'
+import { CardData, Element } from '@/lib/solana-helper'
 
 export class Card extends Phaser.GameObjects.Container {
   public name: string
@@ -32,6 +32,7 @@ export class Card extends Phaser.GameObjects.Container {
   private cardWidth = 100
   private cardHeight = 140
   private idleAnimation?: Phaser.Tweens.Tween
+  private healthBarVisible = true
 
   isDragging = false
   zIndex = 0
@@ -151,7 +152,7 @@ export class Card extends Phaser.GameObjects.Container {
     this.attackText.setVisible(!isFaceDown)
     this.healthText.setVisible(!isFaceDown)
     this.elementText.setVisible(!isFaceDown)
-    this.healthBar.setVisible(!isFaceDown)
+    this.healthBar.setVisible(!isFaceDown && this.healthBarVisible)
     this.cardBorder.setVisible(!isFaceDown)
   }
 
@@ -329,7 +330,8 @@ export class Card extends Phaser.GameObjects.Container {
   }
 
   toggleHealthBar(visible: boolean) {
-    this.healthBar.setVisible(visible)
+    this.healthBarVisible = visible
+    this.healthBar.setVisible(visible && !this.isFaceDown)
   }
 
   updateCardData(data: CardData) {
