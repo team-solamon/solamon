@@ -30,10 +30,23 @@ export class CardBattleScene extends Phaser.Scene {
   preload() {
     this.load.image('battlefield', '/images/game/battlefield.png')
 
+    // bgm
+    this.load.audio('bgm-game', '/sounds/bgm-game.mp3')
+
+    // sfx
+    this.load.audio('sfx-card_flip', '/sounds/sfx-card_flip.mp3')
+    this.load.audio('sfx-prepare_attack', '/sounds/sfx-prepare_attack.mp3')
+    this.load.audio('stx-attack', '/sounds/stx-attack.mp3')
+    this.load.audio('sfx-dead', '/sounds/sfx-dead.mp3')
+    this.load.audio('sfx-hit', '/sounds/sfx-hit.mp3')
+    this.load.audio('sfx-critical', '/sounds/sfx-critical.mp3')
+    this.load.audio('sfx-halved', '/sounds/sfx-halved.mp3')
+
     loadAllCardAssets(this)
   }
 
   create() {
+    this.sound.setMute(EventBridge.mute)
     this.createFadeOverlay()
 
     this.add
@@ -49,6 +62,13 @@ export class CardBattleScene extends Phaser.Scene {
     this.loadBattleConfiguration().then(() => this.initializeCardData())
 
     this.gameResult = new GameResult(this, 400, 300)
+
+    this.sound
+      .add('bgm-game', {
+        volume: 0.7,
+        loop: true,
+      })
+      .play()
   }
 
   private createFadeOverlay() {
@@ -174,12 +194,16 @@ export class CardBattleScene extends Phaser.Scene {
   private revealCards() {
     this.playerCards.forEach((card, i) => {
       this.time.delayedCall(500 + i * 300, () => {
+        this.sound.play('sfx-card_flip', { volume: 0.7 })
+
         card.flipCard()
       })
     })
 
     this.opponentCards.forEach((card, i) => {
       this.time.delayedCall(1200 + i * 200, () => {
+        this.sound.play('sfx-card_flip', { volume: 0.7 })
+
         card.flipCard()
       })
     })
@@ -236,6 +260,7 @@ export class CardBattleScene extends Phaser.Scene {
     const damage = currentAction.damage
     const attackColor = getCardColor(attackerCard.element)
 
+    this.sound.play('sfx-prepare_attack', { volume: 0.7 })
     await performSingleAttack(
       this,
       attackerCard,
@@ -249,6 +274,7 @@ export class CardBattleScene extends Phaser.Scene {
     await this.delay(200)
 
     if (defenderCard.health <= 0) {
+      this.sound.play('sfx-dead', { volume: 0.6 })
       await this.handleDefeatedCard(defenderCard, !isPlayerAttacking)
     }
 
@@ -280,6 +306,7 @@ export class CardBattleScene extends Phaser.Scene {
     if (!attackerCard.isActive) {
       attackerCard.setActiveCard(true)
       this.addBattleLog(`🗡️ ${attackerCard.name} enters the battlefield!`)
+      this.sound.play('sfx-card_flip', { volume: 0.7 })
       await attackerCard.moveToPosition(
         isPlayerAttacking ? centerX - cardOffset : centerX + cardOffset,
         battleY,
@@ -290,6 +317,7 @@ export class CardBattleScene extends Phaser.Scene {
     if (!defenderCard.isActive) {
       defenderCard.setActiveCard(true)
       this.addBattleLog(`⚔️ ${defenderCard.name} enters the battlefield!`)
+      this.sound.play('sfx-card_flip', { volume: 0.7 })
       await defenderCard.moveToPosition(
         isPlayerAttacking ? centerX + cardOffset : centerX - cardOffset,
         battleY,

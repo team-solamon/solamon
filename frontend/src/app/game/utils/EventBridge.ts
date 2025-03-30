@@ -5,7 +5,9 @@ const noop = () => {
 }
 
 export class EventBridge {
+  public static mute: boolean = false
   private static cachedReplay: BattleReplay | null = null
+
   static onLogUpdate: (message: string) => void = noop
 
   static onScoreUpdate: (playerScore: number, opponentScore: number) => void =
@@ -36,6 +38,8 @@ export class EventBridge {
   }
 
   static reset(): void {
+    this.mute = false
+    this.cachedReplay = null
     this.onLogUpdate = noop
     this.onScoreUpdate = noop
     this.onOnReplayLoaded = noop
