@@ -26,7 +26,9 @@ const Game: React.FC = () => {
   const program = getProgram()
   const connection = getConnection()
   const player = getKeypairFromLocalStorage()
-  const [battleLogs, setBattleLogs] = useState<string[]>([])
+  const [battleLogs, setBattleLogs] = useState<
+    { message: string; color: string }[]
+  >([])
   const [battleActions, setBattleActions] = useState<ParsedBattleAction[]>([])
   const [scores, setScores] = useState({ player: 0, opponent: 0 })
   const [battleAccount, setBattleAccount] = useState<BattleAccount | null>(null)
@@ -106,8 +108,8 @@ const Game: React.FC = () => {
   }
 
   const handleGameReady = () => {
-    EventBridge.onLogUpdate = (message: string) => {
-      setBattleLogs((prevLogs) => [message, ...prevLogs])
+    EventBridge.onLogUpdate = (message: string, color: string) => {
+      setBattleLogs((prevLogs) => [{ message, color }, ...prevLogs])
     }
 
     EventBridge.onScoreUpdate = (

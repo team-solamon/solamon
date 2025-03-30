@@ -1,7 +1,11 @@
 import React, { useEffect, useRef } from 'react'
 import Typography from '@/components/Typography'
 
-const GameLogs = ({ logs }: { logs: string[] }) => {
+const GameLogs = ({
+  logs,
+}: {
+  logs: { message: string; color: string }[]
+}) => {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -22,8 +26,13 @@ const GameLogs = ({ logs }: { logs: string[] }) => {
             key={index}
             className='log-entry py-1 border-b border-gray-300 flex'
           >
-            <span className='text-green-600 mr-2'>▶</span>
-            <span className='text-sm'>{log}</span>
+            <span
+              className='mr-2'
+              style={{ color: log.color }}
+            >
+              ▶
+            </span>
+            <span className='text-sm'>{log.message}</span>
           </div>
         ))}
       </div>

@@ -8,7 +8,7 @@ export class EventBridge {
   public static mute: boolean = false
   private static cachedReplay: BattleReplay | null = null
 
-  static onLogUpdate: (message: string) => void = noop
+  static onLogUpdate: (message: string, color: string) => void = noop
 
   static onScoreUpdate: (playerScore: number, opponentScore: number) => void =
     noop
@@ -22,9 +22,9 @@ export class EventBridge {
     }
   }
 
-  static addLog(message: string) {
+  static addLog(message: string, color: string): void {
     if (this.onLogUpdate) {
-      this.onLogUpdate(message)
+      this.onLogUpdate(message, color)
     }
   }
 

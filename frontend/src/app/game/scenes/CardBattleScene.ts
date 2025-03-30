@@ -223,7 +223,7 @@ export class CardBattleScene extends Phaser.Scene {
         })
       }
 
-      this.addBattleLog('⚔️ Battle begins! ⚔️')
+      this.addBattleLog('⚔️ Battle begins! ⚔️', 'system')
 
       await this.startBattle()
     }
@@ -309,7 +309,10 @@ export class CardBattleScene extends Phaser.Scene {
     if (!attackerCard.isActive) {
       attackerCard.setActiveCard(true)
       const attackerName = isPlayerAttacking ? 'Your card' : "Opponent's card"
-      this.addBattleLog(`🗡️ ${attackerName} enters the battlefield!`)
+      this.addBattleLog(
+        `🗡️ ${attackerName} enters the battlefield!`,
+        isPlayerAttacking ? 'mine' : 'opponent'
+      )
       this.sound.play('sfx-card_flip', { volume: 0.7 })
       await attackerCard.moveToPosition(
         isPlayerAttacking ? centerX - cardOffset : centerX + cardOffset,
@@ -321,7 +324,10 @@ export class CardBattleScene extends Phaser.Scene {
     if (!defenderCard.isActive) {
       defenderCard.setActiveCard(true)
       const defenderName = isPlayerAttacking ? "Opponent's card" : 'Your card'
-      this.addBattleLog(`⚔️ ${defenderName} enters the battlefield!`)
+      this.addBattleLog(
+        `⚔️ ${defenderName} enters the battlefield!`,
+        isPlayerAttacking ? 'opponent' : 'mine'
+      )
       this.sound.play('sfx-card_flip', { volume: 0.7 })
       await defenderCard.moveToPosition(
         isPlayerAttacking ? centerX + cardOffset : centerX - cardOffset,
@@ -391,8 +397,14 @@ export class CardBattleScene extends Phaser.Scene {
     EventBridge.updateScore(this.playerScore, this.opponentScore)
   }
 
-  addBattleLog(message: string) {
-    EventBridge.addLog(message)
+  addBattleLog(message: string, type: 'system' | 'mine' | 'opponent') {
+    let color = 'white'
+    if (type === 'mine') {
+      color = 'green'
+    } else if (type === 'opponent') {
+      color = 'red'
+    }
+    EventBridge.addLog(message, color)
   }
 
   endGame() {
@@ -401,6 +413,6 @@ export class CardBattleScene extends Phaser.Scene {
 
     const resultMessage =
       this.gameResult?.show(this.playerScore, this.opponentScore) || ''
-    this.addBattleLog('Battle ended: ' + resultMessage)
+    this.addBattleLog('Battle ended: ' + resultMessage, 'system')
   }
 }

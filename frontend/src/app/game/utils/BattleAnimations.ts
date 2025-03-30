@@ -400,9 +400,13 @@ function handleCardDefeat(
   scene: Phaser.Scene,
   defender: Card,
   color: number,
-  addBattleLog: (message: string) => void
+  addBattleLog: (message: string, type: 'system' | 'mine' | 'opponent') => void
 ) {
-  addBattleLog(`💀 ${defender.name} was defeated!`)
+  const defeatedMessage = defender.isPlayer
+    ? `💀 Your card was defeated!`
+    : `💀 Opponent's card was defeated!`
+
+  addBattleLog(defeatedMessage, defender.isPlayer ? 'mine' : 'opponent')
 
   scene.time.delayedCall(200, () => {
     scene.cameras.main.shake(300, 0.004)
@@ -433,7 +437,7 @@ export const performSingleAttack = async (
   damage: number,
   attackEvent: AttackEvent,
   attackColor: number,
-  addBattleLog: (message: string) => void
+  addBattleLog: (message: string, type: 'system' | 'mine' | 'opponent') => void
 ) => {
   const originalZoom = scene.cameras.main.zoom
   scene.tweens.add({
@@ -454,7 +458,8 @@ export const performSingleAttack = async (
     addBattleLog(
       `⚔️ ${
         attackerCard.isPlayer ? 'You attack' : 'Opponent attacks'
-      } for ${damage} damage!`
+      } for ${damage} damage!`,
+      attackerCard.isPlayer ? 'mine' : 'opponent'
     )
 
     createAttackProjectile(
