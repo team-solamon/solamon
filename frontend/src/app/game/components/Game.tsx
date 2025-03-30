@@ -49,7 +49,7 @@ const Game: React.FC = () => {
     }
 
     const isPlayer1 =
-      battleAccount?.player2.toString() === player.publicKey.toString()
+      battleAccount?.player1.toString() === player.publicKey.toString()
 
     if (battleAccount && battleActions) {
       const battleReplay: BattleReplay = {
