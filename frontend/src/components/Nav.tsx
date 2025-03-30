@@ -10,6 +10,7 @@ import Typography from './Typography'
 import SolanaBalance from './SolanaBalance'
 import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/lib/routes'
+import { getExplorerUrl } from '@/lib/url-helper'
 
 const Nav: React.FC = () => {
   const { openModal } = useModal()
@@ -51,7 +52,13 @@ const Nav: React.FC = () => {
       </div>
       <div className='wallet-info text-right flex items-end '>
         <Typography variant='body-2' color='secondary' className='mr-4'>
+          <a
+          href={`${getExplorerUrl(keypair?.publicKey.toBase58() || '')}`}
+          target='_blank'
+          rel='noopener noreferrer'
+          >
           {trimAddress(keypair?.publicKey.toBase58())}
+          </a>
         </Typography>
         <SolanaBalance balance={balance || 0} />
         <div
