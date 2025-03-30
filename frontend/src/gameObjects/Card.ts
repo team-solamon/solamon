@@ -93,16 +93,12 @@ export class Card extends Phaser.GameObjects.Container {
       })
       .setOrigin(0.5)
       */
-
-    this.elementText = this.scene.add
-      .text(0, -30, getElementEmoji(this.element), {
-        fontSize: '14px',
-        fontStyle: 'bold',
-      })
+    const statsBackground = this.scene.add
+      .rectangle(0, 40, 80, 25, 0x000000, 0.7)
       .setOrigin(0.5)
 
     this.attackText = this.scene.add
-      .text(-35, 40, `⚔️${this.attack}`, {
+      .text(-20, 40, `⚔️${this.attack}`, {
         fontSize: '16px',
         color: '#ff5555',
         fontStyle: 'bold',
@@ -112,12 +108,19 @@ export class Card extends Phaser.GameObjects.Container {
       .setOrigin(0.5)
 
     this.healthText = this.scene.add
-      .text(35, 40, `❤️${this.health}`, {
+      .text(20, 40, `❤️${this.health}`, {
         fontSize: '16px',
         color: '#55ff55',
         fontStyle: 'bold',
         stroke: '#000000',
         strokeThickness: 3,
+      })
+      .setOrigin(0.5)
+
+    this.elementText = this.scene.add
+      .text(0, -30, getElementEmoji(this.element), {
+        fontSize: '14px',
+        fontStyle: 'bold',
       })
       .setOrigin(0.5)
 
@@ -128,10 +131,10 @@ export class Card extends Phaser.GameObjects.Container {
       this.cardFront,
       this.cardBack,
       this.cardBorder,
-      //this.nameText,
-      this.elementText,
+      statsBackground,
       this.attackText,
       this.healthText,
+      this.elementText,
       this.healthBar,
     ])
 
