@@ -202,9 +202,13 @@ pub mod solamon {
         )?;
 
         // remove battle from available battles
-        config_account
+        if let Some(index) = config_account
             .available_battle_ids
-            .remove(battle_account.battle_id as usize);
+            .iter()
+            .position(|&id| id == battle_account.battle_id)
+        {
+            config_account.available_battle_ids.remove(index);
+        }
 
         battle_account.battle_status = BattleStatus::Canceled;
         Ok(())
@@ -249,9 +253,14 @@ pub mod solamon {
         let battle_status = execute_battle(&mut battle_account.clone());
         battle_account.battle_status = battle_status;
         user_account.battle_count += 1;
-        config_account
+
+        if let Some(index) = config_account
             .available_battle_ids
-            .remove(battle_account.battle_id as usize);
+            .iter()
+            .position(|&id| id == battle_account.battle_id)
+        {
+            config_account.available_battle_ids.remove(index);
+        }
 
         opponent_user_account
             .solamons
