@@ -5,7 +5,7 @@ import { HealthBar } from './HealthBar'
 import { getCardColor, getCardColorString, getElementEmoji } from '@/data/card'
 import { FloatingText } from './FloatingText'
 import { AttackEvent } from '../data/replay'
-import { CardData, Element, stringToElement } from '@/lib/solana-helper'
+import { CardData, Element } from '@/lib/solana-helper'
 
 export class Card extends Phaser.GameObjects.Container {
   public name: string
@@ -32,6 +32,8 @@ export class Card extends Phaser.GameObjects.Container {
   private cardWidth = 100
   private cardHeight = 140
   private idleAnimation?: Phaser.Tweens.Tween
+  private healthBarVisible = true
+  private statsBackground!: Phaser.GameObjects.Rectangle
 
   isDragging = false
   zIndex = 0
@@ -92,16 +94,12 @@ export class Card extends Phaser.GameObjects.Container {
       })
       .setOrigin(0.5)
       */
-
-    this.elementText = this.scene.add
-      .text(0, -30, getElementEmoji(this.element), {
-        fontSize: '14px',
-        fontStyle: 'bold',
-      })
+    this.statsBackground = this.scene.add
+      .rectangle(0, 40, 80, 25, 0x000000, 0.7)
       .setOrigin(0.5)
 
     this.attackText = this.scene.add
-      .text(-35, 40, `⚔️${this.attack}`, {
+      .text(-20, 40, `⚔️${this.attack}`, {
         fontSize: '16px',
         color: '#ff5555',
         fontStyle: 'bold',
@@ -111,10 +109,20 @@ export class Card extends Phaser.GameObjects.Container {
       .setOrigin(0.5)
 
     this.healthText = this.scene.add
-      .text(35, 40, `❤️${this.health}`, {
+      .text(20, 40, `❤️${this.health}`, {
         fontSize: '16px',
         color: '#55ff55',
         fontStyle: 'bold',
+        stroke: '#000000',
+        strokeThickness: 3,
+      })
+      .setOrigin(0.5)
+
+    this.elementText = this.scene.add
+      .text(0, -50, getElementEmoji(this.element), {
+        fontSize: '14px',
+        fontStyle: 'bold',
+        color: '#ffffff',
         stroke: '#000000',
         strokeThickness: 3,
       })
@@ -127,10 +135,10 @@ export class Card extends Phaser.GameObjects.Container {
       this.cardFront,
       this.cardBack,
       this.cardBorder,
-      //this.nameText,
-      this.elementText,
+      this.statsBackground,
       this.attackText,
       this.healthText,
+      this.elementText,
       this.healthBar,
     ])
 
@@ -147,11 +155,11 @@ export class Card extends Phaser.GameObjects.Container {
     this.isFaceDown = isFaceDown
     this.cardFront.setVisible(!isFaceDown)
     this.cardBack.setVisible(isFaceDown)
-    //this.nameText.setVisible(!isFaceDown)
+    this.statsBackground.setVisible(!isFaceDown)
     this.attackText.setVisible(!isFaceDown)
     this.healthText.setVisible(!isFaceDown)
     this.elementText.setVisible(!isFaceDown)
-    this.healthBar.setVisible(!isFaceDown)
+    this.healthBar.setVisible(!isFaceDown && this.healthBarVisible)
     this.cardBorder.setVisible(!isFaceDown)
   }
 
@@ -329,7 +337,8 @@ export class Card extends Phaser.GameObjects.Container {
   }
 
   toggleHealthBar(visible: boolean) {
-    this.healthBar.setVisible(visible)
+    this.healthBarVisible = visible
+    this.healthBar.setVisible(visible && !this.isFaceDown)
   }
 
   updateCardData(data: CardData) {

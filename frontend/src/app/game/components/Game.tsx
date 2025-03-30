@@ -76,7 +76,7 @@ const sampleBattleReplay: BattleReplay = {
 
 const Game: React.FC = () => {
   const [battleLogs, setBattleLogs] = useState<string[]>([])
-  const [scores, setScores] = useState({ player: 0, opponent: 0 })
+  const [scores, setScores] = useState({ player: 3, opponent: 3 })
 
   // TODO Test setup
   useEffect(() => {

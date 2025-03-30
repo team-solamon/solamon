@@ -88,6 +88,7 @@ export class DrawScene extends Phaser.Scene {
     this.card.scaleX = 2.0
     this.card.scaleY = 2.0
     this.card.stopIdleAnimation()
+    this.card.toggleHealthBar(false)
 
     this.card.setFaceDown(true)
     this.cardPack = new CardPack(this, 400, LAYOUT.CARD_Y, this.card)
