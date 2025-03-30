@@ -56,7 +56,11 @@ const CardList: React.FC<CardListProps> = ({
             className='card bg-[rgba(202,193,185,1)]  p-2 rounded-lg flex flex-col items-center relative'
             onClick={() => onCardPick && onCardPick(card)}
           >
-            <Card card={card} className='mx-auto' />
+            <Card
+              species={card.species}
+              element={card.element}
+              className='mx-auto'
+            />
             {pickedCards && pickedCards.includes(card) && (
               <div className='absolute inset-0 flex items-center justify-center'>
                 <div className='bg-black opacity-70 w-full h-full absolute rounded-lg'></div>

@@ -32,7 +32,8 @@ const PickedCards: React.FC<PickedCardsProps> = ({
           >
             {pickedCards[index] ? (
               <Card
-                card={pickedCards[index]}
+                species={pickedCards[index].species}
+                element={pickedCards[index].element}
                 onClick={() => onCardRemove(pickedCards[index])}
               />
             ) : (
