@@ -243,13 +243,16 @@ export class CardBattleScene extends Phaser.Scene {
     const { attackerCard, defenderCard } = battleCards
 
     const isPlayerAttacking = currentAction.isPlayer
+
+    /*
     const playerCard = isPlayerAttacking ? attackerCard : defenderCard
     const opponentCard = isPlayerAttacking ? defenderCard : attackerCard
-
     this.backgroundContainer?.updateStatusText(
       `Battle: ${playerCard.name} vs ${opponentCard.name}`,
       false
     )
+    */
+    this.backgroundContainer?.updateStatusText(``, false)
 
     await this.positionCardsOnBattlefield(
       attackerCard,
@@ -270,6 +273,7 @@ export class CardBattleScene extends Phaser.Scene {
       attackColor,
       this.addBattleLog.bind(this)
     )
+    this.updateScore()
 
     await this.delay(200)
 
@@ -278,7 +282,6 @@ export class CardBattleScene extends Phaser.Scene {
       await this.handleDefeatedCard(defenderCard, !isPlayerAttacking)
     }
 
-    this.updateScore()
     this.time.delayedCall(1000, () => this.startBattle())
   }
 
@@ -376,11 +379,11 @@ export class CardBattleScene extends Phaser.Scene {
 
   updateScore() {
     this.playerScore = this.playerCards.reduce((score, card) => {
-      return score + (card.health > 0 ? 1 : 0)
+      return score + (card.health > 0 ? card.health : 0)
     }, 0)
 
     this.opponentScore = this.opponentCards.reduce((score, card) => {
-      return score + (card.health > 0 ? 1 : 0)
+      return score + (card.health > 0 ? card.health : 0)
     }, 0)
 
     EventBridge.updateScore(this.playerScore, this.opponentScore)

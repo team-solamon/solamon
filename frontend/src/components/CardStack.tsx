@@ -91,7 +91,8 @@ const CardStack: React.FC<CardStackProps> = ({
             }}
           >
             <CardImage
-              card={item.card}
+              species={item.card.species}
+              element={item.card.element}
               width='100px'
               height='auto'
               maxWidth='100px'

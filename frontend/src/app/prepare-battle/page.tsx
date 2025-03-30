@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Nav from '@/components/Nav'
 import PickedCards from '@/components/PickedCards'
@@ -21,7 +21,7 @@ import {
 import { Keypair, sendAndConfirmTransaction } from '@solana/web3.js'
 import { useLoading } from '@/contexts/LoadingContext'
 
-const PrepareBattlePage = () => {
+const PrepareBattleContent = () => {
   const searchParams = useSearchParams()
   const battleId = searchParams.get('battleId')
   const router = useRouter()
@@ -120,7 +120,7 @@ const PrepareBattlePage = () => {
         <div className='flex space-x-4'>
           {battleAccount?.player1Solamons.map(
             (card: CardData, index: number) => (
-              <Card key={index} card={card} />
+              <Card key={index} species={card.species} element={card.element} />
             )
           )}
         </div>
@@ -142,6 +142,14 @@ const PrepareBattlePage = () => {
         onCardPick={handleCardPick}
       />
     </div>
+  )
+}
+
+const PrepareBattlePage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PrepareBattleContent />
+    </Suspense>
   )
 }
 
