@@ -11,25 +11,61 @@ const fighters: BattleStatus[] = [
   {
     status: 'pending',
     myCards: [
-      { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3 },
-      { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
-      { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5 },
+      { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3, species: 1 },
+      {
+        name: 'WATER',
+        element: { water: {} },
+        attack: 3,
+        health: 6,
+        species: 2,
+      },
+      {
+        name: 'EARTH',
+        element: { earth: {} },
+        attack: 4,
+        health: 5,
+        species: 3,
+      },
     ],
   },
   {
     status: 'pending',
     myCards: [
-      { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
-      { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
-      { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
+      {
+        name: 'WATER',
+        element: { water: {} },
+        attack: 3,
+        health: 6,
+        species: 1,
+      },
+      {
+        name: 'WATER',
+        element: { water: {} },
+        attack: 3,
+        health: 6,
+        species: 2,
+      },
+      {
+        name: 'WATER',
+        element: { water: {} },
+        attack: 3,
+        health: 6,
+        species: 3,
+      },
     ],
   },
   {
     status: 'pending',
     myCards: [
-      { name: 'METAL', element: { metal: {} }, attack: 6, health: 2 },
-      { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4 },
-      { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3 },
+      {
+        name: 'METAL',
+        element: { metal: {} },
+        attack: 6,
+        health: 2,
+        species: 1,
+      },
+      { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4, species: 2 },
+      { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3, species: 3 },
     ],
   },
 ]

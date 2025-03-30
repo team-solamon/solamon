@@ -1,5 +1,5 @@
 import React from 'react'
-import { getCardTexture, getElementEmoji } from '@/data/card'
+import { getElementEmoji } from '@/data/card'
 import { CardData } from '@/lib/solana-helper'
 
 interface CardImageProps {
@@ -22,7 +22,7 @@ const Card: React.FC<CardImageProps> = ({
   onClick,
 }) => {
   const getImageSrc = (card: CardData) => {
-    return `/images/game/${getCardTexture(card.element)}.png`
+    return `/images/species/${card.species}.png`
   }
 
   return (

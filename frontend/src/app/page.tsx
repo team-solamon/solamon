@@ -14,6 +14,7 @@ import {
 } from '@/lib/helper'
 
 import Button from '@/components/Button'
+import { ROUTES } from '@/lib/routes'
 
 export default function HomePage() {
   const router = useRouter()
@@ -49,7 +50,7 @@ export default function HomePage() {
       }
       hideLoading()
     }
-    router.push('/home')
+    router.push(ROUTES.HOME)
   }
 
   return (

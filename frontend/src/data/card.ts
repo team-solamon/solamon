@@ -44,21 +44,3 @@ export function getElementEmoji(element: Element): string {
       return '❓'
   }
 }
-
-export function getCardTexture(element: Element): string {
-  switch (elementToString(element)) {
-    case 'fire':
-      return 'card-fire'
-    case 'water':
-      return 'card-water'
-    case 'earth':
-      return 'card-earth'
-    case 'metal':
-      return 'card-metal'
-    case 'wood':
-      return 'card-wood'
-    case 'none':
-    default:
-      return 'cardback'
-  }
-}

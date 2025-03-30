@@ -5,31 +5,67 @@ import { BattleReplay } from '@/data/replay'
 import PhaserGame from './PhaserGame'
 import { CardBattleScene } from '@/app/game/scenes/CardBattleScene'
 import { EventBridge } from '@/app/game/utils/EventBridge'
-import { CardData } from '@/lib/solana-helper'
+import { CardData, stringToElement } from '@/lib/solana-helper'
 
 const cards: CardData[] = [
-  { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3 },
-  { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3 },
-  { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
-  { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5 },
-  { name: 'METAL', element: { metal: {} }, attack: 6, health: 2 },
-  { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4 },
-  { name: 'WATER', element: { water: {} }, attack: 3, health: 6 },
-  { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5 },
-  { name: 'METAL', element: { metal: {} }, attack: 6, health: 2 },
-  { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4 },
+  { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3, species: 0 },
+  { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3, species: 1 },
+  { name: 'WATER', element: { water: {} }, attack: 3, health: 6, species: 2 },
+  { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5, species: 3 },
+  { name: 'METAL', element: { metal: {} }, attack: 6, health: 2, species: 4 },
+  { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4, species: 5 },
+  { name: 'WATER', element: { water: {} }, attack: 3, health: 6, species: 6 },
+  { name: 'EARTH', element: { earth: {} }, attack: 4, health: 5, species: 7 },
+  { name: 'METAL', element: { metal: {} }, attack: 6, health: 2, species: 8 },
+  { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4, species: 9 },
 ]
 
 const playerCardData: CardData[] = [
-  { name: 'WATER', attack: 4, health: 10, element: 'WATER' },
-  { name: 'FIRE', attack: 8, health: 6, element: 'FIRE' },
-  { name: 'METAL', attack: 6, health: 12, element: 'METAL' },
+  {
+    name: 'WATER',
+    attack: 4,
+    health: 10,
+    element: stringToElement('water'),
+    species: 0,
+  },
+  {
+    name: 'FIRE',
+    attack: 8,
+    health: 6,
+    element: stringToElement('fire'),
+    species: 1,
+  },
+  {
+    name: 'METAL',
+    attack: 6,
+    health: 12,
+    element: stringToElement('metal'),
+    species: 2,
+  },
 ]
 
 const opponentCardData: CardData[] = [
-  { name: 'EARTH', attack: 4, health: 8, element: 'EARTH' },
-  { name: 'WOOD', attack: 7, health: 7, element: 'WOOD' },
-  { name: 'METAL', attack: 9, health: 9, element: 'METAL' },
+  {
+    name: 'EARTH',
+    attack: 4,
+    health: 8,
+    element: stringToElement('earth'),
+    species: 3,
+  },
+  {
+    name: 'WOOD',
+    attack: 7,
+    health: 7,
+    element: stringToElement('wood'),
+    species: 4,
+  },
+  {
+    name: 'METAL',
+    attack: 9,
+    health: 9,
+    element: stringToElement('metal'),
+    species: 5,
+  },
 ]
 
 const sampleBattleReplay: BattleReplay = {

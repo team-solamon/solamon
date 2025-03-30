@@ -2,15 +2,10 @@ import * as Phaser from 'phaser'
 
 import { DefeatedVisual } from './DefeatedVisual'
 import { HealthBar } from './HealthBar'
-import {
-  getCardColor,
-  getCardColorString,
-  getCardTexture,
-  getElementEmoji,
-} from '@/data/card'
+import { getCardColor, getCardColorString, getElementEmoji } from '@/data/card'
 import { FloatingText } from './FloatingText'
 import { AttackEvent } from '../data/replay'
-import { CardData, Element } from '@/lib/solana-helper'
+import { CardData, Element, stringToElement } from '@/lib/solana-helper'
 
 export class Card extends Phaser.GameObjects.Container {
   public name: string
@@ -18,6 +13,7 @@ export class Card extends Phaser.GameObjects.Container {
   public attack: number
   public initialHealth: number
   public element: Element
+  public species: number
   public isPlayer: boolean
   public originalX: number
   public originalY: number
@@ -49,6 +45,7 @@ export class Card extends Phaser.GameObjects.Container {
     attack: number,
     health: number,
     element: Element,
+    species: number,
     isPlayer: boolean
   ) {
     super(scene, x, y)
@@ -61,6 +58,7 @@ export class Card extends Phaser.GameObjects.Container {
     this.health = health
     this.initialHealth = health
     this.element = element
+    this.species = species
     this.isPlayer = isPlayer
 
     this.createCard()
@@ -68,7 +66,7 @@ export class Card extends Phaser.GameObjects.Container {
 
   createCard() {
     this.cardFront = this.scene.add
-      .sprite(0, 0, getCardTexture(this.element))
+      .sprite(0, 0, `species-${this.species}`)
       .setDisplaySize(this.cardWidth, this.cardHeight)
 
     this.cardBack = this.scene.add
@@ -83,6 +81,7 @@ export class Card extends Phaser.GameObjects.Container {
       .rectangle(0, 0, this.cardWidth - 3, this.cardHeight - 3, 0x000000, 0)
       .setStrokeStyle(3, getCardColor(this.element), 1)
 
+    /*
     this.nameText = this.scene.add
       .text(0, -50, this.name, {
         fontSize: '14px',
@@ -92,6 +91,7 @@ export class Card extends Phaser.GameObjects.Container {
         strokeThickness: 3,
       })
       .setOrigin(0.5)
+      */
 
     this.elementText = this.scene.add
       .text(0, -30, getElementEmoji(this.element), {
@@ -127,7 +127,7 @@ export class Card extends Phaser.GameObjects.Container {
       this.cardFront,
       this.cardBack,
       this.cardBorder,
-      this.nameText,
+      //this.nameText,
       this.elementText,
       this.attackText,
       this.healthText,
@@ -147,7 +147,7 @@ export class Card extends Phaser.GameObjects.Container {
     this.isFaceDown = isFaceDown
     this.cardFront.setVisible(!isFaceDown)
     this.cardBack.setVisible(isFaceDown)
-    this.nameText.setVisible(!isFaceDown)
+    //this.nameText.setVisible(!isFaceDown)
     this.attackText.setVisible(!isFaceDown)
     this.healthText.setVisible(!isFaceDown)
     this.elementText.setVisible(!isFaceDown)
@@ -338,17 +338,18 @@ export class Card extends Phaser.GameObjects.Container {
     this.health = data.health
     this.initialHealth = data.health
     this.element = data.element
+    this.species = data.species
 
-    this.nameText.setText(this.name)
+    //this.nameText.setText(this.name)
     this.attackText.setText(`⚔️${data.attack}`)
     this.healthText.setText(`❤️${this.health}`)
+
     this.elementText.setText(getElementEmoji(this.element))
     this.elementText.setColor(getCardColorString(this.element))
-
     this.cardBorder.setStrokeStyle(3, getCardColor(this.element), 1)
 
     this.cardFront
-      .setTexture(getCardTexture(this.element))
+      .setTexture(`species-${this.species}`)
       .setDisplaySize(this.cardWidth, this.cardHeight)
 
     this.healthBar.update(this.health, this.initialHealth)

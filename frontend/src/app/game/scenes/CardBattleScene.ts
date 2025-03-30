@@ -6,7 +6,9 @@ import { GameResult } from '../gameObjects/GameResult'
 import { performSingleAttack } from '../utils/BattleAnimations'
 import { EventBridge } from '../utils/EventBridge'
 import { BattleAction, BattleReplay } from '@/data/replay'
-import { Element } from '@/lib/solana-helper'
+import { loadAllCardAssets } from '@/lib/phaser-utils'
+import { getCardColor } from '@/data/card'
+import { stringToElement } from '@/lib/solana-helper'
 
 export class CardBattleScene extends Phaser.Scene {
   private playerCards: Card[] = []
@@ -21,29 +23,14 @@ export class CardBattleScene extends Phaser.Scene {
   private battleConfig: BattleReplay | null = null
   private currentActionIndex = 0
 
-  private elementColors: Record<Element, number> = {
-    FIRE: 0xff3300,
-    WATER: 0x0066ff,
-    EARTH: 0x996633,
-    METAL: 0xcccccc,
-    WOOD: 0x33cc33,
-    NONE: 0xffffff,
-  }
-
   constructor() {
     super({ key: 'CardBattleScene' })
   }
 
   preload() {
-    this.load.image('cardback', '/images/game/cardback.png')
-    this.load.image('starburst', '/images/game/starburst.png')
     this.load.image('battlefield', '/images/game/battlefield.png')
 
-    this.load.image('card-fire', '/images/game/card-fire.png')
-    this.load.image('card-water', '/images/game/card-water.png')
-    this.load.image('card-earth', '/images/game/card-earth.png')
-    this.load.image('card-metal', '/images/game/card-metal.png')
-    this.load.image('card-wood', '/images/game/card-wood.png')
+    loadAllCardAssets(this)
   }
 
   create() {
@@ -102,12 +89,36 @@ export class CardBattleScene extends Phaser.Scene {
   private createEmptyCards() {
     this.playerCards = Array(3)
       .fill(null)
-      .map((_, i) => new Card(this, 250 + i * 150, 450, '', 0, 0, 'NONE', true))
+      .map(
+        (_, i) =>
+          new Card(
+            this,
+            250 + i * 150,
+            450,
+            '',
+            0,
+            0,
+            stringToElement('fire'),
+            0,
+            true
+          )
+      )
 
     this.opponentCards = Array(3)
       .fill(null)
       .map(
-        (_, i) => new Card(this, 250 + i * 150, 150, '', 0, 0, 'NONE', false)
+        (_, i) =>
+          new Card(
+            this,
+            250 + i * 150,
+            150,
+            '',
+            0,
+            0,
+            stringToElement('fire'),
+            0,
+            false
+          )
       )
     ;[...this.playerCards, ...this.opponentCards].forEach((card) => {
       card.setFaceDown(true)
@@ -219,7 +230,7 @@ export class CardBattleScene extends Phaser.Scene {
     )
 
     const damage = currentAction.damage
-    const attackColor = this.elementColors[attackerCard.element]
+    const attackColor = getCardColor(attackerCard.element)
 
     await performSingleAttack(
       this,

@@ -10,7 +10,7 @@ import CardList from '@/components/CardList'
 const myCards: CardData[] = [
   {
     id: 1,
-    species: 101,
+    species: 1,
     element: stringToElement('fire'),
     attack: 20,
     health: 20,
@@ -18,7 +18,7 @@ const myCards: CardData[] = [
   },
   {
     id: 2,
-    species: 102,
+    species: 2,
     element: stringToElement('water'),
     attack: 30,
     health: 10,
@@ -26,7 +26,7 @@ const myCards: CardData[] = [
   },
   {
     id: 3,
-    species: 103,
+    species: 3,
     element: stringToElement('earth'),
     attack: 10,
     health: 30,
@@ -34,7 +34,7 @@ const myCards: CardData[] = [
   },
   {
     id: 4,
-    species: 104,
+    species: 4,
     element: stringToElement('wood'),
     attack: 20,
     health: 20,
@@ -42,7 +42,7 @@ const myCards: CardData[] = [
   },
   {
     id: 5,
-    species: 105,
+    species: 5,
     element: stringToElement('metal'),
     attack: 10,
     health: 10,
@@ -50,7 +50,7 @@ const myCards: CardData[] = [
   },
   {
     id: 6,
-    species: 101,
+    species: 6,
     element: stringToElement('fire'),
     attack: 20,
     health: 20,
@@ -58,7 +58,7 @@ const myCards: CardData[] = [
   },
   {
     id: 7,
-    species: 102,
+    species: 7,
     element: stringToElement('water'),
     attack: 30,
     health: 10,
@@ -66,7 +66,7 @@ const myCards: CardData[] = [
   },
   {
     id: 8,
-    species: 103,
+    species: 8,
     element: stringToElement('earth'),
     attack: 10,
     health: 30,
@@ -74,7 +74,7 @@ const myCards: CardData[] = [
   },
   {
     id: 9,
-    species: 104,
+    species: 9,
     element: stringToElement('wood'),
     attack: 20,
     health: 20,
@@ -82,7 +82,7 @@ const myCards: CardData[] = [
   },
   {
     id: 10,
-    species: 105,
+    species: 10,
     element: stringToElement('metal'),
     attack: 10,
     health: 10,

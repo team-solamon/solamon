@@ -8,6 +8,7 @@ import { getCardColor } from '@/data/card'
 import { Card } from '@/gameObjects/Card'
 import { EventBridge } from '../utils/EventBridge'
 import { CardData, elementToString } from '@/lib/solana-helper'
+import { loadAllCardAssets } from '@/lib/phaser-utils'
 
 const LAYOUT = {
   CARD_Y: 250,
@@ -38,14 +39,7 @@ export class DrawScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('cardpack', '/images/game/cardpack.png')
-    this.load.image('cardback', '/images/game/cardback.png')
-
-    this.load.image('card-fire', '/images/game/card-fire.png')
-    this.load.image('card-water', '/images/game/card-water.png')
-    this.load.image('card-earth', '/images/game/card-earth.png')
-    this.load.image('card-metal', '/images/game/card-metal.png')
-    this.load.image('card-wood', '/images/game/card-wood.png')
+    loadAllCardAssets(this)
   }
 
   create() {
@@ -84,10 +78,11 @@ export class DrawScene extends Phaser.Scene {
       this,
       400,
       LAYOUT.CARD_Y,
-      elementToString(cards[this.drawsCount].element),
+      cards[this.drawsCount].element,
       cards[this.drawsCount].attack,
       cards[this.drawsCount].health,
       cards[this.drawsCount].element,
+      cards[this.drawsCount].species,
       true
     )
     this.card.scaleX = 2.0

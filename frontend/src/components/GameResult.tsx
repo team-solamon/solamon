@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import CardStack from './CardStack'
 import { BattleStatus } from '@/data/battle'
 import Button from './Button'
+import { ROUTES } from '@/lib/routes'
 
 interface GameResultProps {
   battleStatus: BattleStatus
@@ -41,7 +42,7 @@ const GameResult: React.FC<GameResultProps> = ({
         <button
           className='text-yellow-500 underline'
           onClick={() => {
-            router.push('/game')
+            router.push(ROUTES.GAME)
           }}
         >
           Battle replay &gt;
