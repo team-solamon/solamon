@@ -7,7 +7,7 @@ import { createElegantRings } from '../utils/effects'
 import { getCardColor } from '@/data/card'
 import { Card } from '@/gameObjects/Card'
 import { EventBridge } from '../utils/EventBridge'
-import { CardData, elementToString } from '@/lib/solana-helper'
+import { CardData } from '@/lib/solana-helper'
 import { loadAllCardAssets } from '@/lib/phaser-utils'
 
 const LAYOUT = {
