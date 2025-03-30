@@ -1,77 +1,29 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Nav from '@/components/Nav'
-import { BattleStatus } from '@/data/battle'
-
-const fighters: BattleStatus[] = [
-  {
-    status: 'pending',
-    myCards: [
-      { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3, species: 1 },
-      {
-        name: 'WATER',
-        element: { water: {} },
-        attack: 3,
-        health: 6,
-        species: 2,
-      },
-      {
-        name: 'EARTH',
-        element: { earth: {} },
-        attack: 4,
-        health: 5,
-        species: 3,
-      },
-    ],
-  },
-  {
-    status: 'pending',
-    myCards: [
-      {
-        name: 'WATER',
-        element: { water: {} },
-        attack: 3,
-        health: 6,
-        species: 1,
-      },
-      {
-        name: 'WATER',
-        element: { water: {} },
-        attack: 3,
-        health: 6,
-        species: 2,
-      },
-      {
-        name: 'WATER',
-        element: { water: {} },
-        attack: 3,
-        health: 6,
-        species: 3,
-      },
-    ],
-  },
-  {
-    status: 'pending',
-    myCards: [
-      {
-        name: 'METAL',
-        element: { metal: {} },
-        attack: 6,
-        health: 2,
-        species: 1,
-      },
-      { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4, species: 2 },
-      { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3, species: 3 },
-    ],
-  },
-]
+import { CardData, getPendingBattleAccounts } from '@/lib/solana-helper'
+import { BattleAccount } from '@/lib/solana-helper'
+import { getProgram } from '@/lib/helper'
 
 const ChooseFighterPage = () => {
   const router = useRouter()
+  const [pendingBattleAccounts, setPendingBattleAccounts] = useState<
+    BattleAccount[]
+  >([])
+  const program = getProgram()
+  useEffect(() => {
+    fetchPendingBattleAccounts()
+  }, [])
+
+  const fetchPendingBattleAccounts = async () => {
+    const battleAccounts = await getPendingBattleAccounts(program)
+    console.log({ battleAccounts })
+    setPendingBattleAccounts(battleAccounts)
+  }
 
   return (
     <div className='choose-fighter-page bg-black text-white min-h-screen p-4'>
@@ -89,17 +41,25 @@ const ChooseFighterPage = () => {
         Pick a squad to fight. You'll choose your own next.
       </p>
       <div className='fighters-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-        {fighters.map((fighter, index) => (
+        {pendingBattleAccounts.map(({ account: battleAccount }, index) => (
           <div
             key={index}
             className='fighter-card bg-[#978578] p-4 rounded-lg flex flex-col items-center'
           >
             <div className='cards flex gap-2 mb-4'>
-              {fighter.myCards.map((card, cardIndex) => (
-                <Card key={cardIndex} card={card} />
-              ))}
+              {battleAccount.player1Solamons.map(
+                (card: CardData, cardIndex: number) => (
+                  <Card key={cardIndex} card={card} />
+                )
+              )}
             </div>
-            <Button>
+            <Button
+              onClick={() => {
+                router.push(
+                  `/prepare-battle?battleId=${battleAccount.battleId}`
+                )
+              }}
+            >
               Choose Fighter <span className='text-blue-400'>0.15</span>
             </Button>
           </div>
