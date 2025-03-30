@@ -197,30 +197,58 @@ const HomePageContent = () => {
                       />
                     </div>
                   </div>
+
                   {battleStatusToString(battleAccount.battleStatus) ===
-                    'player1Wins' ||
-                  battleStatusToString(battleAccount.battleStatus) ===
-                    'player2Wins' ? (
-                    <Button
-                      onClick={() => {
-                        setSelectedBattle(battleAccount)
-                        openModal('result')
-                      }}
-                    >
-                      {battleStatusToString(battleAccount.battleStatus)}
-                    </Button>
+                  'pending' ? (
+                    <>
+                      <div className='flex justify-center'>
+                        <Typography
+                          variant='body-2'
+                          outline={false}
+                          className='rounded-xl bg-[rgba(151,133,120,1)] w-full text-center mb-1 h-[30px]'
+                        >
+                          Pending
+                        </Typography>
+                      </div>
+                      <div
+                        onClick={() =>
+                          handleCancelBattle(battleAccount.battleId)
+                        }
+                      >
+                        <Typography
+                          variant='body-3'
+                          color='default'
+                          outline={false}
+                          className='cursor-pointer w-full text-center mb-1'
+                        >
+                          Cancel
+                        </Typography>
+                      </div>
+                    </>
+                  ) : battleStatusToString(battleAccount.battleStatus) ===
+                    'canceled' ? (
+                    <div className='flex justify-center'>
+                      <Typography
+                        variant='body-3'
+                        color='default'
+                        outline={false}
+                        className='w-full text-center mb-1'
+                      >
+                        Canceled
+                      </Typography>
+                    </div>
                   ) : (
-                    <Button>
-                      {battleStatusToString(battleAccount.battleStatus)}
-                    </Button>
-                  )}
-                  {battleStatusToString(battleAccount.battleStatus) ===
-                    'pending' && (
-                    <Button
-                      onClick={() => handleCancelBattle(battleAccount.battleId)}
-                    >
-                      cancel
-                    </Button>
+                    <div className='flex justify-center'>
+                      <Button
+                        size='S'
+                        onClick={() => {
+                          setSelectedBattle(battleAccount)
+                          openModal('result')
+                        }}
+                      >
+                        Result
+                      </Button>
+                    </div>
                   )}
                 </div>
               )
@@ -248,7 +276,7 @@ const HomePageContent = () => {
       />
       <ViewAllCardsModal drawableCards={spawnResult} />
       <CardDetailsModal selectedCard={selectedCard} />
-      <ResultModal selectedBattle={selectedBattle} />
+      <ResultModal selectedBattle={selectedBattle} onClaim={fetchMyBattles} />
     </div>
   )
 }

@@ -9,6 +9,7 @@ export default {
         primary: [
           'Pixeloid Sans',
           'Pixeloid Sans Bold',
+          'Jersey',
           ...defaultTheme.fontFamily.sans,
         ],
       },
