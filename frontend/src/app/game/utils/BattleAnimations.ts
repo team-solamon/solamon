@@ -450,6 +450,7 @@ export const performSingleAttack = async (
     const endX = defenderCard.x
     const endY = defenderCard.y
 
+    scene.sound.play('stx-attack', { volume: 0.8 })
     addBattleLog(
       `⚔️ ${attackerCard.name} attacks ${defenderCard.name} for ${damage} damage!`
     )

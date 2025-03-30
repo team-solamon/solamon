@@ -225,7 +225,10 @@ export class Card extends Phaser.GameObjects.Container {
       '#000000'
     )
 
+    this.scene.sound.play('sfx-hit', { volume: 0.6 })
+
     if (attackEvent === 'CRITICAL') {
+      this.scene.sound.play('sfx-critical', { volume: 0.6 })
       new FloatingText(
         this.scene,
         this.x,
@@ -235,6 +238,7 @@ export class Card extends Phaser.GameObjects.Container {
         '#000000'
       )
     } else if (attackEvent === 'HALVED') {
+      this.scene.sound.play('sfx-halved', { volume: 0.6 })
       new FloatingText(
         this.scene,
         this.x,
