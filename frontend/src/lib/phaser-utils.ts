@@ -3,6 +3,7 @@ import Phaser from 'phaser'
 export function loadCardAssets(scene: Phaser.Scene): void {
   scene.load.image('cardpack', '/images/game/cardpack.png')
   scene.load.image('cardback', '/images/game/cardback.png')
+  scene.load.image('starburst', '/images/game/starburst.png')
 }
 
 export function loadSpeciesAssets(

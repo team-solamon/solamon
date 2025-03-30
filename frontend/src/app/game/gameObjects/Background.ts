@@ -49,7 +49,7 @@ export class BackgroundContainer extends Phaser.GameObjects.Container {
       .setAlpha(0)
 
     this.opponentLabel = scene.add
-      .text(400, 60, 'OPPONENT', {
+      .text(400, 50, 'OPPONENT', {
         fontSize: '16px',
         color: '#e74c3c',
         fontStyle: 'bold',
