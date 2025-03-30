@@ -121,6 +121,7 @@ const enemyCards: CardData[] = [
 const PrepareBattlePage = () => {
   const router = useRouter()
   const [pickedCards, setPickedCards] = useState<CardData[]>([])
+  const [loading, setLoading] = useState(false)
 
   const handleCardPick = (card: CardData) => {
     if (pickedCards.includes(card)) {
@@ -132,6 +133,22 @@ const PrepareBattlePage = () => {
 
   const handleCardRemove = (card: CardData) => {
     setPickedCards(pickedCards.filter((c) => c !== card))
+  }
+
+  const handleFight = async () => {
+    if (pickedCards.length < 3) {
+      console.log('Please pick 3 cards')
+      return
+    }
+
+    setLoading(true)
+    try {
+      console.log('Starting battle with cards:', pickedCards)
+    } catch (error) {
+      console.error('Battle error:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -160,6 +177,8 @@ const PrepareBattlePage = () => {
         pickedCards={pickedCards}
         onCardRemove={handleCardRemove}
         buttonLabel='Fight!'
+        onButtonClick={handleFight}
+        loading={loading}
         buttonDisabled={pickedCards.length < 3}
       />
 

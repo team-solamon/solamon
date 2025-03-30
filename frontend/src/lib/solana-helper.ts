@@ -360,6 +360,10 @@ export function battleStatusToString(battleStatus: BattleStatus): string {
 			return "player1Wins"
 		case JSON.stringify({ player2Wins: {} }):
 			return "player2Wins"
+			default:
+		throw new Error(
+				`Unknown battle status: ${JSON.stringify(battleStatus)}`
+			)
 	}
 }
 
