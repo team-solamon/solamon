@@ -133,6 +133,10 @@ export class CardBattleScene extends Phaser.Scene {
       }
 
       EventBridge.setOnReplayDataLoaded((replay: BattleReplay) => {
+        if (this.battleConfig) {
+          return
+        }
+
         this.battleConfig = replay
 
         if (this.backgroundContainer) {
