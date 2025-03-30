@@ -243,10 +243,10 @@ export class CardBattleScene extends Phaser.Scene {
     const { attackerCard, defenderCard } = battleCards
 
     const isPlayerAttacking = currentAction.isPlayer
-    const playerCard = isPlayerAttacking ? attackerCard : defenderCard
-    const opponentCard = isPlayerAttacking ? defenderCard : attackerCard
 
     /*
+    const playerCard = isPlayerAttacking ? attackerCard : defenderCard
+    const opponentCard = isPlayerAttacking ? defenderCard : attackerCard
     this.backgroundContainer?.updateStatusText(
       `Battle: ${playerCard.name} vs ${opponentCard.name}`,
       false
