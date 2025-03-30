@@ -22,13 +22,21 @@ const PickedCards: React.FC<PickedCardsProps> = ({
   onButtonClick,
 }) => {
   return (
-    <section className='picked-section bg-[#978578] p-4 rounded-lg mb-8'>
+    <section className='picked-section bg-[#978578] p-4 rounded-lg mb-8 max-w-[1000px] mx-auto'>
       <Typography variant='title-2'>Picked</Typography>
-      <div className='picked-cards flex gap-4 mb-4'>
+      <Typography
+        variant='body-2'
+        color='inverse'
+        className='text-center mb-4'
+        outline={false}
+      >
+        Select 3 cards from My Cards.
+      </Typography>
+      <div className='picked-cards flex gap-4 mb-4 justify-center'>
         {Array.from({ length: 3 }).map((_, index) => (
           <div
             key={index}
-            className='card-slot bg-gray-700 p-4 rounded-lg flex items-center justify-center'
+            className='card-slot bg-[rgba(202,193,185,1)] p-4 rounded-lg flex items-center justify-center w-[210px] h-[280px]'
           >
             {pickedCards[index] ? (
               <Card
@@ -37,18 +45,20 @@ const PickedCards: React.FC<PickedCardsProps> = ({
                 onClick={() => onCardRemove(pickedCards[index])}
               />
             ) : (
-              <span className='text-gray-400'>?</span>
+              <Typography variant='display-title-1'>?</Typography>
             )}
           </div>
         ))}
       </div>
-      <Button
-        disabled={buttonDisabled}
-        onClick={onButtonClick}
-        loading={loading}
-      >
-        {buttonLabel} <span className='text-blue-400'>0.1</span>
-      </Button>
+      <div className='flex justify-center'>
+        <Button
+          disabled={buttonDisabled}
+          onClick={onButtonClick}
+          loading={loading}
+        >
+          {buttonLabel}
+        </Button>
+      </div>
     </section>
   )
 }
