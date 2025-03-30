@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Nav from '@/components/Nav'
 import PickedCards from '@/components/PickedCards'
@@ -20,7 +20,7 @@ import {
 } from '@/lib/helper'
 import { Keypair, sendAndConfirmTransaction } from '@solana/web3.js'
 
-const PrepareBattlePage = () => {
+const PrepareBattleContent = () => {
   const searchParams = useSearchParams()
   const battleId = searchParams.get('battleId')
   const router = useRouter()
@@ -140,6 +140,14 @@ const PrepareBattlePage = () => {
         onCardPick={handleCardPick}
       />
     </div>
+  )
+}
+
+const PrepareBattlePage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PrepareBattleContent />
+    </Suspense>
   )
 }
 
