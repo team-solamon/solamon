@@ -26,6 +26,7 @@ export type SolamonPrototype = IdlTypes<Solamon>["solamonPrototype"]
 export type Element = IdlTypes<Solamon>["element"]
 export type BattleStatus = IdlTypes<Solamon>["battleStatus"]
 export type CardData = IdlTypes<Solamon>["solamon"]
+export type BattleAccount = IdlTypes<Solamon>["battleAccount"]
 
 export const getConfigPDA = (program: Program<Solamon>) => {
 	const [configPDA, _bump] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -304,15 +305,15 @@ export async function showSpawnResult(
 	const tx = await connection.getTransaction(txSig, {
 		commitment: "confirmed",
 	})
-	console.log('Spawn result')
-  const logs = (tx?.meta?.logMessages ?? [])
-    .filter((log) => log.includes('Spawned'))
-    .map((log) => {
-      const trimmedLog = log.slice(29)
-      return parseSolamonLog(trimmedLog)
-    })
+	console.log("Spawn result")
+	const logs = (tx?.meta?.logMessages ?? [])
+		.filter((log) => log.includes("Spawned"))
+		.map((log) => {
+			const trimmedLog = log.slice(29)
+			return parseSolamonLog(trimmedLog)
+		})
 
-  return logs
+	return logs
 }
 
 export function stringToElement(elementStr: string): Element {
@@ -349,6 +350,19 @@ export function elementToString(element: Element): string {
 	}
 }
 
+export function battleStatusToString(battleStatus: BattleStatus): string {
+	switch (JSON.stringify(battleStatus)) {
+		case JSON.stringify({ pending: {} }):
+			return "pending"
+		case JSON.stringify({ canceled: {} }):
+			return "canceled"
+		case JSON.stringify({ player1Wins: {} }):
+			return "player1Wins"
+		case JSON.stringify({ player2Wins: {} }):
+			return "player2Wins"
+	}
+}
+
 export function parseSolamonLog(logString: string): CardData {
 	// Handle the specific format from the logs
 	// Convert from "{ id: 0, species: 3, element: Metal, attack: 3, health: 12, is_available: true }"
@@ -368,8 +382,8 @@ export function parseSolamonLog(logString: string): CardData {
 	)
 
 	if (!elementMatch) {
-    throw new Error(`Failed to parse element from log: ${logString}`)
-  }
+		throw new Error(`Failed to parse element from log: ${logString}`)
+	}
 
 	// Map the string to the enum
 	const element = stringToElement(elementMatch[1])

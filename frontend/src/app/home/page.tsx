@@ -14,13 +14,17 @@ import NewCardModal from '@/components/modals/NewCardModal'
 import ViewAllCardsModal from '@/components/modals/ViewAllCardsModal'
 import CardDetailsModal from '@/components/modals/CardDetailsModal'
 import ResultModal from '@/components/modals/ResultModal'
-import { BattleStatus } from '@/data/battle'
 import {
   CardData,
   elementToString,
+  getBattleAccountsByUser,
   getUserAccount,
   showSpawnResult,
   spawnSolamonsTx,
+  BattleAccount,
+  battleStatusToString,
+  cancelBattleAndUnwrapSolTx,
+  getConfigAccount,
 } from '@/lib/solana-helper'
 import {
   getConnection,
@@ -30,134 +34,19 @@ import {
 import { useLoading } from '@/contexts/LoadingContext'
 import Typography from '@/components/Typography'
 import CardList from '@/components/CardList'
-
-const cardStackData: BattleStatus[] = [
-  {
-    status: 'pending',
-    myCards: [
-      {
-        name: 'FIRE',
-        element: { fire: {} },
-        attack: 5,
-        health: 3,
-        species: 1,
-      },
-      {
-        name: 'WATER',
-        element: { water: {} },
-        attack: 3,
-        health: 6,
-        species: 2,
-      },
-      {
-        name: 'EARTH',
-        element: { earth: {} },
-        attack: 4,
-        health: 5,
-        species: 3,
-      },
-    ],
-  },
-  {
-    status: 'result',
-    isPlayerWinner: true,
-    myCards: [
-      {
-        name: 'METAL',
-        element: { metal: {} },
-        attack: 6,
-        health: 2,
-        species: 4,
-      },
-      { name: 'WOOD', element: { wood: {} }, attack: 4, health: 4, species: 5 },
-      { name: 'FIRE', element: { fire: {} }, attack: 5, health: 3, species: 6 },
-    ],
-    opponentCards: [
-      {
-        name: 'WATER',
-        element: { water: {} },
-        attack: 3,
-        health: 6,
-        species: 7,
-      },
-      {
-        name: 'EARTH',
-        element: { earth: {} },
-        attack: 4,
-        health: 5,
-        species: 8,
-      },
-      {
-        name: 'METAL',
-        element: { metal: {} },
-        attack: 6,
-        health: 2,
-        species: 9,
-      },
-    ],
-  },
-  {
-    status: 'result',
-    isPlayerWinner: false,
-    myCards: [
-      {
-        name: 'METAL',
-        element: { metal: {} },
-        attack: 6,
-        health: 2,
-        species: 10,
-      },
-      {
-        name: 'WOOD',
-        element: { wood: {} },
-        attack: 4,
-        health: 4,
-        species: 11,
-      },
-      {
-        name: 'FIRE',
-        element: { fire: {} },
-        attack: 5,
-        health: 3,
-        species: 12,
-      },
-    ],
-    opponentCards: [
-      {
-        name: 'WATER',
-        element: { water: {} },
-        attack: 3,
-        health: 6,
-        species: 13,
-      },
-      {
-        name: 'EARTH',
-        element: { earth: {} },
-        attack: 4,
-        health: 5,
-        species: 14,
-      },
-      {
-        name: 'METAL',
-        element: { metal: {} },
-        attack: 6,
-        health: 2,
-        species: 15,
-      },
-    ],
-  },
-]
+import { sendAndConfirmTransaction } from '@solana/web3.js'
 
 const HomePageContent = () => {
   const router = useRouter()
 
   const { openModal, closeModal } = useModal()
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null)
-  const [selectedBattle, setSelectedBattle] = useState<BattleStatus | null>(
+  const [selectedBattle, setSelectedBattle] = useState<BattleAccount | null>(
     null
   )
   const [spawnResult, setSpawnResult] = useState<CardData[]>([])
   const [myCards, setMyCards] = useState<CardData[]>([])
+  const [myBattles, setMyBattles] = useState<BattleAccount[]>([])
   const { showLoading, hideLoading } = useLoading()
   const connection = getConnection()
   const program = getProgram()
@@ -165,6 +54,7 @@ const HomePageContent = () => {
 
   useEffect(() => {
     fetchMyCards()
+    fetchMyBattles()
   }, [])
 
   const fetchMyCards = async () => {
@@ -176,18 +66,29 @@ const HomePageContent = () => {
     setMyCards(myAccount.solamons)
   }
 
+  const fetchMyBattles = async () => {
+    if (!player) {
+      console.error('No player found')
+      return
+    }
+    const myBattles = await getBattleAccountsByUser(program, player.publicKey)
+    setMyBattles([
+      ...myBattles.player1BattleAccounts,
+      ...myBattles.player2BattleAccounts,
+    ])
+  }
+
   const handleNewCardFromTutorial = () => {
     closeModal('tutorial')
     openModal('purchaseCard')
   }
 
   const handlePurchase = async (amount: number) => {
-    showLoading('Spawning solamons...')
-
     if (!player) {
       console.error('No player found')
       return
     }
+    showLoading('Spawning solamons...')
     const tx = await spawnSolamonsTx(
       connection,
       program,
@@ -201,6 +102,30 @@ const HomePageContent = () => {
     hideLoading()
     closeModal('purchaseCard')
     openModal('newCard')
+  }
+
+  const handleCancelBattle = async (battleId: number) => {
+    const config = await getConfigAccount(program)
+
+    if (!player) {
+      console.error('No player found')
+      return
+    }
+    showLoading('Cancelling battle...')
+    const tx = await cancelBattleAndUnwrapSolTx(
+      connection,
+      program,
+      player.publicKey,
+      battleId
+    )
+    try {
+      await sendAndConfirmTransaction(getConnection(), tx, [player])
+    } catch (error) {
+      console.error(error)
+    }
+
+    fetchMyBattles()
+    hideLoading()
   }
 
   const handleViewAllCards = () => {
@@ -226,6 +151,7 @@ const HomePageContent = () => {
     return counts
   }
 
+  console.log({ myBattles })
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
       <Nav />
@@ -233,7 +159,9 @@ const HomePageContent = () => {
         <Button onClick={() => openModal('purchaseCard')}>
           + New Card <span className='text-blue-400'>0.1</span>
         </Button>
-        <Button onClick={() => router.push(ROUTES.OPEN_BATTLE)}>Open Match</Button>
+        <Button onClick={() => router.push(ROUTES.OPEN_BATTLE)}>
+          Open Match
+        </Button>
         <Button onClick={() => router.push(ROUTES.CHOOSE_FIGHTER)}>
           Choose Fighter
         </Button>
@@ -241,37 +169,57 @@ const HomePageContent = () => {
 
       <section className='battle-section mb-8'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <Typography variant='title-2' color='inverse'>
-            Battle
-          </Typography>
+          <Typography variant='title-2'>Battle</Typography>
           <div className='battle-cards grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
-            {cardStackData.map((battle, index) => (
-              <div
-                key={index}
-                className='card bg-[rgba(202,193,185,1)] p-4 rounded-lg max-w-[250px] w-full'
-              >
-                <div className='flex justify-around'>
-                  <div>
-                    <h4 className='text-center text-sm text-gray-400 mb-2'>
-                      My Cards
-                    </h4>
-                    <CardStack cards={battle.myCards} className='mx-auto' />
+            {myBattles.map(({ account: battleAccount }, index) => {
+              return (
+                <div
+                  key={index}
+                  className='card bg-[rgba(202,193,185,1)] p-4 rounded-lg max-w-[250px] w-full'
+                >
+                  <div className='flex justify-around'>
+                    <div>
+                      <h4 className='text-center text-sm text-gray-400 mb-2'>
+                        My Cards
+                      </h4>
+                      <CardStack
+                        cards={
+                          player?.publicKey == battleAccount.player1.toBase58()
+                            ? battleAccount.player1Solamons
+                            : battleAccount.player2Solamons
+                        }
+                        className='mx-auto'
+                      />
+                    </div>
                   </div>
+                  {battleStatusToString(battleAccount.battleStatus) ===
+                    'player1Wins' ||
+                  battleStatusToString(battleAccount.battleStatus) ===
+                    'player2Wins' ? (
+                    <Button
+                      onClick={() => {
+                        setSelectedBattle(battleAccount)
+                        openModal('result')
+                      }}
+                    >
+                      {battleStatusToString(battleAccount.battleStatus)}
+                    </Button>
+                  ) : (
+                    <Button>
+                      {battleStatusToString(battleAccount.battleStatus)}
+                    </Button>
+                  )}
+                  {battleStatusToString(battleAccount.battleStatus) ===
+                    'pending' && (
+                    <Button
+                      onClick={() => handleCancelBattle(battleAccount.battleId)}
+                    >
+                      Cancle
+                    </Button>
+                  )}
                 </div>
-                {battle.status === 'result' ? (
-                  <Button
-                    onClick={() => {
-                      setSelectedBattle(battle)
-                      openModal('result')
-                    }}
-                  >
-                    {battle.status}
-                  </Button>
-                ) : (
-                  <Button>{battle.status}</Button>
-                )}
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
