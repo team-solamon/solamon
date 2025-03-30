@@ -21,6 +21,7 @@ import {
 } from "@solana/web3.js"
 
 import { Solamon } from "../target/types/solamon"
+import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes"
 
 export type SolamonPrototype = IdlTypes<Solamon>["solamonPrototype"]
 export type Element = IdlTypes<Solamon>["element"]
@@ -120,6 +121,35 @@ export const getBattleAccount = async (
 export const getAllBattleAccounts = async (program: Program<Solamon>) => {
 	const battleAccounts = await program.account.battleAccount.all()
 	return battleAccounts
+}
+
+export const getPendingBattleAccounts = async (program: Program<Solamon>) => {
+	const offset =
+		8 + // discriminator
+		1 + // bump
+		8 + // battle_id
+		32 + // player_1
+		32 + // player_2
+		4 + // vec length for player_1_solamons
+		3 * 7 + // 3 solamons with 7 bytes each
+		4 + // vec length for player_2_solamons
+		3 * 7 // 3 solamons with 7 bytes each
+
+	const battleAccounts = await program.account.battleAccount.all([
+		{
+			memcmp: {
+				offset: offset,
+				bytes: bs58.encode([0]), // Pending is 0 in the enum
+			},
+		},
+	])
+
+	// @TODO. Remove filter and use the above
+	return battleAccounts.filter(
+		(battleAccount) =>
+			JSON.stringify(battleAccount.account.battleStatus) ===
+			JSON.stringify({ pending: {} })
+	)
 }
 
 export const getBattleAccountsByUser = async (
@@ -360,8 +390,8 @@ export function battleStatusToString(battleStatus: BattleStatus): string {
 			return "player1Wins"
 		case JSON.stringify({ player2Wins: {} }):
 			return "player2Wins"
-			default:
-		throw new Error(
+		default:
+			throw new Error(
 				`Unknown battle status: ${JSON.stringify(battleStatus)}`
 			)
 	}

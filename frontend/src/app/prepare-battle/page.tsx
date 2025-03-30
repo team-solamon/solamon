@@ -1,127 +1,60 @@
 'use client'
 
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Nav from '@/components/Nav'
 import PickedCards from '@/components/PickedCards'
 import CardList from '@/components/CardList'
 import Card from '@/components/Card'
-import { CardData, stringToElement } from '@/lib/solana-helper'
-
-const myCards: CardData[] = [
-  {
-    id: 1,
-    species: 101,
-    element: stringToElement('fire'),
-    attack: 20,
-    health: 20,
-    isAvailable: true,
-  },
-  {
-    id: 2,
-    species: 102,
-    element: stringToElement('water'),
-    attack: 30,
-    health: 10,
-    isAvailable: true,
-  },
-  {
-    id: 3,
-    species: 103,
-    element: stringToElement('earth'),
-    attack: 10,
-    health: 30,
-    isAvailable: true,
-  },
-  {
-    id: 4,
-    species: 104,
-    element: stringToElement('wood'),
-    attack: 20,
-    health: 20,
-    isAvailable: true,
-  },
-  {
-    id: 5,
-    species: 105,
-    element: stringToElement('metal'),
-    attack: 10,
-    health: 10,
-    isAvailable: true,
-  },
-  {
-    id: 6,
-    species: 101,
-    element: stringToElement('fire'),
-    attack: 20,
-    health: 20,
-    isAvailable: true,
-  },
-  {
-    id: 7,
-    species: 102,
-    element: stringToElement('water'),
-    attack: 30,
-    health: 10,
-    isAvailable: true,
-  },
-  {
-    id: 8,
-    species: 103,
-    element: stringToElement('earth'),
-    attack: 10,
-    health: 30,
-    isAvailable: true,
-  },
-  {
-    id: 9,
-    species: 104,
-    element: stringToElement('wood'),
-    attack: 20,
-    health: 20,
-    isAvailable: true,
-  },
-  {
-    id: 10,
-    species: 105,
-    element: stringToElement('metal'),
-    attack: 10,
-    health: 10,
-    isAvailable: true,
-  },
-]
-
-const enemyCards: CardData[] = [
-  {
-    id: 11,
-    species: 201,
-    element: stringToElement('water'),
-    attack: 20,
-    health: 20,
-    isAvailable: true,
-  },
-  {
-    id: 12,
-    species: 202,
-    element: stringToElement('earth'),
-    attack: 20,
-    health: 20,
-    isAvailable: true,
-  },
-  {
-    id: 13,
-    species: 203,
-    element: stringToElement('fire'),
-    attack: 20,
-    health: 20,
-    isAvailable: true,
-  },
-]
+import {
+  BattleAccount,
+  CardData,
+  getBattleAccount,
+  getUserAccount,
+  wrapSolAndJoinBattleTx,
+} from '@/lib/solana-helper'
+import {
+  getConnection,
+  getKeypairFromLocalStorage,
+  getProgram,
+} from '@/lib/helper'
+import { Keypair, sendAndConfirmTransaction } from '@solana/web3.js'
 
 const PrepareBattlePage = () => {
+  const searchParams = useSearchParams()
+  const battleId = searchParams.get('battleId')
   const router = useRouter()
+  const program = getProgram()
+  const connection = getConnection()
+  const player = getKeypairFromLocalStorage()
+  const [myCards, setMyCards] = useState<CardData[]>([])
   const [pickedCards, setPickedCards] = useState<CardData[]>([])
   const [loading, setLoading] = useState(false)
+  const [battleAccount, setBattleAccount] = useState<BattleAccount | null>(null)
+
+  useEffect(() => {
+    console.log({ battleId })
+    if (!battleId) {
+      router.push('/choose-fighter')
+      return
+    }
+    if (!player) {
+      router.push('/')
+      return
+    }
+    fetchBattleAccount(battleId)
+    fetchMyCards(player)
+  }, [battleId])
+
+  const fetchBattleAccount = async (battleId: string) => {
+    const battleAccount = await getBattleAccount(program, parseInt(battleId))
+    setBattleAccount(battleAccount)
+  }
+
+  const fetchMyCards = async (player: Keypair) => {
+    const myAccount = await getUserAccount(program, player.publicKey)
+    setMyCards(myAccount.solamons)
+  }
 
   const handleCardPick = (card: CardData) => {
     if (pickedCards.includes(card)) {
@@ -140,10 +73,26 @@ const PrepareBattlePage = () => {
       console.log('Please pick 3 cards')
       return
     }
+    if (!player) {
+      console.log('Please connect your wallet')
+      return
+    }
+    if (!battleId) {
+      console.log('Battle ID is not found')
+      return
+    }
 
     setLoading(true)
     try {
       console.log('Starting battle with cards:', pickedCards)
+      const tx = await wrapSolAndJoinBattleTx(
+        connection,
+        program,
+        player.publicKey,
+        parseInt(battleId),
+        pickedCards.map((card) => card.id)
+      )
+      await sendAndConfirmTransaction(connection, tx, [player])
     } catch (error) {
       console.error('Battle error:', error)
     } finally {
@@ -167,9 +116,11 @@ const PrepareBattlePage = () => {
       <div className='enemy-cards bg-gray-800 p-4 rounded-lg mb-4'>
         <h2 className='text-yellow-400 text-xl mb-2'>Enemy Card</h2>
         <div className='flex space-x-4'>
-          {enemyCards.map((card, index) => (
-            <Card key={index} species={card.species} element={card.element} />
-          ))}
+          {battleAccount?.player1Solamons.map(
+            (card: CardData, index: number) => (
+              <Card key={index} card={card} />
+            )
+          )}
         </div>
       </div>
 
@@ -185,6 +136,7 @@ const PrepareBattlePage = () => {
       <CardList
         cards={myCards}
         pickedCards={pickedCards}
+        showInBattle={true}
         onCardPick={handleCardPick}
       />
     </div>
