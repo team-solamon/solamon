@@ -30,11 +30,14 @@ export class CardBattleScene extends Phaser.Scene {
   preload() {
     this.load.image('battlefield', '/images/game/battlefield.png')
 
+    // bgm
+    this.load.audio('bgm-game', '/sounds/bgm-game.mp3')
+
+    // sfx
     this.load.audio('sfx-card_flip', '/sounds/sfx-card_flip.mp3')
     this.load.audio('sfx-prepare_attack', '/sounds/sfx-prepare_attack.mp3')
     this.load.audio('stx-attack', '/sounds/stx-attack.mp3')
     this.load.audio('sfx-dead', '/sounds/sfx-dead.mp3')
-
     this.load.audio('sfx-hit', '/sounds/sfx-hit.mp3')
     this.load.audio('sfx-critical', '/sounds/sfx-critical.mp3')
     this.load.audio('sfx-halved', '/sounds/sfx-halved.mp3')
@@ -58,6 +61,13 @@ export class CardBattleScene extends Phaser.Scene {
     this.loadBattleConfiguration().then(() => this.initializeCardData())
 
     this.gameResult = new GameResult(this, 400, 300)
+
+    this.sound
+      .add('bgm-game', {
+        volume: 0.7,
+        loop: true,
+      })
+      .play()
   }
 
   private createFadeOverlay() {
