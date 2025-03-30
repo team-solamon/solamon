@@ -32,6 +32,9 @@ export class DrawScene extends Phaser.Scene {
   private loadingText: Phaser.GameObjects.Text | null = null
   private loadingTween: Phaser.Tweens.Tween | null = null
 
+  // Background music property
+  private backgroundMusic: Phaser.Sound.BaseSound | null = null
+
   private config: { cards: CardData[] } | null = null
 
   constructor() {
@@ -40,6 +43,8 @@ export class DrawScene extends Phaser.Scene {
 
   preload() {
     loadAllCardAssets(this)
+
+    this.load.audio('bgm-draw', '/sounds/bgm-draw.mp3')
   }
 
   create() {
@@ -50,12 +55,25 @@ export class DrawScene extends Phaser.Scene {
     this.drawsCount = 0
     this.originalCameraZoom = this.cameras.main.zoom
 
+    this.backgroundMusic = this.sound.add('bgm-draw', {
+      volume: 0.5,
+      loop: true,
+    })
+    this.backgroundMusic.play()
+
     this.showLoadingAnimation()
 
     this.loadDrawConfiguration().then(() => {
       this.clearLoadingAnimation()
       this.createCardAndPack()
     })
+  }
+
+  shutdown() {
+    if (this.backgroundMusic) {
+      this.backgroundMusic.stop()
+    }
+    this.sound.stopAll()
   }
 
   private async loadDrawConfiguration() {
