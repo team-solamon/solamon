@@ -5,6 +5,7 @@ import Modal from '../Modal'
 import Button from '../Button'
 import { useModal } from '@/contexts/ModalContext'
 import Typography from '../Typography'
+import SolanaBalance from '../SolanaBalance'
 
 interface PurchaseCardModalProps {
   onPurchase: (amount: number) => void
@@ -60,7 +61,10 @@ const PurchaseCardModal: React.FC<PurchaseCardModalProps> = ({
             onClick={() => onPurchase(cardAmount)}
             disabled={cardAmount === 0}
           >
-            + New Card ({(cardAmount * 0.1).toFixed(1)})
+            <div className='flex items-center gap-1'>
+              + New Card
+              <SolanaBalance balance={cardAmount * 0.1} />
+            </div>
           </Button>
         </div>
       </div>

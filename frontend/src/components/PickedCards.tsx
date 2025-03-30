@@ -3,6 +3,7 @@ import Card from '@/components/Card'
 import Button from '@/components/Button'
 import { CardData } from '@/lib/solana-helper'
 import Typography from './Typography'
+import CardStats from './CardStats'
 
 interface PickedCardsProps {
   pickedCards: CardData[]
@@ -39,11 +40,17 @@ const PickedCards: React.FC<PickedCardsProps> = ({
             className='card-slot bg-[rgba(202,193,185,1)] p-4 rounded-lg flex items-center justify-center w-[210px] h-[280px]'
           >
             {pickedCards[index] ? (
-              <Card
-                species={pickedCards[index].species}
-                element={pickedCards[index].element}
-                onClick={() => onCardRemove(pickedCards[index])}
-              />
+              <div className='relative w-full h-full flex flex-col items-center justify-center'>
+                <Card
+                  species={pickedCards[index].species}
+                  element={pickedCards[index].element}
+                  onClick={() => onCardRemove(pickedCards[index])}
+                />
+                <CardStats
+                  attack={pickedCards[index].attack}
+                  health={pickedCards[index].health}
+                />
+              </div>
             ) : (
               <Typography variant='display-title-1'>?</Typography>
             )}

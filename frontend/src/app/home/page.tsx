@@ -35,6 +35,7 @@ import { useLoading } from '@/contexts/LoadingContext'
 import Typography from '@/components/Typography'
 import CardList from '@/components/CardList'
 import { sendAndConfirmTransaction } from '@solana/web3.js'
+import SolanaBalance from '@/components/SolanaBalance'
 
 const HomePageContent = () => {
   const router = useRouter()
@@ -161,7 +162,10 @@ const HomePageContent = () => {
       <Nav />
       <div className='action-buttons flex flex-col items-center sm:flex-row justify-center gap-4 mb-16'>
         <Button onClick={() => openModal('purchaseCard')}>
-          + New Card <span className='text-blue-400'>0.1</span>
+          <div className='flex items-center gap-1'>
+            + New Card
+            <SolanaBalance balance={0.1} />
+          </div>
         </Button>
         <Button onClick={() => router.push(ROUTES.OPEN_BATTLE)}>
           Open Match
