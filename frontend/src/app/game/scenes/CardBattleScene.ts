@@ -8,6 +8,7 @@ import { EventBridge } from '../utils/EventBridge'
 import { BattleAction, BattleReplay } from '@/data/replay'
 import { loadAllCardAssets } from '@/lib/phaser-utils'
 import { getCardColor } from '@/data/card'
+import { stringToElement } from '@/lib/solana-helper'
 
 export class CardBattleScene extends Phaser.Scene {
   private playerCards: Card[] = []
@@ -89,13 +90,35 @@ export class CardBattleScene extends Phaser.Scene {
     this.playerCards = Array(3)
       .fill(null)
       .map(
-        (_, i) => new Card(this, 250 + i * 150, 450, '', 0, 0, 'fire', 0, true)
+        (_, i) =>
+          new Card(
+            this,
+            250 + i * 150,
+            450,
+            '',
+            0,
+            0,
+            stringToElement('fire'),
+            0,
+            true
+          )
       )
 
     this.opponentCards = Array(3)
       .fill(null)
       .map(
-        (_, i) => new Card(this, 250 + i * 150, 150, '', 0, 0, 'fire', 0, false)
+        (_, i) =>
+          new Card(
+            this,
+            250 + i * 150,
+            150,
+            '',
+            0,
+            0,
+            stringToElement('fire'),
+            0,
+            false
+          )
       )
     ;[...this.playerCards, ...this.opponentCards].forEach((card) => {
       card.setFaceDown(true)
