@@ -11,6 +11,7 @@ import SolanaBalance from './SolanaBalance'
 import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/lib/routes'
 import { getExplorerUrl } from '@/lib/url-helper'
+import { useLoading } from '@/contexts/LoadingContext'
 
 const Nav: React.FC = () => {
   const { openModal } = useModal()
@@ -18,6 +19,25 @@ const Nav: React.FC = () => {
 
   const [balance, setBalance] = useState<number | null>(null)
   const keypair = getKeypairFromLocalStorage()
+  const { showLoading, hideLoading } = useLoading()
+
+  const handleRequestAirdrop = async () => {
+    if (!keypair?.publicKey) return
+    const connection = getConnection()
+    // Request airdrop
+    try {
+      showLoading('Requesting airdrop...')
+      const airdropSignature = await connection.requestAirdrop(
+        keypair.publicKey,
+        1e9 // 1 SOL in lamports
+      )
+      await connection.confirmTransaction(airdropSignature)
+    } catch (error) {
+      alert(error)
+      console.error('Airdrop failed', error)
+    }
+    hideLoading()
+  }
 
   useEffect(() => {
     fetchBalance()
@@ -53,17 +73,17 @@ const Nav: React.FC = () => {
       <div className='wallet-info text-right flex items-end '>
         <Typography variant='body-2' color='secondary' className='mr-4'>
           <a
-          href={`${getExplorerUrl(keypair?.publicKey.toBase58() || '')}`}
-          target='_blank'
-          rel='noopener noreferrer'
+            href={`${getExplorerUrl(keypair?.publicKey.toBase58() || '')}`}
+            target='_blank'
+            rel='noopener noreferrer'
           >
-          {trimAddress(keypair?.publicKey.toBase58())}
+            {trimAddress(keypair?.publicKey.toBase58())}
           </a>
         </Typography>
         <SolanaBalance balance={balance || 0} />
         <div
           className='ml-4 text-[rgba(255,212,0,1)] cursor-pointer border border-[rgba(255,212,0,1)] rounded-lg w-[110px] h-[32px] flex items-center justify-center'
-          onClick={() => {}}
+          onClick={handleRequestAirdrop}
         >
           <Typography variant='body-3'>claim dev SOL</Typography>
         </div>
