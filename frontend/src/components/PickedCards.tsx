@@ -9,7 +9,7 @@ interface PickedCardsProps {
   onCardRemove: (card: CardData) => void
   buttonLabel: string
   buttonDisabled: boolean
-  loading: boolean
+  loading?: boolean
   onButtonClick: () => void
 }
 

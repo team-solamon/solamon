@@ -13,6 +13,7 @@ import {
 	TOKEN_PROGRAM_ID,
 } from "@solana/spl-token"
 import {
+	ComputeBudgetProgram,
 	Connection,
 	PublicKey,
 	SystemProgram,
@@ -184,7 +185,7 @@ export const getBattleAccountsByUser = async (
 	return { player1BattleAccounts, player2BattleAccounts }
 }
 
-export const getBattleLogs = async (
+export const getBattleActions = async (
 	connection: Connection,
 	battleAccountPDA: anchor.web3.PublicKey
 ) => {
@@ -201,7 +202,52 @@ export const getBattleLogs = async (
 		}
 	)
 
-	return battleLogs?.meta?.logMessages
+	const logs = battleLogs?.meta?.logMessages
+		?.filter((log) => log.includes("Program log: Action:"))
+		.map((log) => {
+			return log.replace("Program log: Action: ", "")
+		})
+
+	return logs?.map(parseBattleActionLog) || []
+}
+
+export type AttackEvent = "NONE" | "CRITICAL" | "HALVED"
+
+export interface ParsedBattleAction {
+	player: string
+	atkIdx: number
+	defIdx: number
+	damage: number
+	event: AttackEvent
+}
+
+export function parseBattleActionLog(logString: string): ParsedBattleAction {
+	// Parse strings like "{ player: G1NMEwUeQLN3iu9E6tZCD1d6o9fwQnyLuX6WpE6Rsf54, atkIdx: 0, defIdx: 0, damage: 2, event: NONE }"
+
+	// Extract values using regex
+	const playerMatch = logString.match(/player:\s*([a-zA-Z0-9]+)/)
+	const atkIdxMatch = logString.match(/atkIdx:\s*(\d+)/)
+	const defIdxMatch = logString.match(/defIdx:\s*(\d+)/)
+	const damageMatch = logString.match(/damage:\s*(\d+)/)
+	const eventMatch = logString.match(/event:\s*([A-Z_]+)/)
+
+	if (
+		!playerMatch ||
+		!atkIdxMatch ||
+		!defIdxMatch ||
+		!damageMatch ||
+		!eventMatch
+	) {
+		throw new Error(`Failed to parse battle action log: ${logString}`)
+	}
+
+	return {
+		player: playerMatch[1],
+		atkIdx: parseInt(atkIdxMatch[1]),
+		defIdx: parseInt(defIdxMatch[1]),
+		damage: parseInt(damageMatch[1]),
+		event: eventMatch[1] as AttackEvent,
+	}
 }
 
 export async function isToken2022Mint(
@@ -486,6 +532,9 @@ export async function wrapSolAndJoinBattleTx(
 	solamonIds: number[]
 ) {
 	const joinBattleTx = new Transaction()
+	joinBattleTx.add(
+		ComputeBudgetProgram.setComputeUnitLimit({ units: 500_000 })
+	)
 
 	const battleAccount = await getBattleAccount(program, battleId)
 

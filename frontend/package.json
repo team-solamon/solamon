@@ -11,6 +11,7 @@
     "@coral-xyz/anchor": "^0.31.0",
     "@solana/spl-token": "^0.4.13",
     "@solana/web3.js": "^1.98.0",
+    "@solana/codecs-data-structures": "0.2.1",
     "clsx": "^2.0.0",
     "lucide-react": "^0.438.0",
     "next": "^14.2.23",
