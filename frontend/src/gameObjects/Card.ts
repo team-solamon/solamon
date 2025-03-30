@@ -118,9 +118,12 @@ export class Card extends Phaser.GameObjects.Container {
       .setOrigin(0.5)
 
     this.elementText = this.scene.add
-      .text(0, -30, getElementEmoji(this.element), {
+      .text(0, -50, getElementEmoji(this.element), {
         fontSize: '14px',
         fontStyle: 'bold',
+        color: '#ffffff',
+        stroke: '#000000',
+        strokeThickness: 3,
       })
       .setOrigin(0.5)
 
