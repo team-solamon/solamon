@@ -11,7 +11,7 @@ const Button = ({
   children: React.ReactNode
   onClick?: () => void
   disabled?: boolean
-  size?: 'L' | 'M'
+  size?: 'L' | 'M' | 'S'
   loading?: boolean
 }) => {
   const [isHovered, setIsHovered] = useState(false)
@@ -25,6 +25,19 @@ const Button = ({
 
   const variant = size === 'L' ? 'body-1' : 'body-2'
 
+  if (size === 'S') {
+    return (
+      <button
+        onClick={onClick}
+        disabled={disabled || loading}
+        className='flex items-center justify-center bg-primary rounded-md px-3 py-1'
+      >
+        <Typography variant='body-3' color='default' outline={false}>
+          {children}
+        </Typography>
+      </button>
+    )
+  }
   return (
     <button
       onClick={onClick}

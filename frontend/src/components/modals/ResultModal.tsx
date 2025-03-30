@@ -4,31 +4,42 @@ import React from 'react'
 import Modal from '../Modal'
 import GameResult from '../GameResult'
 import { useModal } from '@/contexts/ModalContext'
-import { BattleStatus } from '@/data/battle'
+import { BattleAccount } from '@/lib/solana-helper'
+import {
+  getKeypairFromLocalStorage,
+  getWinnerFromBattleAccount,
+} from '@/lib/helper'
 
 interface ResultModalProps {
-  selectedBattle: BattleStatus | null
+  selectedBattle: BattleAccount
+  onClaim: () => void
 }
 
-const ResultModal: React.FC<ResultModalProps> = ({ selectedBattle }) => {
+const ResultModal: React.FC<ResultModalProps> = ({
+  selectedBattle,
+  onClaim,
+}) => {
   const { modals, closeModal } = useModal()
+  const player = getKeypairFromLocalStorage()
+  const winner = getWinnerFromBattleAccount(selectedBattle)
+  const isPlayerWinner = winner === player?.publicKey?.toBase58()
 
   return (
     <>
-      {selectedBattle && selectedBattle.status === 'result' && (
+      {
         <Modal
           isOpen={modals['result']}
           onClose={() => closeModal('result')}
-          title={selectedBattle.isPlayerWinner ? 'Win' : 'Lose'}
+          title={isPlayerWinner ? 'Win' : 'Lose'}
           maxWidth='600px'
         >
           <GameResult
-            battleStatus={selectedBattle}
-            isPlayerWinner={selectedBattle.isPlayerWinner}
-            reward={selectedBattle.isPlayerWinner ? 0.1 : undefined}
+            onClose={() => closeModal('result')}
+            onClaim={onClaim}
+            battleAccount={selectedBattle}
           />
         </Modal>
-      )}
+      }
     </>
   )
 }
