@@ -118,7 +118,7 @@ const PrepareBattlePage = () => {
         <div className='flex space-x-4'>
           {battleAccount?.player1Solamons.map(
             (card: CardData, index: number) => (
-              <Card key={index} card={card} />
+              <Card key={index} species={card.species} element={card.element} />
             )
           )}
         </div>
