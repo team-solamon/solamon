@@ -26,12 +26,14 @@ const Typography = ({
   outline = true,
   className,
 }: TypographyProps) => {
-  const isBold =
-    variant === 'display-title-1' ||
-    variant === 'title-1' ||
-    variant === 'title-2'
+  const isBold = variant === 'title-1' || variant === 'title-2'
 
-  const font = isBold ? 'Pixeloid Sans Bold' : 'Pixeloid Sans'
+  const fontFamily =
+    variant === 'display-title-1'
+      ? 'Pixeloid Sans Bold'
+      : variant === 'title-1' || variant === 'title-2'
+      ? 'Pixeloid Sans'
+      : 'Jersey'
 
   const textColor = {
     default: 'rgba(19,19,19,1)',
@@ -75,7 +77,7 @@ const Typography = ({
     <div
       className={cn(className)}
       style={{
-        font: font,
+        fontFamily: fontFamily,
         color: textColor[color],
         textShadow: outline ? textShadow : 'none',
         fontSize: fontSize[variant],
