@@ -91,6 +91,7 @@ interface TutorialProps {
 
 const Tutorial: React.FC<TutorialProps> = ({ onNewCard }) => {
   const handleGameReady = () => {
+    EventBridge.mute = true
     EventBridge.loadReplay(sampleBattleReplay)
   }
 

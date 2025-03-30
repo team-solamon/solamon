@@ -46,6 +46,7 @@ export class CardBattleScene extends Phaser.Scene {
   }
 
   create() {
+    this.sound.setMute(EventBridge.mute)
     this.createFadeOverlay()
 
     this.add
