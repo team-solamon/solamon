@@ -7,7 +7,7 @@ import Button from '@/components/Button'
 import Nav from '@/components/Nav'
 import { CardData, getPendingBattleAccounts } from '@/lib/solana-helper'
 import { BattleAccount } from '@/lib/solana-helper'
-import { getProgram } from '@/lib/helper'
+import { getKeypairFromLocalStorage, getProgram } from '@/lib/helper'
 
 const ChooseFighterPage = () => {
   const router = useRouter()
@@ -18,11 +18,13 @@ const ChooseFighterPage = () => {
   useEffect(() => {
     fetchPendingBattleAccounts()
   }, [])
-
   const fetchPendingBattleAccounts = async () => {
     const battleAccounts = await getPendingBattleAccounts(program)
-    console.log({ battleAccounts })
     setPendingBattleAccounts(battleAccounts)
+  }
+  const player = getKeypairFromLocalStorage()
+  const isMyBattle = (battleAccount: BattleAccount) => {
+    return battleAccount.player1.equals(player?.publicKey)
   }
 
   return (
@@ -53,15 +55,19 @@ const ChooseFighterPage = () => {
                 )
               )}
             </div>
-            <Button
-              onClick={() => {
-                router.push(
-                  `/prepare-battle?battleId=${battleAccount.battleId}`
-                )
-              }}
-            >
-              Choose Fighter <span className='text-blue-400'>0.15</span>
-            </Button>
+            {isMyBattle(battleAccount) ? (
+              <Button disabled>my squad</Button>
+            ) : (
+              <Button
+                onClick={() => {
+                  router.push(
+                    `/prepare-battle?battleId=${battleAccount.battleId}`
+                  )
+                }}
+              >
+                Choose Fighter <span className='text-blue-400'>0.15</span>
+              </Button>
+            )}
           </div>
         ))}
       </div>
