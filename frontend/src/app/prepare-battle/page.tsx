@@ -168,7 +168,7 @@ const PrepareBattlePage = () => {
         <h2 className='text-yellow-400 text-xl mb-2'>Enemy Card</h2>
         <div className='flex space-x-4'>
           {enemyCards.map((card, index) => (
-            <Card key={index} card={card} />
+            <Card key={index} species={card.species} element={card.element} />
           ))}
         </div>
       </div>

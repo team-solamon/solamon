@@ -28,7 +28,11 @@ const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
             key={index}
             className='card bg-gray-700 p-2 rounded-lg flex-shrink-0 w-24'
           >
-            <Card card={card} className='mx-auto' />
+            <Card
+              species={card.species}
+              element={card.element}
+              className='mx-auto'
+            />
           </div>
         ))}
       </div>

@@ -96,7 +96,11 @@ const ChooseFighterPage = () => {
           >
             <div className='cards flex gap-2 mb-4'>
               {fighter.myCards.map((card, cardIndex) => (
-                <Card key={cardIndex} card={card} />
+                <Card
+                  key={cardIndex}
+                  species={card.species}
+                  element={card.element}
+                />
               ))}
             </div>
             <Button>
