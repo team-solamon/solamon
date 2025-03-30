@@ -8,6 +8,7 @@ import CardStats from './CardStats'
 interface CardListProps {
   cards: CardData[]
   pickedCards?: CardData[]
+  showInBattle?: boolean
   onCardPick?: (card: CardData) => void
 }
 
@@ -32,6 +33,7 @@ const getElementCounts = (cards: CardData[]) => {
 const CardList: React.FC<CardListProps> = ({
   cards,
   pickedCards,
+  showInBattle,
   onCardPick,
 }) => {
   return (
@@ -56,6 +58,16 @@ const CardList: React.FC<CardListProps> = ({
           >
             <Card card={card} className='mx-auto' />
             {pickedCards && pickedCards.includes(card) && (
+              <div className='absolute inset-0 flex items-center justify-center'>
+                <div className='bg-black opacity-70 w-full h-full absolute rounded-lg'></div>
+                <div className='bg-primary rounded-2xl px-4 py-2 relative'>
+                  <Typography variant='body-2' color='default' outline={false}>
+                    Picked
+                  </Typography>
+                </div>
+              </div>
+            )}
+            {showInBattle && !card.isAvailable && (
               <div className='absolute inset-0 flex items-center justify-center'>
                 <div className='bg-black opacity-70 w-full h-full absolute rounded-lg'></div>
                 <div className='bg-black rounded-full px-4 py-2 relative'>

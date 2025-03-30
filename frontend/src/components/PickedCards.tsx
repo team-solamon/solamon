@@ -2,12 +2,15 @@ import React from 'react'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import { CardData } from '@/lib/solana-helper'
+import Typography from './Typography'
 
 interface PickedCardsProps {
   pickedCards: CardData[]
   onCardRemove: (card: CardData) => void
   buttonLabel: string
   buttonDisabled: boolean
+  loading: boolean
+  onButtonClick: () => void
 }
 
 const PickedCards: React.FC<PickedCardsProps> = ({
@@ -15,10 +18,12 @@ const PickedCards: React.FC<PickedCardsProps> = ({
   onCardRemove,
   buttonLabel,
   buttonDisabled,
+  loading,
+  onButtonClick,
 }) => {
   return (
     <section className='picked-section bg-[#978578] p-4 rounded-lg mb-8'>
-      <h2 className='text-xl font-semibold text-yellow-400 mb-4'>Picked</h2>
+      <Typography variant='title-2'>Picked</Typography>
       <div className='picked-cards flex gap-4 mb-4'>
         {Array.from({ length: 3 }).map((_, index) => (
           <div
@@ -36,7 +41,11 @@ const PickedCards: React.FC<PickedCardsProps> = ({
           </div>
         ))}
       </div>
-      <Button disabled={buttonDisabled}>
+      <Button
+        disabled={buttonDisabled}
+        onClick={onButtonClick}
+        loading={loading}
+      >
         {buttonLabel} <span className='text-blue-400'>0.1</span>
       </Button>
     </section>
