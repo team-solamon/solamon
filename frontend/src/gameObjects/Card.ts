@@ -33,6 +33,7 @@ export class Card extends Phaser.GameObjects.Container {
   private cardHeight = 140
   private idleAnimation?: Phaser.Tweens.Tween
   private healthBarVisible = true
+  private statsBackground!: Phaser.GameObjects.Rectangle
 
   isDragging = false
   zIndex = 0
@@ -93,7 +94,7 @@ export class Card extends Phaser.GameObjects.Container {
       })
       .setOrigin(0.5)
       */
-    const statsBackground = this.scene.add
+    this.statsBackground = this.scene.add
       .rectangle(0, 40, 80, 25, 0x000000, 0.7)
       .setOrigin(0.5)
 
@@ -134,7 +135,7 @@ export class Card extends Phaser.GameObjects.Container {
       this.cardFront,
       this.cardBack,
       this.cardBorder,
-      statsBackground,
+      this.statsBackground,
       this.attackText,
       this.healthText,
       this.elementText,
@@ -154,7 +155,7 @@ export class Card extends Phaser.GameObjects.Container {
     this.isFaceDown = isFaceDown
     this.cardFront.setVisible(!isFaceDown)
     this.cardBack.setVisible(isFaceDown)
-    //this.nameText.setVisible(!isFaceDown)
+    this.statsBackground.setVisible(!isFaceDown)
     this.attackText.setVisible(!isFaceDown)
     this.healthText.setVisible(!isFaceDown)
     this.elementText.setVisible(!isFaceDown)
