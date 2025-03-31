@@ -280,10 +280,7 @@ const HomePageContent = () => {
       </section>
 
       {/* Modals */}
-      <TutorialModal
-        onNewCard={handleNewCardFromModal}
-        onOpenBattle={handleOpenBattleFromModal}
-      />
+      <TutorialModal onNewCard={handleNewCardFromModal} />
       <CardGuideModal
         onNewCard={handleNewCardFromModal}
         onOpenBattle={handleOpenBattleFromModal}
