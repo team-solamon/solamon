@@ -65,16 +65,18 @@ const Nav: React.FC = () => {
   }
 
   return (
-    <header className='header flex justify-between items-center mb-6'>
-      <YellowButton
-        onClick={() => {
-          openModal('tutorial')
-        }}
-      >
-        <Typography variant='body-3'>❔ Tutorial</Typography>
-      </YellowButton>
+    <header className='header flex flex-col lg:flex-row justify-between items-center mb-6 gap-4'>
+      <div className='order-2 lg:order-1'>
+        <YellowButton
+          onClick={() => {
+            openModal('tutorial')
+          }}
+        >
+          <Typography variant='body-3'>❔ Tutorial</Typography>
+        </YellowButton>
+      </div>
       <div
-        className='absolute left-1/2 transform -translate-x-1/2 cursor-pointer'
+        className='order-1 lg:order-2 lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2 cursor-pointer'
         onClick={() => {
           router.push(ROUTES.HOME)
         }}
@@ -83,7 +85,7 @@ const Nav: React.FC = () => {
           SOLAMON
         </Typography>
       </div>
-      <div className='wallet-info text-right flex items-end '>
+      <div className='wallet-info text-right flex items-end order-3 lg:order-3'>
         <Typography variant='body-2' color='secondary' className='mr-4'>
           <a
             href={`${getExplorerUrl(keypair?.publicKey.toBase58() || '')}`}
