@@ -37,6 +37,7 @@ import CardList from '@/components/CardList'
 import { sendAndConfirmTransaction } from '@solana/web3.js'
 import SolanaBalance from '@/components/SolanaBalance'
 import { NEW_CARD_SOL_PRICE } from '@/constant/env'
+import CardGuideModal from '@/components/modals/CardGuideModal'
 
 const HomePageContent = () => {
   const router = useRouter()
@@ -80,12 +81,12 @@ const HomePageContent = () => {
     ])
   }
 
-  const handleNewCardFromTutorial = () => {
+  const handleNewCardFromModal = () => {
     closeModal('tutorial')
     openModal('purchaseCard')
   }
 
-  const handleOpenBattleFromTutorial = () => {
+  const handleOpenBattleFromModal = () => {
     closeModal('tutorial')
     router.push(ROUTES.OPEN_BATTLE)
   }
@@ -279,9 +280,10 @@ const HomePageContent = () => {
       </section>
 
       {/* Modals */}
-      <TutorialModal
-        onNewCard={handleNewCardFromTutorial}
-        onOpenBattle={handleOpenBattleFromTutorial}
+      <TutorialModal onNewCard={handleNewCardFromModal} />
+      <CardGuideModal
+        onNewCard={handleNewCardFromModal}
+        onOpenBattle={handleOpenBattleFromModal}
       />
       <PurchaseCardModal onPurchase={handlePurchase} />
       <NewCardModal

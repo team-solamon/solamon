@@ -1,102 +1,12 @@
 import React, { useEffect, useMemo } from 'react'
 import Button from './Button'
-import Card from './Card'
 import { BattleReplay } from '@/data/replay'
 import PhaserGame from './PhaserGame'
 import { CardBattleScene } from '@/app/game/scenes/CardBattleScene'
 import { EventBridge } from '@/app/game/utils/EventBridge'
 import { CardData, stringToElement } from '@/lib/solana-helper'
 import Typography from './Typography'
-import CardElementProbabilities from './CardElementProbabilities'
 import { FIGHT_SOL_PRICE, WINNER_SOL_REWARD } from '@/constant/env'
-
-interface CardWithProbabilities {
-  species: number
-  probabilities: { element: Element; probability: number }[]
-}
-
-const cards: CardWithProbabilities[] = [
-  {
-    species: 0,
-    probabilities: [
-      { element: stringToElement('fire'), probability: 80 },
-      { element: stringToElement('water'), probability: 10 },
-      { element: stringToElement('earth'), probability: 10 },
-    ],
-  },
-  {
-    species: 1,
-    probabilities: [
-      { element: stringToElement('fire'), probability: 80 },
-      { element: stringToElement('water'), probability: 10 },
-      { element: stringToElement('earth'), probability: 10 },
-    ],
-  },
-  {
-    species: 2,
-    probabilities: [
-      { element: stringToElement('water'), probability: 70 },
-      { element: stringToElement('fire'), probability: 20 },
-      { element: stringToElement('earth'), probability: 10 },
-    ],
-  },
-  {
-    species: 3,
-    probabilities: [
-      { element: stringToElement('earth'), probability: 60 },
-      { element: stringToElement('fire'), probability: 20 },
-      { element: stringToElement('water'), probability: 20 },
-    ],
-  },
-  {
-    species: 4,
-    probabilities: [
-      { element: stringToElement('metal'), probability: 50 },
-      { element: stringToElement('fire'), probability: 30 },
-      { element: stringToElement('water'), probability: 20 },
-    ],
-  },
-  {
-    species: 5,
-    probabilities: [
-      { element: stringToElement('wood'), probability: 40 },
-      { element: stringToElement('fire'), probability: 30 },
-      { element: stringToElement('water'), probability: 30 },
-    ],
-  },
-  {
-    species: 6,
-    probabilities: [
-      { element: stringToElement('water'), probability: 70 },
-      { element: stringToElement('fire'), probability: 20 },
-      { element: stringToElement('earth'), probability: 10 },
-    ],
-  },
-  {
-    species: 7,
-    probabilities: [
-      { element: stringToElement('earth'), probability: 60 },
-      { element: stringToElement('fire'), probability: 20 },
-      { element: stringToElement('water'), probability: 20 },
-    ],
-  },
-  {
-    species: 8,
-    probabilities: [
-      { element: stringToElement('metal'), probability: 50 },
-      { element: stringToElement('fire'), probability: 30 },
-      { element: stringToElement('water'), probability: 20 },
-    ],
-  },
-  {
-    species: 9,
-    probabilities: [
-      { element: stringToElement('wood'), probability: 40 },
-      { element: stringToElement('fire'), probability: 30 },
-      { element: stringToElement('water'), probability: 30 },
-    ],
-  },
-]
 
 const playerCardData: CardData[] = [
   {
@@ -165,10 +75,9 @@ const sampleBattleReplay: BattleReplay = {
 
 interface TutorialProps {
   onNewCard: () => void
-  onOpenBattle: () => void
 }
 
-const Tutorial: React.FC<TutorialProps> = ({ onNewCard, onOpenBattle }) => {
+const Tutorial: React.FC<TutorialProps> = ({ onNewCard }) => {
   const handleGameReady = () => {
     EventBridge.mute = true
     EventBridge.loadReplay(sampleBattleReplay)
@@ -190,96 +99,162 @@ const Tutorial: React.FC<TutorialProps> = ({ onNewCard, onOpenBattle }) => {
   return (
     <div className='flex flex-col h-full'>
       <div className='text-black overflow-y-auto max-h-[60vh] pr-2'>
-        {phaserGame}
+        <div className='w-full h-[100%] flex flex-col justify-center items-center'>
+          <div className='w-[80%] h-[80%]'>{phaserGame}</div>
+        </div>
         <div className='mt-4 space-y-8'>
           <div className='text-center'>
             <Typography variant='body-2' className='font-bold text-lg'>
               🕹️ How to Battle
             </Typography>
           </div>
-          <ol className='list-decimal list-inside space-y-6 text-base'>
-            <li>
-              <strong>🔹 Cards make the battle.</strong>
-              <ul className='list-disc list-inside ml-6 space-y-2'>
-                <li>ATK / HP → visible to both players</li>
-                <li>
-                  Element (Water, Fire, Wood, Metal, Earth) → only you know the
-                  exact stat; your opponent just sees the type.
-                </li>
-              </ul>
-            </li>
-            <li>
-              🔹 Got 3+ cards? You're ready.
-              <ul className='list-disc list-inside ml-6 space-y-2'>
-                <li>
-                  Tap <strong>“Open Match”</strong> to start a battle and wait
-                  for challengers.
-                </li>
-                <li>
-                  Or tap <strong>“Choose Fighter”</strong> to pick an opponent
-                  from the queue and strike first.
-                </li>
-              </ul>
-            </li>
-            <li>
-              🔹 Pick your squad (3 cards).
-              <ul className='list-disc list-inside ml-6 space-y-2'>
-                <li>
-                  Open Match: Pay {FIGHT_SOL_PRICE} SOL → wait for a challenger.
-                </li>
-                <li>
-                  Choose Fighter: Pay {FIGHT_SOL_PRICE} SOL → battle starts
-                  instantly (extra cost for first move advantage).
-                </li>
-              </ul>
-            </li>
-            <li>
-              🔹 Winner gets {WINNER_SOL_REWARD} SOL.
-              <ul className='list-disc list-inside ml-6 space-y-2'>
-                <li>Fight smart. Read the elements. Outsmart your rival.</li>
-              </ul>
-            </li>
-          </ol>
-          <div className='mt-6'>
-            <p className='text-sm font-medium text-black'>
-              Tip! Each mode has its edge.
-            </p>
-            <ul className='list-disc list-inside text-sm text-black space-y-1'>
-              <li>Open Match gives you the first move.</li>
-              <li>
-                Choose Fighter lets you see your opponent's squad before you
-                fight.
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div className='mt-8 space-y-4'>
-          <div className='text-center'>
-            <Typography variant='body-2' className='font-bold text-lg'>
-              🃏 Card Guide
-            </Typography>
-          </div>
-          <div>
-            <p className='text-sm text-black'>
-              One random element per card. See odds before you draw.
-            </p>
-          </div>
-        </div>
-        <div className='grid grid-cols-5 gap-4 p-2'>
-          {cards.map((card, index) => (
-            <div
-              key={index}
-              className='card bg-gray-700 p-2 rounded-lg flex-shrink-0 relative'
-            >
-              <Card species={card.species} className='mx-auto' />
-              <CardElementProbabilities data={card.probabilities} />
+          <div className='space-y-6'>
+            <div className='flex'>
+              <div className='flex-1'>
+                <Typography variant='body-2' color='inverse' outline={false}>
+                  1. Cards make the battle.
+                </Typography>
+                <div className='ml-6 space-y-2 mt-2'>
+                  <div className='flex'>
+                    <Typography
+                      variant='body-2'
+                      color='inverse'
+                      outline={false}
+                    >
+                      * ATK / HP → visible to both players
+                    </Typography>
+                  </div>
+                  <div className='flex'>
+                    <Typography
+                      variant='body-2'
+                      color='inverse'
+                      outline={false}
+                    >
+                      * Element (Water, Fire, Wood, Metal, Earth) → only you
+                      know the exact stat; your opponent just sees the type.
+                    </Typography>
+                  </div>
+                </div>
+              </div>
             </div>
-          ))}
+
+            <div className='flex'>
+              <div className='flex-1'>
+                <Typography variant='body-2' color='inverse' outline={false}>
+                  2. Got 3+ cards? You're ready.
+                </Typography>
+                <div className='ml-6 space-y-2 mt-2'>
+                  <div className='flex'>
+                    <Typography
+                      variant='body-2'
+                      color='inverse'
+                      outline={false}
+                    >
+                      * Tap "Open Match" to start a battle and wait for
+                      challengers.
+                    </Typography>
+                  </div>
+                  <div className='flex'>
+                    <Typography
+                      variant='body-2'
+                      color='inverse'
+                      outline={false}
+                    >
+                      * Or tap "Choose Fighter" to pick an opponent from the
+                      queue and strike first.
+                    </Typography>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className='flex'>
+              <div className='flex-1'>
+                <Typography variant='body-2' color='inverse' outline={false}>
+                  3. Pick your squad (3 cards).
+                </Typography>
+                <div className='ml-6 space-y-2 mt-2'>
+                  <div className='flex'>
+                    <Typography
+                      variant='body-2'
+                      color='inverse'
+                      outline={false}
+                    >
+                      * Open Match: Pay {FIGHT_SOL_PRICE} SOL → wait for a
+                      challenger.
+                    </Typography>
+                  </div>
+                  <div className='flex'>
+                    <Typography
+                      variant='body-2'
+                      color='inverse'
+                      outline={false}
+                    >
+                      * Choose Fighter: Pay {FIGHT_SOL_PRICE} SOL → battle
+                      starts instantly (extra cost for first move advantage).
+                    </Typography>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className='flex'>
+              <div className='flex-1'>
+                <Typography variant='body-2' color='inverse' outline={false}>
+                  4. Winner gets {WINNER_SOL_REWARD} SOL.
+                </Typography>
+                <div className='ml-6 space-y-2 mt-2'>
+                  <div className='flex'>
+                    <Typography
+                      variant='body-2'
+                      color='inverse'
+                      outline={false}
+                    >
+                      * Fight smart. Read the elements. Outsmart your rival.
+                    </Typography>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className='mt-6 bg-[#CAC1B9] rounded-md p-4'>
+            <Typography
+              variant='body-2'
+              color='default'
+              outline={false}
+              className='text-sm font-medium'
+            >
+              Tip! Each mode has its edge.
+            </Typography>
+            <div className='ml-4 space-y-1 mt-1'>
+              <div className='flex'>
+                <Typography
+                  variant='body-2'
+                  color='default'
+                  outline={false}
+                  className='text-sm'
+                >
+                  * Open Match gives you the first move.
+                </Typography>
+              </div>
+              <div className='flex'>
+                <Typography
+                  variant='body-2'
+                  color='default'
+                  outline={false}
+                  className='text-sm'
+                >
+                  * Choose Fighter lets you see your opponent's squad before you
+                  fight.
+                </Typography>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div className='mt-4 flex justify-around sticky bottom-0 bg-[#978578] py-3'>
         <Button onClick={onNewCard}>New Card</Button>
-        <Button onClick={onOpenBattle}>Open Battle</Button>
       </div>
     </div>
   )
