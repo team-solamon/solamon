@@ -318,12 +318,16 @@ export class DrawScene extends Phaser.Scene {
   }
 
   createRedrawButton() {
+    const text = `Redraw (${
+      (this.config?.cards.length ?? 0) - this.drawsCount
+    } cards left)`
+
     this.redrawButton = new Button(this, {
       x: 400,
       y: LAYOUT.REDRAW_BUTTON_Y,
-      width: 200,
+      width: 300,
       height: 50,
-      text: `Redraw (${this.config?.cards.length ?? 0 - this.drawsCount} left)`,
+      text: text,
       backgroundColor: 0x4a6fa5,
       hoverColor: 0x6389c0,
       strokeColor: 0xffffff,
