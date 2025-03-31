@@ -70,7 +70,7 @@ const OpenBattlePage = () => {
     setLoading(true)
 
     // @TODO: temporary
-    const BATLLE_STAKE = 0.01 * LAMPORTS_PER_SOL
+    const BATLLE_STAKE = 0.1 * LAMPORTS_PER_SOL
 
     const tx = await wrapSolAndOpenBattleTx(
       connection,
