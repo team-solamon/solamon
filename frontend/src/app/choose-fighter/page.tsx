@@ -10,6 +10,7 @@ import { BattleAccount } from '@/lib/solana-helper'
 import { getKeypairFromLocalStorage, getProgram } from '@/lib/helper'
 import SolanaBalance from '@/components/SolanaBalance'
 import { FIGHT_SOL_PRICE } from '@/constant/env'
+import SharedModal from '@/components/SharedModal'
 
 const ChooseFighterPage = () => {
   const router = useRouter()
@@ -83,6 +84,7 @@ const ChooseFighterPage = () => {
           </div>
         ))}
       </div>
+      <SharedModal />
     </div>
   )
 }
