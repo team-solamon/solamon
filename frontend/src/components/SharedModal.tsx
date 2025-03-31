@@ -96,6 +96,7 @@ const SharedModal = () => {
         currentCards={myCards}
         drawableCards={spawnResult}
         onClose={fetchMyCards}
+        onOpenBattle={handleOpenBattleFromModal}
       />
     </div>
   )
