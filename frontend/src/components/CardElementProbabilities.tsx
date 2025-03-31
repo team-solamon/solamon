@@ -19,12 +19,10 @@ const CardElementProbabilities: React.FC<ElementProbabilitiesProps> = ({
     <div className='flex items-center gap-2 bg-[rgba(19,19,19,0.8)] px-2 py-1 rounded-md absolute bottom-1 left-1/2 transform -translate-x-1/2'>
       {data.map(({ element, probability }, index) => (
         <div key={index} className='flex items-center'>
-          <Typography variant='caption-4' className='text-xs'>
+          <Typography variant='caption-1'>
             {getElementEmoji(element)}
           </Typography>
-          <Typography variant='caption-4' className='text-xs'>
-            {`${probability}%`}
-          </Typography>
+          <Typography variant='caption-1'>{`${probability}%`}</Typography>
         </div>
       ))}
     </div>
