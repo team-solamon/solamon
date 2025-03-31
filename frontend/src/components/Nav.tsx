@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/lib/routes'
 import { getExplorerUrl } from '@/lib/url-helper'
 import { useLoading } from '@/contexts/LoadingContext'
+import { useBalance } from '@/contexts/BalanceContext'
 
 const YellowButton: React.FC<{
   onClick: () => void
@@ -30,10 +31,9 @@ const YellowButton: React.FC<{
 const Nav: React.FC = () => {
   const { openModal } = useModal()
   const router = useRouter()
-
-  const [balance, setBalance] = useState<number | null>(null)
   const keypair = getKeypairFromLocalStorage()
   const { showLoading, hideLoading } = useLoading()
+  const { balance, fetchBalance } = useBalance()
 
   const handleRequestAirdrop = async () => {
     if (!keypair?.publicKey) return
@@ -52,17 +52,6 @@ const Nav: React.FC = () => {
     }
     hideLoading()
     fetchBalance()
-  }
-
-  useEffect(() => {
-    fetchBalance()
-  }, [])
-
-  const fetchBalance = async () => {
-    const connection = getConnection()
-    if (!keypair?.publicKey) return
-    const balance = await connection.getBalance(keypair.publicKey)
-    setBalance(balance / LAMPORTS_PER_SOL)
   }
 
   return (

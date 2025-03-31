@@ -30,6 +30,7 @@ import { sendAndConfirmTransaction } from '@solana/web3.js'
 import SolanaBalance from '@/components/SolanaBalance'
 import { NEW_CARD_SOL_PRICE } from '@/constant/env'
 import SharedModal from '@/components/SharedModal'
+import { useBalance } from '@/contexts/BalanceContext'
 
 const HomePage = () => {
   const router = useRouter()
@@ -39,7 +40,7 @@ const HomePage = () => {
   const [selectedBattle, setSelectedBattle] = useState<BattleAccount | null>(
     null
   )
-
+  const { fetchBalance } = useBalance()
   const [myCards, setMyCards] = useState<CardData[]>([])
   const [myBattles, setMyBattles] = useState<BattleAccount[]>([])
   const { showLoading, hideLoading } = useLoading()
@@ -92,7 +93,7 @@ const HomePage = () => {
     } catch (error) {
       console.error(error)
     }
-
+    fetchBalance()
     fetchMyBattles()
     hideLoading()
   }

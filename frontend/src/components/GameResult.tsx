@@ -15,6 +15,7 @@ import Typography from './Typography'
 import { useModal } from '@/contexts/ModalContext'
 import { sendAndConfirmTransaction } from '@solana/web3.js'
 import { useLoading } from '@/contexts/LoadingContext'
+import { useBalance } from '@/contexts/BalanceContext'
 
 interface GameResultProps {
   battleAccount: BattleAccount
@@ -34,6 +35,7 @@ const GameResult: React.FC<GameResultProps> = ({
   const claimable =
     isPlayerWinner && battleAccount.claimTimestamp.toNumber() == 0
   const { showLoading, hideLoading } = useLoading()
+  const { fetchBalance } = useBalance()
 
   const handleClaim = async () => {
     if (!player) return
@@ -51,6 +53,7 @@ const GameResult: React.FC<GameResultProps> = ({
       alert('Claim error: ' + error)
     }
     hideLoading()
+    fetchBalance()
     onClaim()
     onClose()
   }
