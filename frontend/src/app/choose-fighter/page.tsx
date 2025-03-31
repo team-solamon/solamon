@@ -55,12 +55,7 @@ const ChooseFighterPage = () => {
               {battleAccount.player1Solamons.map(
                 (card: CardData, cardIndex: number) => (
                   <div key={cardIndex}>
-                    <Card
-                      key={index}
-                      species={card.species}
-                      element={card.element}
-                    />
-                    {/** use <CardElementProbabilities/> */}
+                    <Card key={index} species={card.species} />
                   </div>
                 )
               )}
