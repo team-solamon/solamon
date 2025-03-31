@@ -247,7 +247,10 @@ const HomePageContent = () => {
 
       <section className='my-card-section max-w-[1000px] mx-auto'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <CardList cards={myCards} />
+          <CardList
+            cards={myCards}
+            onPurchaseCard={() => openModal('purchaseCard')}
+          />
         </div>
       </section>
 
