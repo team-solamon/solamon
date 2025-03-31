@@ -71,7 +71,6 @@ export default function RootLayout({
           background: '#fff',
           color: '#000',
           textDecoration: 'none',
-          zIndex: '10',
           borderTopLeftRadius: '12px',
           zIndex: '10000',
           border: '1px solid #fff',
