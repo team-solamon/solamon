@@ -17,6 +17,7 @@ import { LAMPORTS_PER_SOL, sendAndConfirmTransaction } from '@solana/web3.js'
 import { ROUTES } from '@/lib/routes'
 import SharedModal from '@/components/SharedModal'
 import { ModalProvider } from '@/contexts/ModalContext'
+import { useBalance } from '@/contexts/BalanceContext'
 
 const OpenBattlePage = () => {
   const router = useRouter()
@@ -26,6 +27,7 @@ const OpenBattlePage = () => {
   const connection = getConnection()
   const program = getProgram()
   const player = getKeypairFromLocalStorage()
+  const { fetchBalance } = useBalance()
 
   useEffect(() => {
     fetchMyCards()
@@ -70,7 +72,7 @@ const OpenBattlePage = () => {
     setLoading(true)
 
     // @TODO: temporary
-    const BATLLE_STAKE = 0.01 * LAMPORTS_PER_SOL
+    const BATLLE_STAKE = 0.1 * LAMPORTS_PER_SOL
 
     const tx = await wrapSolAndOpenBattleTx(
       connection,
@@ -84,6 +86,7 @@ const OpenBattlePage = () => {
 
     setPickedCards([])
     fetchMyCards()
+    fetchBalance()
     setLoading(false)
   }
 

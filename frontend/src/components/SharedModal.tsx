@@ -20,6 +20,7 @@ import { useModal } from '@/contexts/ModalContext'
 import TutorialModal from './modals/TutorialModal'
 import CardGuideModal from './modals/CardGuideModal'
 import { ROUTES } from '@/lib/routes'
+import { useBalance } from '@/contexts/BalanceContext'
 
 const SharedModal = () => {
   const router = useRouter()
@@ -27,7 +28,7 @@ const SharedModal = () => {
   const { showLoading, hideLoading } = useLoading()
   const { openModal, closeModal, closeModelAll } = useModal()
   const [myCards, setMyCards] = useState<CardData[]>([])
-
+  const { fetchBalance } = useBalance()
   const [spawnResult, setSpawnResult] = useState<CardData[]>([])
   const connection = getConnection()
   const program = getProgram()
@@ -50,6 +51,7 @@ const SharedModal = () => {
     const spawnResult = await showSpawnResult(connection, txSig)
     setSpawnResult(spawnResult)
     hideLoading()
+    fetchBalance()
     closeModal('purchaseCard')
     openModal('newCard')
   }
@@ -96,6 +98,7 @@ const SharedModal = () => {
         currentCards={myCards}
         drawableCards={spawnResult}
         onClose={fetchMyCards}
+        onOpenBattle={handleOpenBattleFromModal}
       />
     </div>
   )

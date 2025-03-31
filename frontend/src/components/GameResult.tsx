@@ -13,6 +13,7 @@ import { getWinnerFromBattleAccount } from '@/lib/helper'
 import Typography from './Typography'
 import { sendAndConfirmTransaction } from '@solana/web3.js'
 import { useLoading } from '@/contexts/LoadingContext'
+import { useBalance } from '@/contexts/BalanceContext'
 
 interface GameResultProps {
   battleAccount: BattleAccount
@@ -34,6 +35,7 @@ const GameResult: React.FC<GameResultProps> = ({
   const claimable =
     isPlayerWinner && battleAccount.claimTimestamp.toNumber() == 0
   const { showLoading, hideLoading } = useLoading()
+  const { fetchBalance } = useBalance()
 
   const handleClaim = async () => {
     if (!player) return
@@ -51,11 +53,12 @@ const GameResult: React.FC<GameResultProps> = ({
       alert('Claim error: ' + error)
     }
     hideLoading()
+    fetchBalance()
     onClaim()
     onClose()
   }
 
-  const { player1Solamons, player2Solamons } = battleAccount
+  if (!battleAccount) return null
 
   return (
     <div className='flex flex-col items-center justify-center'>
@@ -65,14 +68,14 @@ const GameResult: React.FC<GameResultProps> = ({
             isPlayerWinner ? 'scale-110' : 'scale-90 opacity-70'
           } transition-transform`}
         >
-          <CardStack cards={player1Solamons} />
+          <CardStack cards={battleAccount.player1Solamons} />
         </div>
         <div
           className={`${
             !isPlayerWinner ? 'scale-110' : 'scale-90 opacity-70'
           } transition-transform`}
         >
-          <CardStack cards={player2Solamons} />
+          <CardStack cards={battleAccount.player2Solamons} />
         </div>
       </div>
       <div className='mt-4 flex flex-col items-center'>
@@ -80,12 +83,14 @@ const GameResult: React.FC<GameResultProps> = ({
           <Button
             size='S'
             onClick={() => {
+              onClose()
               router.push(`${ROUTES.GAME}?battleId=${battleAccount.battleId}`)
             }}
           >
             {'replay >'}
           </Button>
         )}
+
         {claimable ? (
           <div className='mt-2 flex flex-col items-center justify-center gap-2'>
             <Button onClick={handleClaim}>Claim Reward 0.2 SOL</Button>

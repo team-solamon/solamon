@@ -26,7 +26,7 @@ const CardGuideModal: React.FC<TutorialModalProps> = ({
       isOpen={modals['guide']}
       onClose={() => closeModal('guide')}
       title='🃏 Card Guide!'
-      maxWidth='600px'
+      maxWidth='1000px'
     >
       <div className='flex flex-col h-full'>
         <div className='grid grid-cols-5 gap-4 p-2'>

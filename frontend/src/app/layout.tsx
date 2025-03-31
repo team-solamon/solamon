@@ -49,7 +49,7 @@ export const metadata: Metadata = {
 
 import { ModalProvider } from '@/contexts/ModalContext'
 import { LoadingProvider } from '@/contexts/LoadingContext'
-
+import { BalanceProvider } from '@/contexts/BalanceContext'
 export default function RootLayout({
   children,
 }: {
@@ -59,7 +59,9 @@ export default function RootLayout({
     <html>
       <body>
         <LoadingProvider>
-          <ModalProvider>{children}</ModalProvider>
+          <BalanceProvider>
+            <ModalProvider>{children}</ModalProvider>
+          </BalanceProvider>
         </LoadingProvider>
       </body>
     </html>
