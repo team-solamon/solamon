@@ -19,14 +19,15 @@ const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
     <Modal
       isOpen={modals['viewAllCards']}
       onClose={() => closeModal('viewAllCards')}
-      title='Result'
+      title='+ New Cards'
       maxWidth='600px'
     >
-      <div className='flex justify-center overflow-x-auto gap-4 p-2'>
+      <div className='flex flex-wrap justify-center gap-4 p-2'>
         {drawableCards.map((card, index) => (
           <div
             key={index}
             className='card bg-gray-700 p-2 rounded-lg flex-shrink-0 w-24'
+            style={{ width: 'calc(20% - 16px)' }}
           >
             <Card
               species={card.species}

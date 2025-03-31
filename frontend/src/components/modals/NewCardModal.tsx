@@ -36,7 +36,9 @@ const NewCardModal: React.FC<NewCardModalProps> = ({
       <div className='flex flex-col px-4'>
         <DrawGame drawableCards={drawableCards} />
         <div className='flex justify-center mt-4'>
-          <Button onClick={onViewAll}>Open All</Button>
+          {drawableCards.length >= 2 && (
+            <Button onClick={onViewAll}>Open All</Button>
+          )}
         </div>
       </div>
     </Modal>
