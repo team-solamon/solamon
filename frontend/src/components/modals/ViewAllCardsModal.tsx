@@ -13,12 +13,14 @@ interface ViewAllCardsModalProps {
   currentCards: CardData[]
   drawableCards: CardData[]
   onClose: () => void
+  onOpenBattle: () => void
 }
 
 const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
   currentCards,
   drawableCards,
   onClose,
+  onOpenBattle,
 }) => {
   const { modals, closeModal } = useModal()
   const router = useRouter()
@@ -50,7 +52,7 @@ const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
       </div>
       <div className='flex justify-center mt-4'>
         <Button
-          onClick={() => router.push(ROUTES.OPEN_BATTLE)}
+          onClick={onOpenBattle}
           disabled={currentCards.length + drawableCards.length < 3}
         >
           Open Battle

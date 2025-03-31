@@ -51,6 +51,7 @@ const Nav: React.FC = () => {
       console.error('Airdrop failed', error)
     }
     hideLoading()
+    fetchBalance()
   }
 
   useEffect(() => {
