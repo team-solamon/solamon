@@ -25,6 +25,7 @@ import { ROUTES } from '@/lib/routes'
 import CardStats from '@/components/CardStats'
 import Typography from '@/components/Typography'
 import SharedModal from '@/components/SharedModal'
+import { useBalance } from '@/contexts/BalanceContext'
 
 const PrepareBattlePage = () => {
   const searchParams = useSearchParams()
@@ -38,6 +39,7 @@ const PrepareBattlePage = () => {
   const [loading, setLoading] = useState(false)
   const [battleAccount, setBattleAccount] = useState<BattleAccount | null>(null)
   const { showLoading, hideLoading } = useLoading()
+  const { fetchBalance } = useBalance()
 
   useEffect(() => {
     console.log({ battleId })
@@ -90,7 +92,7 @@ const PrepareBattlePage = () => {
     }
 
     showLoading('Joining battle...')
-
+    setLoading(true)
     try {
       console.log('Starting battle with cards:', pickedCards)
       const tx = await wrapSolAndJoinBattleTx(
@@ -101,10 +103,12 @@ const PrepareBattlePage = () => {
         pickedCards.map((card) => card.id)
       )
       await sendAndConfirmTransaction(connection, tx, [player])
+      fetchBalance()
       router.push(`${ROUTES.GAME}?battleId=${battleId}`)
     } catch (error) {
       alert('Battle error: ' + error)
     }
+    setLoading(false)
     hideLoading()
   }
 
