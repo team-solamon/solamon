@@ -54,6 +54,14 @@ const Nav: React.FC = () => {
     fetchBalance()
   }
 
+  // Show tutorial modal for the first time
+  useEffect(() => {
+    if (!localStorage.getItem('tutorialShown')) {
+      openModal('tutorial')
+      localStorage.setItem('tutorialShown', 'true')
+    }
+  }, [])
+
   return (
     <header className='header flex flex-col lg:flex-row justify-between items-center mb-6 gap-4'>
       <div className='order-2 lg:order-1 flex space-x-4'>
