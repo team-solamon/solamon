@@ -66,13 +66,20 @@ const Nav: React.FC = () => {
 
   return (
     <header className='header flex flex-col lg:flex-row justify-between items-center mb-6 gap-4'>
-      <div className='order-2 lg:order-1'>
+      <div className='order-2 lg:order-1 flex space-x-4'>
         <YellowButton
           onClick={() => {
             openModal('tutorial')
           }}
         >
           <Typography variant='body-3'>❔ Tutorial</Typography>
+        </YellowButton>
+        <YellowButton
+          onClick={() => {
+            openModal('guide')
+          }}
+        >
+          <Typography variant='body-3'>🃏 Card Guide</Typography>
         </YellowButton>
       </div>
       <div
