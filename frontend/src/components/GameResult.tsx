@@ -55,7 +55,7 @@ const GameResult: React.FC<GameResultProps> = ({
     onClose()
   }
 
-  const { player1Solamons, player2Solamons } = battleAccount
+  if (!battleAccount) return null
 
   return (
     <div className='flex flex-col items-center justify-center'>
@@ -65,20 +65,21 @@ const GameResult: React.FC<GameResultProps> = ({
             isPlayerWinner ? 'scale-110' : 'scale-90 opacity-70'
           } transition-transform`}
         >
-          <CardStack cards={player1Solamons} />
+          <CardStack cards={battleAccount.player1Solamons} />
         </div>
         <div
           className={`${
             !isPlayerWinner ? 'scale-110' : 'scale-90 opacity-70'
           } transition-transform`}
         >
-          <CardStack cards={player2Solamons} />
+          <CardStack cards={battleAccount.player2Solamons} />
         </div>
       </div>
       <div className='mt-4 flex flex-col items-center'>
         <Button
           size='S'
           onClick={() => {
+            onClose()
             router.push(`${ROUTES.GAME}?battleId=${battleAccount.battleId}`)
           }}
         >
