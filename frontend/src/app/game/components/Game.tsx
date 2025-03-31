@@ -18,6 +18,9 @@ import { getKeypairFromLocalStorage } from '@/lib/helper'
 import { getConnection } from '@/lib/helper'
 import { getProgram } from '@/lib/helper'
 import { AttackEvent, BattleReplay } from '@/data/replay'
+import ResultModal from '@/components/modals/ResultModal'
+import { ROUTES } from '@/lib/routes'
+import { useModal } from '@/contexts/ModalContext'
 
 const Game: React.FC = () => {
   const searchParams = useSearchParams()
@@ -32,6 +35,7 @@ const Game: React.FC = () => {
   const [battleActions, setBattleActions] = useState<ParsedBattleAction[]>([])
   const [scores, setScores] = useState({ player: 0, opponent: 0 })
   const [battleAccount, setBattleAccount] = useState<BattleAccount | null>(null)
+  const { openModal } = useModal()
 
   useEffect(() => {
     if (!battleId) {
@@ -118,6 +122,14 @@ const Game: React.FC = () => {
     ) => {
       setScores({ player: playerScore, opponent: opponentScore })
     }
+
+    EventBridge.onGameFinished = (result: 'win' | 'lose') => {
+      setTimeout(() => {
+        fetchBattleAccount(battleId!).then(() => {
+          openModal('result')
+        })
+      }, 3000)
+    }
   }
 
   const phaserGame = useMemo(
@@ -145,6 +157,13 @@ const Game: React.FC = () => {
           <GameLogs logs={battleLogs} />
         </div>
       </div>
+      <ResultModal
+        selectedBattle={battleAccount}
+        showReplay={false}
+        onClaim={() => {
+          router.push(ROUTES.HOME)
+        }}
+      />
     </div>
   )
 }

@@ -13,6 +13,8 @@ export class EventBridge {
   static onScoreUpdate: (playerScore: number, opponentScore: number) => void =
     noop
 
+  static onGameFinished: (result: 'win' | 'lose') => void = noop
+
   static onOnReplayLoaded: (replay: BattleReplay) => void = noop
 
   static setOnReplayDataLoaded(callback: (cards: BattleReplay) => void): void {
@@ -26,6 +28,10 @@ export class EventBridge {
     if (this.onLogUpdate) {
       this.onLogUpdate(message, color)
     }
+  }
+
+  static setGameFinished(result: 'win' | 'lose'): void {
+    this.onGameFinished(result)
   }
 
   static updateScore(playerScore: number, opponentScore: number): void {
@@ -43,5 +49,6 @@ export class EventBridge {
     this.onLogUpdate = noop
     this.onScoreUpdate = noop
     this.onOnReplayLoaded = noop
+    this.onGameFinished = noop
   }
 }
