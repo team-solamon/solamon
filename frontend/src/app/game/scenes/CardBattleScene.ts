@@ -414,5 +414,9 @@ export class CardBattleScene extends Phaser.Scene {
     const resultMessage =
       this.gameResult?.show(this.playerScore, this.opponentScore) || ''
     this.addBattleLog('Battle ended: ' + resultMessage, 'system')
+
+    EventBridge.setGameFinished(
+      this.playerScore > this.opponentScore ? 'win' : 'lose'
+    )
   }
 }

@@ -234,7 +234,11 @@ const HomePage = () => {
 
       {/* Modals */}
       <CardDetailsModal selectedCard={selectedCard} />
-      <ResultModal selectedBattle={selectedBattle} onClaim={fetchMyBattles} />
+      <ResultModal
+        selectedBattle={selectedBattle}
+        showReplay={true}
+        onClaim={fetchMyBattles}
+      />
       <SharedModal />
     </div>
   )

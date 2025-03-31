@@ -12,11 +12,13 @@ import {
 
 interface ResultModalProps {
   selectedBattle: BattleAccount
+  showReplay: boolean
   onClaim: () => void
 }
 
 const ResultModal: React.FC<ResultModalProps> = ({
   selectedBattle,
+  showReplay,
   onClaim,
 }) => {
   const { modals, closeModal } = useModal()
@@ -36,6 +38,7 @@ const ResultModal: React.FC<ResultModalProps> = ({
           <GameResult
             onClose={() => closeModal('result')}
             onClaim={onClaim}
+            showReplay={showReplay}
             battleAccount={selectedBattle}
           />
         </Modal>

@@ -1,7 +1,6 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import CardStack from './CardStack'
-import { BattleStatus } from '@/data/battle'
 import Button from './Button'
 import { ROUTES } from '@/lib/routes'
 import { BattleAccount, claimBattleAndUnwrapSolTx } from '@/lib/solana-helper'
@@ -12,18 +11,19 @@ import {
 } from '@/lib/helper'
 import { getWinnerFromBattleAccount } from '@/lib/helper'
 import Typography from './Typography'
-import { useModal } from '@/contexts/ModalContext'
 import { sendAndConfirmTransaction } from '@solana/web3.js'
 import { useLoading } from '@/contexts/LoadingContext'
 
 interface GameResultProps {
   battleAccount: BattleAccount
+  showReplay: boolean
   onClaim: () => void
   onClose: () => void
 }
 
 const GameResult: React.FC<GameResultProps> = ({
   battleAccount,
+  showReplay,
   onClaim,
   onClose,
 }) => {
@@ -76,14 +76,16 @@ const GameResult: React.FC<GameResultProps> = ({
         </div>
       </div>
       <div className='mt-4 flex flex-col items-center'>
-        <Button
-          size='S'
-          onClick={() => {
-            router.push(`${ROUTES.GAME}?battleId=${battleAccount.battleId}`)
-          }}
-        >
-          {'replay >'}
-        </Button>
+        {showReplay && (
+          <Button
+            size='S'
+            onClick={() => {
+              router.push(`${ROUTES.GAME}?battleId=${battleAccount.battleId}`)
+            }}
+          >
+            {'replay >'}
+          </Button>
+        )}
         {claimable ? (
           <div className='mt-2 flex flex-col items-center justify-center gap-2'>
             <Button onClick={handleClaim}>Claim Reward 0.2 SOL</Button>
