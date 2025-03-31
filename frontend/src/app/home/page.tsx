@@ -262,7 +262,11 @@ const HomePageContent = () => {
         onViewAll={handleViewAllCards}
         onClose={fetchMyCards}
       />
-      <ViewAllCardsModal currentCards={myCards} drawableCards={spawnResult} />
+      <ViewAllCardsModal
+        currentCards={myCards}
+        drawableCards={spawnResult}
+        onClose={fetchMyCards}
+      />
       <CardDetailsModal selectedCard={selectedCard} />
       <ResultModal selectedBattle={selectedBattle} onClaim={fetchMyBattles} />
     </div>

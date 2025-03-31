@@ -12,11 +12,13 @@ import Button from '../Button'
 interface ViewAllCardsModalProps {
   currentCards: CardData[]
   drawableCards: CardData[]
+  onClose: () => void
 }
 
 const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
   currentCards,
   drawableCards,
+  onClose,
 }) => {
   const { modals, closeModal } = useModal()
   const router = useRouter()
@@ -24,7 +26,10 @@ const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
   return (
     <Modal
       isOpen={modals['viewAllCards']}
-      onClose={() => closeModal('viewAllCards')}
+      onClose={() => {
+        closeModal('viewAllCards')
+        onClose()
+      }}
       title='+ New Cards'
       maxWidth='600px'
     >
