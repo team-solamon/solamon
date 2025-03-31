@@ -130,8 +130,9 @@ const Tutorial: React.FC<TutorialProps> = ({ onNewCard }) => {
                       color='inverse'
                       outline={false}
                     >
-                      * Element (Water, Fire, Wood, Metal, Earth) → only you
-                      know the exact stat; your opponent just sees the type.
+                      * Element (💧Water, 🔥Fire, 🌳Wood, ⚙️Metal, 🌍Earth) →
+                      only you know the exact element; your opponent has to
+                      guess the type.
                     </Typography>
                   </div>
                 </div>
@@ -221,7 +222,7 @@ const Tutorial: React.FC<TutorialProps> = ({ onNewCard }) => {
           <div className='flex'>
             <div className='flex-1'>
               <Typography variant='body-2' color='inverse' outline={false}>
-                5. Element Advantage System
+                5. Five Elements (Wu Xing) sytem
               </Typography>
               <div className='ml-6 space-y-2 mt-2'>
                 <div className='flex'>
@@ -231,19 +232,19 @@ const Tutorial: React.FC<TutorialProps> = ({ onNewCard }) => {
                 </div>
                 <div className='ml-8 space-y-1'>
                   <Typography variant='body-2' color='inverse' outline={false}>
-                    - Wood → Earth
+                    - 🌳Wood → 🌍Earth
                   </Typography>
                   <Typography variant='body-2' color='inverse' outline={false}>
-                    - Fire → Metal
+                    - 🔥Fire → ⚙️Metal
                   </Typography>
                   <Typography variant='body-2' color='inverse' outline={false}>
-                    - Metal → Wood
+                    - ⚙️Metal → 🌳Wood
                   </Typography>
                   <Typography variant='body-2' color='inverse' outline={false}>
-                    - Water → Fire
+                    - 💧Water → 🔥Fire
                   </Typography>
                   <Typography variant='body-2' color='inverse' outline={false}>
-                    - Earth → Water
+                    - 🌍Earth → 💧Water
                   </Typography>
                 </div>
                 <div className='flex mt-2'>
@@ -253,19 +254,19 @@ const Tutorial: React.FC<TutorialProps> = ({ onNewCard }) => {
                 </div>
                 <div className='ml-8 space-y-1'>
                   <Typography variant='body-2' color='inverse' outline={false}>
-                    - Wood → Fire
+                    - 🌳Wood → 🔥Fire
                   </Typography>
                   <Typography variant='body-2' color='inverse' outline={false}>
-                    - Fire → Earth
+                    - 🔥Fire → 🌍Earth
                   </Typography>
                   <Typography variant='body-2' color='inverse' outline={false}>
-                    - Earth → Metal
+                    - 🌍Earth → ⚙️Metal
                   </Typography>
                   <Typography variant='body-2' color='inverse' outline={false}>
-                    - Metal → Water
+                    - ⚙️Metal → 💧Water
                   </Typography>
                   <Typography variant='body-2' color='inverse' outline={false}>
-                    - Water → Wood
+                    - 💧Water → 🌳Wood
                   </Typography>
                 </div>
               </div>
