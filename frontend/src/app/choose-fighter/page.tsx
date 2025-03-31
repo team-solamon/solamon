@@ -8,6 +8,8 @@ import Nav from '@/components/Nav'
 import { CardData, getPendingBattleAccounts } from '@/lib/solana-helper'
 import { BattleAccount } from '@/lib/solana-helper'
 import { getKeypairFromLocalStorage, getProgram } from '@/lib/helper'
+import SolanaBalance from '@/components/SolanaBalance'
+import { FIGHT_SOL_PRICE } from '@/constant/env'
 
 const ChooseFighterPage = () => {
   const router = useRouter()
@@ -72,7 +74,10 @@ const ChooseFighterPage = () => {
                   )
                 }}
               >
-                Choose Fighter <span className='text-blue-400'>0.15</span>
+                <div className='flex items-center gap-1'>
+                  Choose Fighter
+                  <SolanaBalance balance={FIGHT_SOL_PRICE} />
+                </div>
               </Button>
             )}
           </div>

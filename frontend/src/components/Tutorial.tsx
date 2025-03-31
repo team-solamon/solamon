@@ -8,6 +8,7 @@ import { EventBridge } from '@/app/game/utils/EventBridge'
 import { CardData, stringToElement } from '@/lib/solana-helper'
 import Typography from './Typography'
 import CardElementProbabilities from './CardElementProbabilities'
+import { FIGHT_SOL_PRICE, WINNER_SOL_REWARD } from '@/constant/env'
 
 interface CardWithProbabilities {
   species: number
@@ -223,15 +224,17 @@ const Tutorial: React.FC<TutorialProps> = ({ onNewCard, onOpenBattle }) => {
             <li>
               🔹 Pick your squad (3 cards).
               <ul className='list-disc list-inside ml-6 space-y-2'>
-                <li>Open Match: Pay 0.1 SOL → wait for a challenger.</li>
                 <li>
-                  Choose Fighter: Pay 0.1 SOL → battle starts instantly (extra
-                  cost for first move advantage).
+                  Open Match: Pay {FIGHT_SOL_PRICE} SOL → wait for a challenger.
+                </li>
+                <li>
+                  Choose Fighter: Pay {FIGHT_SOL_PRICE} SOL → battle starts
+                  instantly (extra cost for first move advantage).
                 </li>
               </ul>
             </li>
             <li>
-              🔹 Winner gets 0.15 SOL.
+              🔹 Winner gets {WINNER_SOL_REWARD} SOL.
               <ul className='list-disc list-inside ml-6 space-y-2'>
                 <li>Fight smart. Read the elements. Outsmart your rival.</li>
               </ul>

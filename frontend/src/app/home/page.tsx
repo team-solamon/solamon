@@ -36,6 +36,7 @@ import Typography from '@/components/Typography'
 import CardList from '@/components/CardList'
 import { sendAndConfirmTransaction } from '@solana/web3.js'
 import SolanaBalance from '@/components/SolanaBalance'
+import { NEW_CARD_SOL_PRICE } from '@/constant/env'
 
 const HomePageContent = () => {
   const router = useRouter()
@@ -146,7 +147,7 @@ const HomePageContent = () => {
         <Button onClick={() => openModal('purchaseCard')}>
           <div className='flex items-center gap-1'>
             + New Card
-            <SolanaBalance balance={0.1} />
+            <SolanaBalance balance={NEW_CARD_SOL_PRICE} />
           </div>
         </Button>
         <Button
