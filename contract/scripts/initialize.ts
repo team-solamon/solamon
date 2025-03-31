@@ -27,7 +27,7 @@ async function main() {
 	const feeAccount = adminPublicKey // Fee account is the admin for now
 	const admin = adminPublicKey // Admin is the signer
 	const feePercentageInBasisPoints = 100 // 1% fee (100 basis points = 1%)
-	const spawnFee = new BN(LAMPORTS_PER_SOL * 0.01) // 0.01 SOL per spawn
+	const spawnFee = new BN(LAMPORTS_PER_SOL * 0.1) // 0.01 SOL per spawn
 
 	console.log("Initializing Solamon program with the following parameters:")
 	console.log(`Admin: ${admin.toString()}`)
@@ -50,33 +50,63 @@ async function main() {
 	try {
 		const solamonPrototype: SolamonPrototype[] = [
 			{
-				imageUrl: "https://example.com/image.png",
-				possibleElements: [{ fire: {} }, { water: {} }],
-				elementProbabilityInBasisPoints: [8000, 2000],
+				imageUrl: "0",
+				possibleElements: [{ fire: {} }, { water: {} }, { wood: {} }],
+				elementProbabilityInBasisPoints: [8000, 1000, 1000],
 				distributablePoints: 15,
 			},
 			{
-				imageUrl: "https://example.com/image2.png",
-				possibleElements: [{ wood: {} }, { earth: {} }],
-				elementProbabilityInBasisPoints: [8000, 2000],
+				imageUrl: "1",
+				possibleElements: [{ fire: {} }, { earth: {} }, { metal: {} }],
+				elementProbabilityInBasisPoints: [8000, 1000, 1000],
 				distributablePoints: 15,
 			},
 			{
-				imageUrl: "https://example.com/image3.png",
-				possibleElements: [{ earth: {} }, { metal: {} }],
-				elementProbabilityInBasisPoints: [8000, 2000],
+				imageUrl: "2",
+				possibleElements: [{ water: {} }, { fire: {} }, { metal: {} }],
+				elementProbabilityInBasisPoints: [8000, 1000, 1000],
 				distributablePoints: 15,
 			},
 			{
-				imageUrl: "https://example.com/image4.png",
-				possibleElements: [{ metal: {} }, { water: {} }],
-				elementProbabilityInBasisPoints: [8000, 2000],
+				imageUrl: "3",
+				possibleElements: [{ water: {} }, { wood: {} }, { earth: {} }],
+				elementProbabilityInBasisPoints: [8000, 1000, 1000],
 				distributablePoints: 15,
 			},
 			{
-				imageUrl: "https://example.com/image5.png",
-				possibleElements: [{ wood: {} }, { fire: {} }],
-				elementProbabilityInBasisPoints: [8000, 2000],
+				imageUrl: "4",
+				possibleElements: [{ wood: {} }, { water: {} }, { fire: {} }],
+				elementProbabilityInBasisPoints: [8000, 1000, 1000],
+				distributablePoints: 15,
+			},
+			{
+				imageUrl: "5",
+				possibleElements: [{ wood: {} }, { earth: {} }, { metal: {} }],
+				elementProbabilityInBasisPoints: [8000, 1000, 1000],
+				distributablePoints: 15,
+			},
+			{
+				imageUrl: "6",
+				possibleElements: [{ wood: {} }, { fire: {} }, { metal: {} }],
+				elementProbabilityInBasisPoints: [8000, 1000, 1000],
+				distributablePoints: 15,
+			},
+			{
+				imageUrl: "7",
+				possibleElements: [{ earth: {} }, { water: {} }, { wood: {} }],
+				elementProbabilityInBasisPoints: [8000, 1000, 1000],
+				distributablePoints: 15,
+			},
+			{
+				imageUrl: "8",
+				possibleElements: [{ metal: {} }, { fire: {} }, { earth: {} }],
+				elementProbabilityInBasisPoints: [8000, 1000, 1000],
+				distributablePoints: 15,
+			},
+			{
+				imageUrl: "9",
+				possibleElements: [{ metal: {} }, { water: {} }, { wood: {} }],
+				elementProbabilityInBasisPoints: [8000, 1000, 1000],
 				distributablePoints: 15,
 			},
 		]
