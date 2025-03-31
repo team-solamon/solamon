@@ -6,6 +6,7 @@ import Typography from './Typography'
 import CardStats from './CardStats'
 import SolanaBalance from './SolanaBalance'
 import Button from './Button'
+import { useModal } from '@/contexts/ModalContext'
 
 interface CardListProps {
   cards: CardData[]
@@ -38,8 +39,9 @@ const CardList: React.FC<CardListProps> = ({
   pickedCards,
   showInBattle,
   onCardPick,
-  onPurchaseCard,
 }) => {
+  const { openModal } = useModal()
+
   return (
     <section className='my-card-section bg-[#978578] p-4 rounded-lg max-w-[1000px] mx-auto'>
       <Typography variant='title-2'>My Card | {cards.length}</Typography>
@@ -60,16 +62,14 @@ const CardList: React.FC<CardListProps> = ({
             <br />
             Draw your cards and start a battle!
           </Typography>
-          {onPurchaseCard && (
-            <div className='flex justify-center mt-4'>
-              <Button onClick={onPurchaseCard}>
-                <div className='flex items-center gap-1'>
-                  + New Card
-                  <SolanaBalance balance={0.1} />
-                </div>
-              </Button>
-            </div>
-          )}
+          <div className='flex justify-center mt-4'>
+            <Button onClick={() => openModal('purchaseCard')}>
+              <div className='flex items-center gap-1'>
+                + New Card
+                <SolanaBalance balance={0.1} />
+              </div>
+            </Button>
+          </div>
         </div>
       ) : (
         <div className='card-list grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4'>

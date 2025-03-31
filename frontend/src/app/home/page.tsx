@@ -5,22 +5,14 @@ import { useRouter } from 'next/navigation'
 import CardStack from '@/components/CardStack'
 import Nav from '@/components/Nav'
 import Button from '../../components/Button'
-import { ModalProvider, useModal } from '@/contexts/ModalContext'
+import { useModal } from '@/contexts/ModalContext'
 import { ROUTES } from '@/lib/routes'
-
-import TutorialModal from '@/components/modals/TutorialModal'
-import PurchaseCardModal from '@/components/modals/PurchaseCardModal'
-import NewCardModal from '@/components/modals/NewCardModal'
-import ViewAllCardsModal from '@/components/modals/ViewAllCardsModal'
 import CardDetailsModal from '@/components/modals/CardDetailsModal'
 import ResultModal from '@/components/modals/ResultModal'
 import {
   CardData,
-  elementToString,
   getBattleAccountsByUser,
   getUserAccount,
-  showSpawnResult,
-  spawnSolamonsTx,
   BattleAccount,
   battleStatusToString,
   cancelBattleAndUnwrapSolTx,
@@ -37,9 +29,9 @@ import CardList from '@/components/CardList'
 import { sendAndConfirmTransaction } from '@solana/web3.js'
 import SolanaBalance from '@/components/SolanaBalance'
 import { NEW_CARD_SOL_PRICE } from '@/constant/env'
-import CardGuideModal from '@/components/modals/CardGuideModal'
+import SharedModal from '@/components/SharedModal'
 
-const HomePageContent = () => {
+const HomePage = () => {
   const router = useRouter()
 
   const { openModal, closeModal } = useModal()
@@ -47,7 +39,7 @@ const HomePageContent = () => {
   const [selectedBattle, setSelectedBattle] = useState<BattleAccount | null>(
     null
   )
-  const [spawnResult, setSpawnResult] = useState<CardData[]>([])
+
   const [myCards, setMyCards] = useState<CardData[]>([])
   const [myBattles, setMyBattles] = useState<BattleAccount[]>([])
   const { showLoading, hideLoading } = useLoading()
@@ -81,37 +73,6 @@ const HomePageContent = () => {
     ])
   }
 
-  const handleNewCardFromModal = () => {
-    closeModal('tutorial')
-    openModal('purchaseCard')
-  }
-
-  const handleOpenBattleFromModal = () => {
-    closeModal('tutorial')
-    router.push(ROUTES.OPEN_BATTLE)
-  }
-
-  const handlePurchase = async (amount: number) => {
-    if (!player) {
-      console.error('No player found')
-      return
-    }
-    showLoading('Spawning solamons...')
-    const tx = await spawnSolamonsTx(
-      connection,
-      program,
-      player.publicKey,
-      amount
-    )
-    const txSig = await connection.sendTransaction(tx, [player])
-    await connection.confirmTransaction(txSig)
-    const spawnResult = await showSpawnResult(connection, txSig)
-    setSpawnResult(spawnResult)
-    hideLoading()
-    closeModal('purchaseCard')
-    openModal('newCard')
-  }
-
   const handleCancelBattle = async (battleId: number) => {
     const config = await getConfigAccount(program)
 
@@ -134,11 +95,6 @@ const HomePageContent = () => {
 
     fetchMyBattles()
     hideLoading()
-  }
-
-  const handleViewAllCards = () => {
-    closeModal('newCard')
-    openModal('viewAllCards')
   }
 
   return (
@@ -272,41 +228,15 @@ const HomePageContent = () => {
 
       <section className='my-card-section max-w-[1000px] mx-auto'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <CardList
-            cards={myCards}
-            onPurchaseCard={() => openModal('purchaseCard')}
-          />
+          <CardList cards={myCards} />
         </div>
       </section>
 
       {/* Modals */}
-      <TutorialModal onNewCard={handleNewCardFromModal} />
-      <CardGuideModal
-        onNewCard={handleNewCardFromModal}
-        onOpenBattle={handleOpenBattleFromModal}
-      />
-      <PurchaseCardModal onPurchase={handlePurchase} />
-      <NewCardModal
-        drawableCards={spawnResult}
-        onViewAll={handleViewAllCards}
-        onClose={fetchMyCards}
-      />
-      <ViewAllCardsModal
-        currentCards={myCards}
-        drawableCards={spawnResult}
-        onClose={fetchMyCards}
-      />
       <CardDetailsModal selectedCard={selectedCard} />
       <ResultModal selectedBattle={selectedBattle} onClaim={fetchMyBattles} />
+      <SharedModal />
     </div>
-  )
-}
-
-const HomePage = () => {
-  return (
-    <ModalProvider>
-      <HomePageContent />
-    </ModalProvider>
   )
 }
 

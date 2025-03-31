@@ -15,6 +15,8 @@ import { getProgram } from '@/lib/helper'
 import Typography from '@/components/Typography'
 import { LAMPORTS_PER_SOL, sendAndConfirmTransaction } from '@solana/web3.js'
 import { ROUTES } from '@/lib/routes'
+import SharedModal from '@/components/SharedModal'
+import { ModalProvider } from '@/contexts/ModalContext'
 
 const OpenBattlePage = () => {
   const router = useRouter()
@@ -114,6 +116,7 @@ const OpenBattlePage = () => {
         showInBattle={true}
         onCardPick={handleCardPick}
       />
+      <SharedModal />
     </div>
   )
 }
