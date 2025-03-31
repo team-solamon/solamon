@@ -98,7 +98,7 @@ const Tutorial: React.FC<TutorialProps> = ({ onNewCard }) => {
 
   return (
     <div className='flex flex-col h-full'>
-      <div className='text-black overflow-y-auto max-h-[60vh] pr-2'>
+      <div className='text-black overflow-y-auto max-h-[50vh] pr-2'>
         <div className='w-full h-[100%] flex flex-col justify-center items-center'>
           <div className='w-[80%] h-[80%]'>{phaserGame}</div>
         </div>
@@ -213,6 +213,60 @@ const Tutorial: React.FC<TutorialProps> = ({ onNewCard }) => {
                       * Fight smart. Read the elements. Outsmart your rival.
                     </Typography>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className='flex'>
+            <div className='flex-1'>
+              <Typography variant='body-2' color='inverse' outline={false}>
+                5. Element Advantage System
+              </Typography>
+              <div className='ml-6 space-y-2 mt-2'>
+                <div className='flex'>
+                  <Typography variant='body-2' color='inverse' outline={false}>
+                    * CRITICAL: Double damage when:
+                  </Typography>
+                </div>
+                <div className='ml-8 space-y-1'>
+                  <Typography variant='body-2' color='inverse' outline={false}>
+                    - Wood → Earth
+                  </Typography>
+                  <Typography variant='body-2' color='inverse' outline={false}>
+                    - Fire → Metal
+                  </Typography>
+                  <Typography variant='body-2' color='inverse' outline={false}>
+                    - Metal → Wood
+                  </Typography>
+                  <Typography variant='body-2' color='inverse' outline={false}>
+                    - Water → Fire
+                  </Typography>
+                  <Typography variant='body-2' color='inverse' outline={false}>
+                    - Earth → Water
+                  </Typography>
+                </div>
+                <div className='flex mt-2'>
+                  <Typography variant='body-2' color='inverse' outline={false}>
+                    * HALVED: Half damage when:
+                  </Typography>
+                </div>
+                <div className='ml-8 space-y-1'>
+                  <Typography variant='body-2' color='inverse' outline={false}>
+                    - Wood → Fire
+                  </Typography>
+                  <Typography variant='body-2' color='inverse' outline={false}>
+                    - Fire → Earth
+                  </Typography>
+                  <Typography variant='body-2' color='inverse' outline={false}>
+                    - Earth → Metal
+                  </Typography>
+                  <Typography variant='body-2' color='inverse' outline={false}>
+                    - Metal → Water
+                  </Typography>
+                  <Typography variant='body-2' color='inverse' outline={false}>
+                    - Water → Wood
+                  </Typography>
                 </div>
               </div>
             </div>
