@@ -33,8 +33,12 @@ const NewCardModal: React.FC<NewCardModalProps> = ({
       }}
       title='+ New Card'
     >
-      <DrawGame drawableCards={drawableCards} />
-      <Button onClick={onViewAll}>Open All</Button>
+      <div className='flex flex-col px-4'>
+        <DrawGame drawableCards={drawableCards} />
+        <div className='flex justify-center mt-4'>
+          <Button onClick={onViewAll}>Open All</Button>
+        </div>
+      </div>
     </Modal>
   )
 }
