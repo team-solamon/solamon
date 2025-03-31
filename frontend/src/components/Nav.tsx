@@ -13,6 +13,20 @@ import { ROUTES } from '@/lib/routes'
 import { getExplorerUrl } from '@/lib/url-helper'
 import { useLoading } from '@/contexts/LoadingContext'
 
+const YellowButton: React.FC<{
+  onClick: () => void
+  children: React.ReactNode
+}> = ({ onClick, children }) => {
+  return (
+    <div
+      className='ml-4 text-[rgba(255,212,0,1)] cursor-pointer border border-[rgba(255,212,0,1)] rounded-lg w-[110px] h-[32px] flex items-center justify-center'
+      onClick={onClick}
+    >
+      {children}
+    </div>
+  )
+}
+
 const Nav: React.FC = () => {
   const { openModal } = useModal()
   const router = useRouter()
@@ -51,17 +65,18 @@ const Nav: React.FC = () => {
   }
 
   return (
-    <header className='header flex justify-between items-center mb-6'>
-      <span
-        onClick={() => {
-          openModal('tutorial')
-        }}
-        className='text-solamon-green cursor-pointer font-semibold'
-      >
-        Tutorial
-      </span>
+    <header className='header flex flex-col lg:flex-row justify-between items-center mb-6 gap-4'>
+      <div className='order-2 lg:order-1'>
+        <YellowButton
+          onClick={() => {
+            openModal('tutorial')
+          }}
+        >
+          <Typography variant='body-3'>❔ Tutorial</Typography>
+        </YellowButton>
+      </div>
       <div
-        className='absolute left-1/2 transform -translate-x-1/2 cursor-pointer'
+        className='order-1 lg:order-2 lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2 cursor-pointer'
         onClick={() => {
           router.push(ROUTES.HOME)
         }}
@@ -70,7 +85,7 @@ const Nav: React.FC = () => {
           SOLAMON
         </Typography>
       </div>
-      <div className='wallet-info text-right flex items-end '>
+      <div className='wallet-info text-right flex items-end order-3 lg:order-3'>
         <Typography variant='body-2' color='secondary' className='mr-4'>
           <a
             href={`${getExplorerUrl(keypair?.publicKey.toBase58() || '')}`}
@@ -81,12 +96,9 @@ const Nav: React.FC = () => {
           </a>
         </Typography>
         <SolanaBalance balance={balance || 0} />
-        <div
-          className='ml-4 text-[rgba(255,212,0,1)] cursor-pointer border border-[rgba(255,212,0,1)] rounded-lg w-[110px] h-[32px] flex items-center justify-center'
-          onClick={handleRequestAirdrop}
-        >
+        <YellowButton onClick={handleRequestAirdrop}>
           <Typography variant='body-3'>claim dev SOL</Typography>
-        </div>
+        </YellowButton>
       </div>
     </header>
   )

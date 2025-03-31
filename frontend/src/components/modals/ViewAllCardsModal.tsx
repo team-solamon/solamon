@@ -1,32 +1,44 @@
 'use client'
 
 import React from 'react'
+import { useRouter } from 'next/navigation'
 import Modal from '../Modal'
 import Card from '../Card'
 import { useModal } from '@/contexts/ModalContext'
 import { CardData } from '@/lib/solana-helper'
+import { ROUTES } from '@/lib/routes'
+import Button from '../Button'
 
 interface ViewAllCardsModalProps {
+  currentCards: CardData[]
   drawableCards: CardData[]
+  onClose: () => void
 }
 
 const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
+  currentCards,
   drawableCards,
+  onClose,
 }) => {
   const { modals, closeModal } = useModal()
+  const router = useRouter()
 
   return (
     <Modal
       isOpen={modals['viewAllCards']}
-      onClose={() => closeModal('viewAllCards')}
-      title='Result'
+      onClose={() => {
+        closeModal('viewAllCards')
+        onClose()
+      }}
+      title='+ New Cards'
       maxWidth='600px'
     >
-      <div className='flex justify-center overflow-x-auto gap-4 p-2'>
+      <div className='flex flex-wrap justify-center gap-4 p-2'>
         {drawableCards.map((card, index) => (
           <div
             key={index}
             className='card bg-gray-700 p-2 rounded-lg flex-shrink-0 w-24'
+            style={{ width: 'calc(20% - 16px)' }}
           >
             <Card
               species={card.species}
@@ -35,6 +47,14 @@ const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
             />
           </div>
         ))}
+      </div>
+      <div className='flex justify-center mt-4'>
+        <Button
+          onClick={() => router.push(ROUTES.OPEN_BATTLE)}
+          disabled={currentCards.length + drawableCards.length < 3}
+        >
+          Open Battle
+        </Button>
       </div>
     </Modal>
   )

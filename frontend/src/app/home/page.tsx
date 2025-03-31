@@ -139,24 +139,6 @@ const HomePageContent = () => {
     openModal('viewAllCards')
   }
 
-  const getElementCounts = () => {
-    const counts: { [key: string]: number } = {
-      fire: 0,
-      water: 0,
-      earth: 0,
-      metal: 0,
-      wood: 0,
-    }
-
-    myCards.forEach((card) => {
-      if (counts[elementToString(card.element)] !== undefined) {
-        counts[elementToString(card.element)]++
-      }
-    })
-
-    return counts
-  }
-
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
       <Nav />
@@ -167,8 +149,11 @@ const HomePageContent = () => {
             <SolanaBalance balance={0.1} />
           </div>
         </Button>
-        <Button onClick={() => router.push(ROUTES.OPEN_BATTLE)}>
-          Open Match
+        <Button
+          onClick={() => router.push(ROUTES.OPEN_BATTLE)}
+          disabled={myCards.length < 3}
+        >
+          Open Battle
         </Button>
         <Button onClick={() => router.push(ROUTES.CHOOSE_FIGHTER)}>
           Choose Fighter
@@ -179,90 +164,116 @@ const HomePageContent = () => {
         <div className='bg-[#978578] p-4 rounded-lg'>
           <Typography variant='title-2'>Battle</Typography>
           <div className='battle-cards grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
-            {myBattles.map(({ account: battleAccount }, index) => {
-              return (
-                <div
-                  key={index}
-                  className='card bg-[rgba(202,193,185,1)] p-4 rounded-lg max-w-[250px] w-full'
-                >
-                  <div className='flex justify-around'>
-                    <div>
-                      <h4 className='text-center text-sm text-gray-400 mb-2'>
-                        My Cards
-                      </h4>
-                      <CardStack
-                        cards={
-                          player?.publicKey == battleAccount.player1.toBase58()
-                            ? battleAccount.player1Solamons
-                            : battleAccount.player2Solamons
-                        }
-                        className='mx-auto'
-                      />
-                    </div>
-                  </div>
-
-                  {battleStatusToString(battleAccount.battleStatus) ===
-                  'pending' ? (
-                    <>
-                      <div className='flex justify-center'>
-                        <Typography
-                          variant='body-2'
-                          outline={false}
-                          className='rounded-xl bg-[rgba(151,133,120,1)] w-full text-center mb-1 h-[30px]'
-                        >
-                          Pending
-                        </Typography>
+            {myBattles.length === 0 ? (
+              <div className='col-span-2 md:col-span-3 lg:col-span-4 flex flex-col justify-center items-center p-8 text-center'>
+                <Typography variant='body-1' color='inverse' outline={false}>
+                  No battle history yet.
+                  <br />
+                  Start one by opening a battle or choosing a rival from the
+                  queue.
+                </Typography>
+                <div className='flex justify-center mt-4 gap-4'>
+                  <Button
+                    onClick={() => router.push(ROUTES.OPEN_BATTLE)}
+                    disabled={myCards.length < 3}
+                  >
+                    Open Battle
+                  </Button>
+                  <Button onClick={() => router.push(ROUTES.CHOOSE_FIGHTER)}>
+                    Choose Fighter
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              myBattles.map(({ account: battleAccount }, index) => {
+                return (
+                  <div
+                    key={index}
+                    className='card bg-[rgba(202,193,185,1)] p-4 rounded-lg max-w-[250px] w-full'
+                  >
+                    <div className='flex justify-around'>
+                      <div>
+                        <h4 className='text-center text-sm text-gray-400 mb-2'>
+                          My Cards
+                        </h4>
+                        <CardStack
+                          cards={
+                            player?.publicKey ==
+                            battleAccount.player1.toBase58()
+                              ? battleAccount.player1Solamons
+                              : battleAccount.player2Solamons
+                          }
+                          className='mx-auto'
+                        />
                       </div>
-                      <div
-                        onClick={() =>
-                          handleCancelBattle(battleAccount.battleId)
-                        }
-                      >
+                    </div>
+
+                    {battleStatusToString(battleAccount.battleStatus) ===
+                    'pending' ? (
+                      <>
+                        <div className='flex justify-center'>
+                          <Typography
+                            variant='body-2'
+                            outline={false}
+                            className='rounded-xl bg-[rgba(151,133,120,1)] w-full text-center mb-1 h-[30px]'
+                          >
+                            Pending
+                          </Typography>
+                        </div>
+                        <div
+                          onClick={() =>
+                            handleCancelBattle(battleAccount.battleId)
+                          }
+                        >
+                          <Typography
+                            variant='body-3'
+                            color='default'
+                            outline={false}
+                            className='cursor-pointer w-full text-center mb-1'
+                          >
+                            Cancel
+                          </Typography>
+                        </div>
+                      </>
+                    ) : battleStatusToString(battleAccount.battleStatus) ===
+                      'canceled' ? (
+                      <div className='flex justify-center'>
                         <Typography
                           variant='body-3'
                           color='default'
                           outline={false}
-                          className='cursor-pointer w-full text-center mb-1'
+                          className='w-full text-center mb-1'
                         >
-                          Cancel
+                          Canceled
                         </Typography>
                       </div>
-                    </>
-                  ) : battleStatusToString(battleAccount.battleStatus) ===
-                    'canceled' ? (
-                    <div className='flex justify-center'>
-                      <Typography
-                        variant='body-3'
-                        color='default'
-                        outline={false}
-                        className='w-full text-center mb-1'
-                      >
-                        Canceled
-                      </Typography>
-                    </div>
-                  ) : (
-                    <div className='flex justify-center'>
-                      <Button
-                        size='S'
-                        onClick={() => {
-                          setSelectedBattle(battleAccount)
-                          openModal('result')
-                        }}
-                      >
-                        Result
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
+                    ) : (
+                      <div className='flex justify-center'>
+                        <Button
+                          size='S'
+                          onClick={() => {
+                            setSelectedBattle(battleAccount)
+                            openModal('result')
+                          }}
+                        >
+                          Result
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )
+              })
+            )}
           </div>
         </div>
       </section>
 
       <section className='my-card-section max-w-[1000px] mx-auto'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <CardList cards={myCards} />
+          <CardList
+            cards={myCards}
+            onPurchaseCard={() => openModal('purchaseCard')}
+          />
         </div>
       </section>
 
@@ -277,7 +288,11 @@ const HomePageContent = () => {
         onViewAll={handleViewAllCards}
         onClose={fetchMyCards}
       />
-      <ViewAllCardsModal drawableCards={spawnResult} />
+      <ViewAllCardsModal
+        currentCards={myCards}
+        drawableCards={spawnResult}
+        onClose={fetchMyCards}
+      />
       <CardDetailsModal selectedCard={selectedCard} />
       <ResultModal selectedBattle={selectedBattle} onClaim={fetchMyBattles} />
     </div>

@@ -14,6 +14,7 @@ import { getKeypairFromLocalStorage, getConnection } from '@/lib/helper'
 import { getProgram } from '@/lib/helper'
 import Typography from '@/components/Typography'
 import { LAMPORTS_PER_SOL, sendAndConfirmTransaction } from '@solana/web3.js'
+import { ROUTES } from '@/lib/routes'
 
 const OpenBattlePage = () => {
   const router = useRouter()
@@ -35,6 +36,10 @@ const OpenBattlePage = () => {
     }
     const myAccount = await getUserAccount(program, player.publicKey)
     setMyCards(myAccount.solamons)
+
+    if (myAccount.solamons.length < 3) {
+      router.push(ROUTES.HOME)
+    }
   }
 
   const handleCardPick = (card: CardData) => {

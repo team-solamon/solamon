@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
+import { ROUTES } from '@/lib/routes'
 
 // Dynamically import the Game component with SSR disabled
 const Game = dynamic(() => import('./components/Game'), { ssr: false })
@@ -12,7 +13,7 @@ export default function GamePage() {
     <div className='container mx-auto py-8'>
       <button
         className='text-yellow-400 text-2xl mb-4'
-        onClick={() => router.back()}
+        onClick={() => router.push(ROUTES.HOME)}
       >
         &lt;
       </button>
