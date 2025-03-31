@@ -13,6 +13,20 @@ import { ROUTES } from '@/lib/routes'
 import { getExplorerUrl } from '@/lib/url-helper'
 import { useLoading } from '@/contexts/LoadingContext'
 
+const YellowButton: React.FC<{
+  onClick: () => void
+  children: React.ReactNode
+}> = ({ onClick, children }) => {
+  return (
+    <div
+      className='ml-4 text-[rgba(255,212,0,1)] cursor-pointer border border-[rgba(255,212,0,1)] rounded-lg w-[110px] h-[32px] flex items-center justify-center'
+      onClick={onClick}
+    >
+      {children}
+    </div>
+  )
+}
+
 const Nav: React.FC = () => {
   const { openModal } = useModal()
   const router = useRouter()
@@ -52,14 +66,13 @@ const Nav: React.FC = () => {
 
   return (
     <header className='header flex justify-between items-center mb-6'>
-      <span
+      <YellowButton
         onClick={() => {
           openModal('tutorial')
         }}
-        className='text-solamon-green cursor-pointer font-semibold'
       >
-        Tutorial
-      </span>
+        <Typography variant='body-3'>❔ Tutorial</Typography>
+      </YellowButton>
       <div
         className='absolute left-1/2 transform -translate-x-1/2 cursor-pointer'
         onClick={() => {
@@ -81,12 +94,9 @@ const Nav: React.FC = () => {
           </a>
         </Typography>
         <SolanaBalance balance={balance || 0} />
-        <div
-          className='ml-4 text-[rgba(255,212,0,1)] cursor-pointer border border-[rgba(255,212,0,1)] rounded-lg w-[110px] h-[32px] flex items-center justify-center'
-          onClick={handleRequestAirdrop}
-        >
+        <YellowButton onClick={handleRequestAirdrop}>
           <Typography variant='body-3'>claim dev SOL</Typography>
-        </div>
+        </YellowButton>
       </div>
     </header>
   )
