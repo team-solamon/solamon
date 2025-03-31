@@ -139,24 +139,6 @@ const HomePageContent = () => {
     openModal('viewAllCards')
   }
 
-  const getElementCounts = () => {
-    const counts: { [key: string]: number } = {
-      fire: 0,
-      water: 0,
-      earth: 0,
-      metal: 0,
-      wood: 0,
-    }
-
-    myCards.forEach((card) => {
-      if (counts[elementToString(card.element)] !== undefined) {
-        counts[elementToString(card.element)]++
-      }
-    })
-
-    return counts
-  }
-
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
       <Nav />
@@ -280,7 +262,7 @@ const HomePageContent = () => {
         onViewAll={handleViewAllCards}
         onClose={fetchMyCards}
       />
-      <ViewAllCardsModal drawableCards={spawnResult} />
+      <ViewAllCardsModal currentCards={myCards} drawableCards={spawnResult} />
       <CardDetailsModal selectedCard={selectedCard} />
       <ResultModal selectedBattle={selectedBattle} onClaim={fetchMyBattles} />
     </div>

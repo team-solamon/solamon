@@ -1,19 +1,25 @@
 'use client'
 
 import React from 'react'
+import { useRouter } from 'next/navigation'
 import Modal from '../Modal'
 import Card from '../Card'
 import { useModal } from '@/contexts/ModalContext'
 import { CardData } from '@/lib/solana-helper'
+import { ROUTES } from '@/lib/routes'
+import Button from '../Button'
 
 interface ViewAllCardsModalProps {
+  currentCards: CardData[]
   drawableCards: CardData[]
 }
 
 const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
+  currentCards,
   drawableCards,
 }) => {
   const { modals, closeModal } = useModal()
+  const router = useRouter()
 
   return (
     <Modal
@@ -36,6 +42,14 @@ const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
             />
           </div>
         ))}
+      </div>
+      <div className='flex justify-center mt-4'>
+        <Button
+          onClick={() => router.push(ROUTES.OPEN_BATTLE)}
+          disabled={currentCards.length + drawableCards.length < 3}
+        >
+          Open Battle
+        </Button>
       </div>
     </Modal>
   )
