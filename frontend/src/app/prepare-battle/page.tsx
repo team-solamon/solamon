@@ -24,6 +24,7 @@ import { useLoading } from '@/contexts/LoadingContext'
 import { ROUTES } from '@/lib/routes'
 import CardStats from '@/components/CardStats'
 import Typography from '@/components/Typography'
+import SharedModal from '@/components/SharedModal'
 
 const PrepareBattlePage = () => {
   const searchParams = useSearchParams()
@@ -150,6 +151,7 @@ const PrepareBattlePage = () => {
         showInBattle={true}
         onCardPick={handleCardPick}
       />
+      <SharedModal />
     </div>
   )
 }

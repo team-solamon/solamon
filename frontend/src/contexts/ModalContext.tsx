@@ -10,6 +10,7 @@ type ModalContextType = {
   modals: ModalState
   openModal: (modalKey: string) => void
   closeModal: (modalKey: string) => void
+  closeModelAll: () => void
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined)
@@ -27,8 +28,20 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({
     setModals((prev) => ({ ...prev, [modalKey]: false }))
   }
 
+  const closeModelAll = () => {
+    setModals((prev) => {
+      const updatedModals = { ...prev }
+      Object.keys(updatedModals).forEach((key) => {
+        updatedModals[key] = false
+      })
+      return updatedModals
+    })
+  }
+
   return (
-    <ModalContext.Provider value={{ modals, openModal, closeModal }}>
+    <ModalContext.Provider
+      value={{ modals, openModal, closeModal, closeModelAll }}
+    >
       {children}
     </ModalContext.Provider>
   )
