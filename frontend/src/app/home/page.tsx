@@ -167,8 +167,11 @@ const HomePageContent = () => {
             <SolanaBalance balance={0.1} />
           </div>
         </Button>
-        <Button onClick={() => router.push(ROUTES.OPEN_BATTLE)}>
-          Open Match
+        <Button
+          onClick={() => router.push(ROUTES.OPEN_BATTLE)}
+          disabled={myCards.length < 3}
+        >
+          Open Battle
         </Button>
         <Button onClick={() => router.push(ROUTES.CHOOSE_FIGHTER)}>
           Choose Fighter
