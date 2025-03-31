@@ -45,6 +45,9 @@ const Modal: React.FC<ModalProps> = ({
       onKeyDown={(e) => {
         if (e.key === 'Escape') onClose()
       }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
     >
       <div
         className='relative w-full max-w-[1200px] mx-auto bg-[#978578] rounded-lg shadow-2xl overflow-hidden'
