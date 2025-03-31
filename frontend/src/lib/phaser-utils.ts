@@ -17,5 +17,5 @@ export function loadSpeciesAssets(
 
 export function loadAllCardAssets(scene: Phaser.Scene): void {
   loadCardAssets(scene)
-  loadSpeciesAssets(scene, 30)
+  loadSpeciesAssets(scene, 10)
 }
