@@ -190,7 +190,51 @@ async function generateNewStory(storyText: string): Promise<string> {
   return story
 }
 
-async function generateNewImage(storyText: string): Promise<string> {
+async function uploadImageToStorage(
+  imageUrl: string,
+  battleId: string
+): Promise<string> {
+  try {
+    const response = await fetch(imageUrl)
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch image: ${response.status} ${response.statusText}`
+      )
+    }
+
+    const imageBlob = await response.blob()
+
+    const timestamp = Date.now()
+    const filename = `battle_${battleId}_${timestamp}.png`
+
+    const { data, error } = await supabase.storage
+      .from('images')
+      .upload(filename, imageBlob, {
+        contentType: 'image/png',
+        cacheControl: '3600',
+      })
+
+    if (error) {
+      console.error('Error uploading to Supabase Storage:', error)
+      return imageUrl
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('images')
+      .getPublicUrl(filename)
+
+    console.log('Image successfully uploaded to Supabase Storage')
+    return publicUrlData.publicUrl
+  } catch (error) {
+    console.error('Error in image upload process:', error)
+    return imageUrl
+  }
+}
+
+async function generateNewImage(
+  storyText: string,
+  battleId: string
+): Promise<string> {
   const imagePrompt = storyText.substring(0, 500)
   const enhancedImagePrompt = `Create a highly detailed and visually stunning fantasy artwork based on the following description: ${imagePrompt}. The artwork should capture the essence of an epic fantasy battle scene with vibrant colors, intricate details, and a dramatic atmosphere. Focus on the environment, characters, and magical elements to make it visually captivating.`
 
@@ -200,9 +244,16 @@ async function generateNewImage(storyText: string): Promise<string> {
     size: '512x512',
   })
 
-  const imageUrl = imageResponse.data[0]?.url || 'No image was generated.'
-  console.log('Image generated successfully')
-  return imageUrl
+  const tempImageUrl = imageResponse.data[0]?.url || 'No image was generated.'
+
+  if (tempImageUrl === 'No image was generated.') {
+    return tempImageUrl
+  }
+
+  const permanentImageUrl = await uploadImageToStorage(tempImageUrl, battleId)
+
+  console.log('Image generated and uploaded to Storage successfully')
+  return permanentImageUrl
 }
 
 export async function generateStoryWithImage(
@@ -225,7 +276,7 @@ export async function generateStoryWithImage(
 
     if (!imageUrl) {
       console.log('No existing image found, generating new image')
-      imageUrl = await generateNewImage(story)
+      imageUrl = await generateNewImage(story, battleId)
       await saveImageUrlToDB(battleId, imageUrl)
     } else {
       console.log('Using cached image from database')
