@@ -82,7 +82,7 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
 
       const fullStory = storyLines.join('\n')
 
-      generateStoryWithImage(fullStory)
+      generateStoryWithImage(selectedBattle.battleId, fullStory)
         .then((response) => {
           setStoryText(response.story)
           setImageUrl(response.imageUrl)
