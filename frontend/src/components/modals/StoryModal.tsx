@@ -37,6 +37,9 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
   useEffect(() => {
     if (!selectedBattle) return
 
+    setStoryText('')
+    setImageUrl('')
+
     setBattleAccount(selectedBattle)
     fetchBattleActions(selectedBattle.battleId)
   }, [selectedBattle])
