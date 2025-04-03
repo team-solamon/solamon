@@ -16,6 +16,7 @@ import {
   getWinnerFromBattleAccount,
 } from '@/lib/helper'
 import { generateStoryWithImage } from '@/actions/storyActions'
+import Typography from '../Typography'
 
 interface StoryModalProps {
   selectedBattle: BattleAccount
@@ -108,7 +109,7 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
             <div className='flex justify-center items-center p-4'>
               <div className='flex flex-col items-center'>
                 <svg
-                  className='animate-spin h-8 w-8 text-gray-600'
+                  className='animate-spin h-8 w-8 text-white'
                   xmlns='http://www.w3.org/2000/svg'
                   fill='none'
                   viewBox='0 0 24 24'
@@ -127,13 +128,15 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
                     d='M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z'
                   ></path>
                 </svg>
-                <p className='mt-2 text-gray-600'>
+                <p className='mt-2 text-gray-600'></p>
+
+                <Typography variant='body-2' color='inverse' outline={false}>
                   Generating your battle story...
-                </p>
+                </Typography>
               </div>
             </div>
           ) : (
-            <div className='p-4 space-y-4'>
+            <div className='p-4 space-y-4 max-h-[400px] overflow-y-auto'>
               {imageUrl && (
                 <div className='w-full flex justify-center'>
                   <img

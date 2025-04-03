@@ -44,11 +44,15 @@ export async function generateStoryWithImage(
 
     console.log('Story generated successfully')
 
-    const themeWords = ['battle', 'fantasy', 'warrior', 'duel', 'epic']
-    const imageTheme = themeWords[Math.floor(Math.random() * themeWords.length)]
-    const imageUrl = `https://source.unsplash.com/random/800x600/?${encodeURIComponent(
-      imageTheme
-    )}`
+    const imagePrompt = story.substring(0, 1000)
+
+    const imageResponse = await openai.images.generate({
+      prompt: imagePrompt,
+      n: 1,
+      size: '256x256',
+    })
+
+    const imageUrl = imageResponse.data[0]?.url || 'No image was generated.'
 
     return {
       story,
