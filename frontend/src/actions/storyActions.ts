@@ -163,14 +163,17 @@ async function generateNewStory(storyText: string): Promise<string> {
   ]
 
   const randomScenario = scenarios[Math.floor(Math.random() * scenarios.length)]
-  const sanitizedStoryText = storyText
-    .replace(/[^a-zA-Z0-9 .,!?'"-]/g, '')
-    .substring(0, 1000)
-  const prompt = `Craft a concise and creative fantasy battle story inspired by a battle log between two unnamed warriors. Use evocative titles like "the shadowed avenger" or "the flame-bound sentinel." Set the scene in ${randomScenario}, describing the environment briefly to enhance the drama. Focus on emotions, the flow of the fight, and the ultimate outcome, keeping the story short and impactful.
 
-  Battle log:
-  
-  ${sanitizedStoryText}`
+  const prompt = `Craft a short, creative fantasy battle story inspired by a fictional battle log between two unnamed warriors. 
+    Use evocative titles like "The Shadowed Avenger" or "The Flame-bound Sentinel" to give them identity. 
+    Set the scene in ${randomScenario}, describing the atmosphere and environment briefly to enhance the drama. 
+    Focus on the flow of the duel, each warrior's strategy, emotional tension, and the outcome — whether it's victory, defeat, or a mysterious disappearance. 
+    Keep it vivid and magical, but avoid graphic or excessively violent descriptions. 
+    Imply the action through dramatic tone and clever narration rather than explicit detail.
+    
+    Battle log:
+    ${storyText}
+    `
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
@@ -258,7 +261,7 @@ async function generateNewImage(
 
 export async function generateStoryWithImage(
   battleId: string,
-  storyText: string
+  battleLog: string
 ): Promise<{ story: string; imageUrl: string }> {
   try {
     console.log('Processing story and image for battle:', battleId)
@@ -268,7 +271,7 @@ export async function generateStoryWithImage(
 
     if (!story) {
       console.log('No existing story found, generating new story')
-      story = await generateNewStory(storyText)
+      story = await generateNewStory(battleLog)
       await saveStoryToDB(battleId, story)
     } else {
       console.log('Using cached story from database')

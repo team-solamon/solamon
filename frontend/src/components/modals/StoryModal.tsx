@@ -60,7 +60,7 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
     }
 
     if (battleAccount && battleActions) {
-      const storyLines = battleActions.map((action) => {
+      const battleLogLines = battleActions.map((action) => {
         const attacker =
           action.player === battleAccount.player1.toString()
             ? battleAccount.player1Name || 'Player 1'
@@ -81,11 +81,11 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
           ? battleAccount.player1Name || 'Player 1'
           : battleAccount.player2Name || 'Player 2'
 
-      storyLines.push(`${winnerName} is the winner of the battle!`)
+      battleLogLines.push(`${winnerName} is the winner of the battle!`)
 
-      const fullStory = storyLines.join('\n')
+      const battleLog = battleLogLines.join('\n')
 
-      generateStoryWithImage(selectedBattle.battleId, fullStory)
+      generateStoryWithImage(selectedBattle.battleId, battleLog)
         .then((response) => {
           setStoryText(response.story)
           setImageUrl(response.imageUrl)
