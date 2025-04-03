@@ -91,7 +91,10 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
           setImageUrl(response.imageUrl)
         })
         .catch((error) => {
-          setStoryText('Failed to generate story image: ' + error.message)
+          console.error('Story generation error:', error)
+          setStoryText(
+            "We couldn't create your battle story at this time. Please try again later."
+          )
         })
         .finally(() => {
           setLoading(false)

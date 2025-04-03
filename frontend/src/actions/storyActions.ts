@@ -29,7 +29,7 @@ async function getStoryFromDB(battleId: string): Promise<string | null> {
       return null
     }
 
-    if (!data || !data.story) {
+    if (!data || !data.story || data.story === '') {
       console.log(`No story found for battle ${battleId}`)
       return null
     }
@@ -55,7 +55,7 @@ async function getImageUrlFromDB(battleId: string): Promise<string | null> {
       return null
     }
 
-    if (!data || !data.story_image_url) {
+    if (!data || !data.story_image_url || data.story_image_url === '') {
       console.log(`No image found for battle ${battleId}`)
       return null
     }
