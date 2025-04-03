@@ -81,8 +81,8 @@ const GameResult: React.FC<GameResultProps> = ({
         </div>
       </div>
       <div className='mt-4 flex flex-col items-center'>
-        {showReplay && (
-          <div className='flex gap-2'>
+        <div className='flex gap-2'>
+          {showReplay && (
             <Button
               size='S'
               onClick={() => {
@@ -92,17 +92,17 @@ const GameResult: React.FC<GameResultProps> = ({
             >
               {'replay >'}
             </Button>
-            <Button
-              size='S'
-              onClick={() => {
-                onClose()
-                openModal('story')
-              }}
-            >
-              {'story >'}
-            </Button>
-          </div>
-        )}
+          )}
+          <Button
+            size='S'
+            onClick={() => {
+              onClose()
+              openModal('story')
+            }}
+          >
+            {'story >'}
+          </Button>
+        </div>
 
         {claimable ? (
           <div className='mt-2 flex flex-col items-center justify-center gap-2'>

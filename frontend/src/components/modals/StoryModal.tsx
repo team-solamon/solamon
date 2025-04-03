@@ -106,7 +106,8 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
           isOpen={modals['story']}
           onClose={() => closeModal('story')}
           title={'Battle Story'}
-          maxWidth='600px'
+          maxWidth='800px'
+          maxHeight='800px'
         >
           {loading ? (
             <div className='flex justify-center items-center p-4'>
@@ -134,12 +135,19 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
                 <p className='mt-2 text-gray-600'></p>
 
                 <Typography variant='body-2' color='inverse' outline={false}>
-                  Generating your battle story...
+                  {
+                    [
+                      'Your battle is being forged...',
+                      'A clash of legends awaits...',
+                      'The story writes itself...',
+                      'The fight stirs in the shadows...',
+                    ][Math.floor(Math.random() * 4)]
+                  }
                 </Typography>
               </div>
             </div>
           ) : (
-            <div className='p-4 space-y-4 max-h-[400px] overflow-y-auto'>
+            <div className='p-4 space-y-4 max-h-[600px] overflow-y-auto'>
               {imageUrl && (
                 <div className='w-full flex justify-center'>
                   <img
@@ -148,7 +156,11 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
                   />
                 </div>
               )}
-              <div className='whitespace-pre-line'>{storyText}</div>
+              <div className='whitespace-pre-line'>
+                <Typography variant='body-2' color='inverse' outline={false}>
+                  {storyText}
+                </Typography>
+              </div>
             </div>
           )}
         </Modal>
