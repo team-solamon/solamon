@@ -234,29 +234,96 @@ async function uploadImageToStorage(
   }
 }
 
+async function sanitizeImagePrompt(text: string): Promise<string> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are a helpful assistant that creates safe image descriptions.',
+        },
+        {
+          role: 'user',
+          content: `Create a safe, non-violent fantasy scene description based on this battle story. Focus only on the environment, characters' appearance, and magical elements. Avoid any violence, blood, weapons, or disturbing imagery: "${text.substring(
+            0,
+            300
+          )}"`,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 200,
+    })
+
+    return (
+      response.choices[0]?.message?.content ||
+      'A mystical fantasy battle arena with magical energy flows'
+    )
+  } catch (error) {
+    console.error('Error sanitizing image prompt:', error)
+    return 'A mystical fantasy battle arena with magical energy flows'
+  }
+}
+
 async function generateNewImage(
   storyText: string,
   battleId: string
 ): Promise<string> {
-  const imagePrompt = storyText.substring(0, 500)
-  const enhancedImagePrompt = `Create a highly detailed and visually stunning fantasy artwork based on the following description: ${imagePrompt}. The artwork should capture the essence of an epic fantasy battle scene with vibrant colors, intricate details, and a dramatic atmosphere. Focus on the environment, characters, and magical elements to make it visually captivating.`
+  const maxAttempts = 3
+  const MAX_PROMPT_LENGTH = 800
+  const STYLE_SUFFIX =
+    'Style: digital art, high fantasy, magical atmosphere, vibrant colors.'
 
-  const imageResponse = await openai.images.generate({
-    prompt: enhancedImagePrompt,
-    n: 1,
-    size: '512x512',
-  })
+  try {
+    const sanitizedPrompt = await sanitizeImagePrompt(storyText)
 
-  const tempImageUrl = imageResponse.data[0]?.url || 'No image was generated.'
+    const truncatedPrompt =
+      sanitizedPrompt.length > MAX_PROMPT_LENGTH
+        ? sanitizedPrompt.substring(0, MAX_PROMPT_LENGTH) + '...'
+        : sanitizedPrompt
 
-  if (tempImageUrl === 'No image was generated.') {
-    return tempImageUrl
+    const enhancedImagePrompt = `Create a highly detailed fantasy artwork showing: ${truncatedPrompt}. ${STYLE_SUFFIX}`
+
+    console.log(`Prompt length: ${enhancedImagePrompt.length} characters`)
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        console.log(`Image generation attempt ${attempt}/${maxAttempts}`)
+
+        const imageResponse = await openai.images.generate({
+          prompt: enhancedImagePrompt,
+          n: 1,
+          size: '256x256',
+        })
+
+        const tempImageUrl = imageResponse.data[0]?.url
+
+        if (!tempImageUrl) {
+          console.log(`Attempt ${attempt} failed: No image URL returned`)
+          continue
+        }
+
+        const permanentImageUrl = await uploadImageToStorage(
+          tempImageUrl,
+          battleId
+        )
+        console.log('Image generated and uploaded to Storage successfully')
+        return permanentImageUrl
+      } catch (error: any) {
+        console.error(
+          `Image generation attempt ${attempt} failed:`,
+          error.message
+        )
+      }
+    }
+
+    console.log('All image generation attempts failed, using fallback image')
+    return ''
+  } catch (error) {
+    console.error('Error in image generation process:', error)
+    return ''
   }
-
-  const permanentImageUrl = await uploadImageToStorage(tempImageUrl, battleId)
-
-  console.log('Image generated and uploaded to Storage successfully')
-  return permanentImageUrl
 }
 
 export async function generateStoryWithImage(
