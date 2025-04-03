@@ -16,55 +16,91 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-async function getBattleStoryFromDB(
-  battleId: string
-): Promise<{ story: string; imageUrl: string } | null> {
+async function getStoryFromDB(battleId: string): Promise<string | null> {
   try {
     const { data, error } = await supabase
       .from('story')
-      .select('story, story_image_url')
+      .select('story')
       .eq('id', battleId)
       .single()
 
     if (error) {
-      console.error('Supabase query error:', error)
+      console.error('Supabase story query error:', error)
       return null
     }
 
-    if (!data) {
+    if (!data || !data.story) {
       console.log(`No story found for battle ${battleId}`)
       return null
     }
 
     console.log(`Found existing story for battle ${battleId}`)
-    return {
-      story: data.story,
-      imageUrl: data.story_image_url,
-    }
+    return data.story
   } catch (error) {
     console.error('Error retrieving story from database:', error)
     return null
   }
 }
 
-async function saveBattleStoryToDB(
-  battleId: string,
-  story: string,
-  imageUrl: string
-): Promise<boolean> {
+async function getImageUrlFromDB(battleId: string): Promise<string | null> {
   try {
-    const { error } = await supabase.from('story').insert({
-      id: battleId,
-      story: story,
-      story_image_url: imageUrl,
-    })
+    const { data, error } = await supabase
+      .from('story')
+      .select('story_image_url')
+      .eq('id', battleId)
+      .single()
 
     if (error) {
-      console.error('Supabase insert error:', error)
-      return false
+      console.error('Supabase image query error:', error)
+      return null
     }
 
-    console.log(`Successfully saved story for battle ${battleId} to database`)
+    if (!data || !data.story_image_url) {
+      console.log(`No image found for battle ${battleId}`)
+      return null
+    }
+
+    console.log(`Found existing image for battle ${battleId}`)
+    return data.story_image_url
+  } catch (error) {
+    console.error('Error retrieving image URL from database:', error)
+    return null
+  }
+}
+
+async function saveStoryToDB(
+  battleId: string,
+  story: string
+): Promise<boolean> {
+  try {
+    const { data } = await supabase
+      .from('story')
+      .select('id')
+      .eq('id', battleId)
+      .single()
+
+    if (data) {
+      const { error } = await supabase
+        .from('story')
+        .update({ story })
+        .eq('id', battleId)
+
+      if (error) {
+        console.error('Supabase story update error:', error)
+        return false
+      }
+    } else {
+      const { error } = await supabase
+        .from('story')
+        .insert({ id: battleId, story })
+
+      if (error) {
+        console.error('Supabase story insert error:', error)
+        return false
+      }
+    }
+
+    console.log(`Successfully saved story for battle ${battleId}`)
     return true
   } catch (error) {
     console.error('Error saving story to database:', error)
@@ -72,9 +108,47 @@ async function saveBattleStoryToDB(
   }
 }
 
-async function generateNewStoryWithImage(
-  storyText: string
-): Promise<{ story: string; imageUrl: string }> {
+async function saveImageUrlToDB(
+  battleId: string,
+  imageUrl: string
+): Promise<boolean> {
+  try {
+    const { data } = await supabase
+      .from('story')
+      .select('id')
+      .eq('id', battleId)
+      .single()
+
+    if (data) {
+      const { error } = await supabase
+        .from('story')
+        .update({ story_image_url: imageUrl })
+        .eq('id', battleId)
+
+      if (error) {
+        console.error('Supabase image update error:', error)
+        return false
+      }
+    } else {
+      const { error } = await supabase
+        .from('story')
+        .insert({ id: battleId, story_image_url: imageUrl })
+
+      if (error) {
+        console.error('Supabase image insert error:', error)
+        return false
+      }
+    }
+
+    console.log(`Successfully saved image URL for battle ${battleId}`)
+    return true
+  } catch (error) {
+    console.error('Error saving image URL to database:', error)
+    return false
+  }
+}
+
+async function generateNewStory(storyText: string): Promise<string> {
   const scenarios = [
     'an ancient battlefield shrouded in mist, where the echoes of past warriors linger',
     'a temple deep within a forgotten jungle, filled with glowing runes and traps',
@@ -113,8 +187,11 @@ async function generateNewStoryWithImage(
   const story =
     response.choices[0]?.message?.content || 'No story was generated.'
   console.log('Story generated successfully')
+  return story
+}
 
-  const imagePrompt = story.substring(0, 500)
+async function generateNewImage(storyText: string): Promise<string> {
+  const imagePrompt = storyText.substring(0, 500)
   const enhancedImagePrompt = `Create a highly detailed and visually stunning fantasy artwork based on the following description: ${imagePrompt}. The artwork should capture the essence of an epic fantasy battle scene with vibrant colors, intricate details, and a dramatic atmosphere. Focus on the environment, characters, and magical elements to make it visually captivating.`
 
   const imageResponse = await openai.images.generate({
@@ -124,7 +201,8 @@ async function generateNewStoryWithImage(
   })
 
   const imageUrl = imageResponse.data[0]?.url || 'No image was generated.'
-  return { story, imageUrl }
+  console.log('Image generated successfully')
+  return imageUrl
 }
 
 export async function generateStoryWithImage(
@@ -132,30 +210,32 @@ export async function generateStoryWithImage(
   storyText: string
 ): Promise<{ story: string; imageUrl: string }> {
   try {
-    console.log('Processing story for battle:', battleId)
+    console.log('Processing story and image for battle:', battleId)
 
-    const existingStory = await getBattleStoryFromDB(battleId)
+    let story = await getStoryFromDB(battleId)
+    let imageUrl = await getImageUrlFromDB(battleId)
 
-    if (existingStory) {
-      console.log('Found existing story in database, returning it')
-      return existingStory
+    if (!story) {
+      console.log('No existing story found, generating new story')
+      story = await generateNewStory(storyText)
+      await saveStoryToDB(battleId, story)
+    } else {
+      console.log('Using cached story from database')
     }
 
-    console.log('No existing story found, generating new story')
-    console.log(
-      'Generating story for log:',
-      storyText.substring(0, 100) + '...'
-    )
-
-    const { story, imageUrl } = await generateNewStoryWithImage(storyText)
-
-    await saveBattleStoryToDB(battleId, story, imageUrl)
+    if (!imageUrl) {
+      console.log('No existing image found, generating new image')
+      imageUrl = await generateNewImage(story)
+      await saveImageUrlToDB(battleId, imageUrl)
+    } else {
+      console.log('Using cached image from database')
+    }
 
     return { story, imageUrl }
   } catch (error: any) {
-    console.error('Error generating story:', error)
+    console.error('Error in story/image processing:', error)
     throw new Error(
-      `Failed to generate story: ${error.message || 'Unknown error'}`
+      `Failed to process story/image: ${error.message || 'Unknown error'}`
     )
   }
 }
