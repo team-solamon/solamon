@@ -14,6 +14,7 @@ import Typography from './Typography'
 import { sendAndConfirmTransaction } from '@solana/web3.js'
 import { useLoading } from '@/contexts/LoadingContext'
 import { useBalance } from '@/contexts/BalanceContext'
+import { useModal } from '@/contexts/ModalContext'
 
 interface GameResultProps {
   battleAccount: BattleAccount
@@ -28,6 +29,7 @@ const GameResult: React.FC<GameResultProps> = ({
   onClaim,
   onClose,
 }) => {
+  const { openModal } = useModal()
   const router = useRouter()
   const player = getKeypairFromLocalStorage()
   const winner = getWinnerFromBattleAccount(battleAccount)
@@ -80,15 +82,26 @@ const GameResult: React.FC<GameResultProps> = ({
       </div>
       <div className='mt-4 flex flex-col items-center'>
         {showReplay && (
-          <Button
-            size='S'
-            onClick={() => {
-              onClose()
-              router.push(`${ROUTES.GAME}?battleId=${battleAccount.battleId}`)
-            }}
-          >
-            {'replay >'}
-          </Button>
+          <div className='flex gap-2'>
+            <Button
+              size='S'
+              onClick={() => {
+                onClose()
+                router.push(`${ROUTES.GAME}?battleId=${battleAccount.battleId}`)
+              }}
+            >
+              {'replay >'}
+            </Button>
+            <Button
+              size='S'
+              onClick={() => {
+                onClose()
+                openModal('story')
+              }}
+            >
+              {'story >'}
+            </Button>
+          </div>
         )}
 
         {claimable ? (
