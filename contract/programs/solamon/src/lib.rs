@@ -51,6 +51,7 @@ pub mod solamon {
         let user_account = &mut ctx.accounts.user_account;
         let config_account = &mut ctx.accounts.config_account;
         user_account.bump = ctx.bumps.user_account;
+        user_account.user = ctx.accounts.player.key();
         let current_count = user_account.solamons.len();
         let solamon_prototype_account = &ctx.accounts.solamon_prototype_account;
 
@@ -254,6 +255,15 @@ pub mod solamon {
         let battle_status = execute_battle(&mut battle_account.clone());
         battle_account.battle_status = battle_status;
         user_account.battle_count += 1;
+
+        if battle_account.battle_status == BattleStatus::Player2Wins {
+            user_account.points += WINNER_POINTS;
+            opponent_user_account.points =
+                opponent_user_account.points.saturating_sub(LOSER_POINTS);
+        } else {
+            user_account.points = user_account.points.saturating_sub(LOSER_POINTS);
+            opponent_user_account.points += WINNER_POINTS;
+        }
 
         if let Some(index) = config_account
             .available_battle_ids

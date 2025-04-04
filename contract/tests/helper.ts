@@ -92,6 +92,12 @@ export const getUserAccount = async (
 	return userAccount
 }
 
+// @AARON: for leaderboard, use user & points in account
+export const getAllUserAccounts = async (program: Program<Solamon>) => {
+	const userAccounts = await program.account.userAccount.all()
+	return userAccounts
+}
+
 export const getBattleAccountPDA = (
 	program: Program<Solamon>,
 	battleId: number

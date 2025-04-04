@@ -125,15 +125,19 @@ pub struct SpawnSolamons<'info> {
 #[account]
 pub struct UserAccount {
     pub bump: u8,
-    pub solamons: Vec<Solamon>,
+    pub user: Pubkey,
+    pub points: u16,
     pub battle_count: u64,
+    pub solamons: Vec<Solamon>,
 }
 
 impl Space for UserAccount {
     const INIT_SPACE: usize = 8 // discriminator
-        + 1 // bump
-        + MAX_SOLAMONS_PER_USER_ACCOUNT * Solamon::INIT_SPACE // solamons
-        + 8; // battle_count
+        + 1 // bump 
+        + 32 // user
+        + 2 // points
+        + 8 // battle_count
+        + MAX_SOLAMONS_PER_USER_ACCOUNT * Solamon::INIT_SPACE; // solamons
 }
 
 #[account]

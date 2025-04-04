@@ -1664,6 +1664,18 @@ export type Solamon = {
             "type": "u8"
           },
           {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "points",
+            "type": "u16"
+          },
+          {
+            "name": "battleCount",
+            "type": "u64"
+          },
+          {
             "name": "solamons",
             "type": {
               "vec": {
@@ -1672,10 +1684,6 @@ export type Solamon = {
                 }
               }
             }
-          },
-          {
-            "name": "battleCount",
-            "type": "u64"
           }
         ]
       }

@@ -21,6 +21,7 @@ import {
 	BattleStatus,
 	showSpawnResult,
 	spawnSolamonsTx,
+	getAllUserAccounts,
 } from "./helper"
 
 describe("solamon", () => {
@@ -372,5 +373,12 @@ describe("solamon", () => {
 		const balanceAfter = await connection.getBalance(player3.publicKey)
 
 		expect(balanceAfter).to.be.greaterThan(balanceBefore)
+	})
+
+	it("Can get all user accounts", async () => {
+		const userAccounts = await getAllUserAccounts(program)
+		expect(userAccounts.length).to.be.greaterThan(0)
+
+		console.log(JSON.stringify(userAccounts, null, 2))
 	})
 })

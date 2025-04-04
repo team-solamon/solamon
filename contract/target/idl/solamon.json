@@ -1658,6 +1658,18 @@
             "type": "u8"
           },
           {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "points",
+            "type": "u16"
+          },
+          {
+            "name": "battle_count",
+            "type": "u64"
+          },
+          {
             "name": "solamons",
             "type": {
               "vec": {
@@ -1666,10 +1678,6 @@
                 }
               }
             }
-          },
-          {
-            "name": "battle_count",
-            "type": "u64"
           }
         ]
       }
