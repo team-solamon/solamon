@@ -15,8 +15,8 @@ import {
   getProgram,
   getWinnerFromBattleAccount,
 } from '@/lib/helper'
-import { generateStoryWithImage } from '@/actions/storyActions'
 import Typography from '../Typography'
+import { createClient } from '@supabase/supabase-js'
 
 interface StoryModalProps {
   selectedBattle: BattleAccount
@@ -33,6 +33,12 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
   const [storyText, setStoryText] = useState<string>('')
   const [imageUrl, setImageUrl] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
+
+  // Initialize Supabase client
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  )
 
   useEffect(() => {
     if (!selectedBattle) return
@@ -51,6 +57,42 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
     )
     if (battleActions) {
       setBattleActions(battleActions)
+    }
+  }
+
+  const callGenerateStoryFunction = async (
+    battleId: string,
+    battleLog: string
+  ) => {
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+      if (!supabaseUrl || !supabaseAnonKey) {
+        throw new Error('Supabase configuration is missing')
+      }
+
+      const response = await fetch(
+        `${supabaseUrl}/functions/v1/generate-story`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${supabaseAnonKey}`,
+          },
+          body: JSON.stringify({ battleId, battleLog }),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error calling generate-story function:', error)
+      throw error
     }
   }
 
@@ -85,7 +127,7 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
 
       const battleLog = battleLogLines.join('\n')
 
-      generateStoryWithImage(selectedBattle.battleId, battleLog)
+      callGenerateStoryFunction(selectedBattle.battleId, battleLog)
         .then((response) => {
           setStoryText(response.story)
           setImageUrl(response.imageUrl)
