@@ -12,7 +12,7 @@ import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Nav from '@/components/Nav'
 import SharedModal from '@/components/SharedModal'
-import SolanaBalance from '@/components/SolanaBalance'
+import Balance from '@/components/Balance'
 
 import { FIGHT_SOL_PRICE } from '@/constant/env'
 
@@ -78,7 +78,7 @@ const ChooseFighterPage = () => {
               >
                 <div className='flex items-center gap-1'>
                   Choose Fighter
-                  <SolanaBalance balance={FIGHT_SOL_PRICE} />
+                  <Balance balance={FIGHT_SOL_PRICE} />
                 </div>
               </Button>
             )}

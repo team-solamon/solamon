@@ -12,7 +12,7 @@ import {
   CardData,
   getBattleAccount,
   getUserAccount,
-  wrapSolAndJoinBattleTx,
+  joinBattleTx,
 } from '@/lib/solana-helper'
 
 import Card from '@/components/Card'
@@ -93,8 +93,7 @@ const PrepareBattlePage = () => {
     setLoading(true)
     try {
       console.log('Starting battle with cards:', pickedCards)
-      const tx = await wrapSolAndJoinBattleTx(
-        connection,
+      const tx = await joinBattleTx(
         program,
         publicKey,
         parseInt(battleId),

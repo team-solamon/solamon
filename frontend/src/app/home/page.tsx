@@ -10,7 +10,8 @@ import { ROUTES } from '@/lib/routes'
 import {
   BattleAccount,
   battleStatusToString,
-  cancelBattleAndUnwrapSolTx,
+  burnSolamonTx,
+  cancelBattleTx,
   CardData,
   getBattleAccountsByUser,
   getUserAccount,
@@ -23,7 +24,7 @@ import ResultModal from '@/components/modals/ResultModal'
 import StoryModal from '@/components/modals/StoryModal'
 import Nav from '@/components/Nav'
 import SharedModal from '@/components/SharedModal'
-import SolanaBalance from '@/components/SolanaBalance'
+import Balance from '@/components/Balance'
 import Typography from '@/components/Typography'
 
 import { NEW_CARD_SOL_PRICE } from '@/constant/env'
@@ -81,12 +82,7 @@ const HomePage = () => {
       return
     }
     showLoading('Cancelling battle...')
-    const tx = await cancelBattleAndUnwrapSolTx(
-      connection,
-      program,
-      publicKey,
-      battleId
-    )
+    const tx = await cancelBattleTx(program, publicKey, battleId)
     try {
       const txHash = await sendTransaction(tx, connection)
       await connection.confirmTransaction(txHash)
@@ -98,6 +94,20 @@ const HomePage = () => {
     hideLoading()
   }
 
+  const handleRedeemCard = async (card: CardData) => {
+    if (!publicKey) {
+      console.error('No player found')
+      return
+    }
+    showLoading('Redeeming card...')
+    const tx = await burnSolamonTx(connection, program, publicKey, card.id)
+    const txHash = await sendTransaction(tx, connection)
+    await connection.confirmTransaction(txHash)
+    fetchBalance()
+    fetchMyCards()
+    hideLoading()
+  }
+
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
       <Nav />
@@ -105,7 +115,7 @@ const HomePage = () => {
         <Button onClick={() => openModal('purchaseCard')}>
           <div className='flex items-center gap-1'>
             + New Card
-            <SolanaBalance balance={NEW_CARD_SOL_PRICE} />
+            <Balance balance={NEW_CARD_SOL_PRICE} />
           </div>
         </Button>
         <Button
@@ -228,7 +238,7 @@ const HomePage = () => {
 
       <section className='my-card-section max-w-[1000px] mx-auto'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <CardList cards={myCards} />
+          <CardList cards={myCards} onRedeemCard={handleRedeemCard} />
         </div>
       </section>
 

@@ -1,5 +1,7 @@
 'use client'
 
+import { zBTC_MINT } from '@/constant/env'
+import { getAssociatedTokenAddressSync } from '@solana/spl-token'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
@@ -7,6 +9,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 
 interface BalanceContextType {
   balance: number | null
+  zBTCBalance: number | null
   fetchBalance: () => Promise<void>
 }
 
@@ -16,6 +19,7 @@ export const BalanceProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [balance, setBalance] = useState<number | null>(null)
+  const [zBTCBalance, setzBTCBalance] = useState<number | null>(null)
   const { connection } = useConnection()
   const { publicKey } = useWallet()
 
@@ -25,6 +29,11 @@ export const BalanceProvider: React.FC<{ children: React.ReactNode }> = ({
       publicKey || new PublicKey('')
     )
     setBalance(balanceInLamports / LAMPORTS_PER_SOL)
+
+    const zBTCBalanceInLamports = await connection.getTokenAccountBalance(
+      getAssociatedTokenAddressSync(zBTC_MINT, publicKey)
+    )
+    setzBTCBalance(Number(zBTCBalanceInLamports.value.amount))
   }
 
   useEffect(() => {
@@ -34,7 +43,7 @@ export const BalanceProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [publicKey])
 
   return (
-    <BalanceContext.Provider value={{ balance, fetchBalance }}>
+    <BalanceContext.Provider value={{ balance, zBTCBalance, fetchBalance }}>
       {children}
     </BalanceContext.Provider>
   )

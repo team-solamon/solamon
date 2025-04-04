@@ -5,7 +5,7 @@ import React from 'react'
 import { getProgram } from '@/lib/helper'
 import { getWinnerFromBattleAccount } from '@/lib/helper'
 import { ROUTES } from '@/lib/routes'
-import { BattleAccount, claimBattleAndUnwrapSolTx } from '@/lib/solana-helper'
+import { BattleAccount, claimBattleTx } from '@/lib/solana-helper'
 
 import { useBalance } from '@/contexts/BalanceContext'
 import { useLoading } from '@/contexts/LoadingContext'
@@ -45,12 +45,8 @@ const GameResult: React.FC<GameResultProps> = ({
 
     showLoading('Claiming reward...')
     try {
-      const tx = await claimBattleAndUnwrapSolTx(
-        connection,
-        program,
-        publicKey,
-        battleAccount.battleId
-      )
+      const tx = await claimBattleTx(program, publicKey, battleAccount.battleId)
+
       const txHash = await sendTransaction(tx, connection)
       await connection.confirmTransaction(txHash)
     } catch (error) {

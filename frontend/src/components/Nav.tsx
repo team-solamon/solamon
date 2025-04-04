@@ -12,7 +12,7 @@ import { useBalance } from '@/contexts/BalanceContext'
 import { useLoading } from '@/contexts/LoadingContext'
 import { useModal } from '@/contexts/ModalContext'
 
-import SolanaBalance from './SolanaBalance'
+import Balance from './Balance'
 import Typography from './Typography'
 
 const YellowButton: React.FC<{
@@ -34,27 +34,12 @@ const Nav: React.FC = () => {
   const router = useRouter()
   const { connected, publicKey } = useWallet()
   const { showLoading, hideLoading } = useLoading()
-  const { balance, fetchBalance } = useBalance()
+  const { balance, zBTCBalance, fetchBalance } = useBalance()
   const { connection } = useConnection()
+  const { disconnect } = useWallet()
 
-  const handleRequestAirdrop = async () => {
-    // Request airdrop
-    if (!publicKey) {
-      return
-    }
-    try {
-      showLoading('Requesting airdrop...')
-      const airdropSignature = await connection.requestAirdrop(
-        publicKey,
-        1e9 // 1 SOL in lamports
-      )
-      await connection.confirmTransaction(airdropSignature)
-    } catch (error) {
-      alert(error)
-      console.error('Airdrop failed', error)
-    }
-    hideLoading()
-    fetchBalance()
+  const handleDisconnect = () => {
+    disconnect()
   }
 
   // Show tutorial modal for the first time
@@ -111,9 +96,10 @@ const Nav: React.FC = () => {
             {trimAddress(publicKey?.toBase58())}
           </a>
         </Typography>
-        <SolanaBalance balance={balance || 0} />
-        <YellowButton onClick={handleRequestAirdrop}>
-          <Typography variant='body-3'>claim dev SOL</Typography>
+        <Balance balance={balance || 0} icon='sol' />
+        <Balance balance={zBTCBalance || 0} icon='zbtc' />
+        <YellowButton onClick={handleDisconnect}>
+          <Typography variant='body-3'>disconnect</Typography>
         </YellowButton>
       </div>
     </header>

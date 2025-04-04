@@ -7,7 +7,7 @@ import { useModal } from '@/contexts/ModalContext'
 
 import Button from '../Button'
 import Modal from '../Modal'
-import SolanaBalance from '../SolanaBalance'
+import Balance from '../Balance'
 import Typography from '../Typography'
 
 interface PurchaseCardModalProps {
@@ -66,7 +66,7 @@ const PurchaseCardModal: React.FC<PurchaseCardModalProps> = ({
           >
             <div className='flex items-center gap-1'>
               + New Card
-              <SolanaBalance balance={cardAmount * NEW_CARD_SOL_PRICE} />
+              <Balance balance={cardAmount * NEW_CARD_SOL_PRICE} />
             </div>
           </Button>
         </div>

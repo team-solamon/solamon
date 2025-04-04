@@ -11,7 +11,8 @@ import { ReactNode, useMemo } from 'react'
 import '@solana/wallet-adapter-react-ui/styles.css'
 
 const WalletContextProvider = ({ children }: { children: ReactNode }) => {
-  const endpoint = clusterApiUrl('devnet')
+  const endpoint =
+    'https://newest-practical-snowflake.solana-mainnet.quiknode.pro/b03f0eacffc5f1860d23a09201ab2003fb94df1b/'
   const wallets = useMemo(() => [], [])
 
   return (

@@ -10,8 +10,9 @@ import { useModal } from '@/contexts/ModalContext'
 
 import Button from './Button'
 import CardStats from './CardStats'
-import SolanaBalance from './SolanaBalance'
+import Balance from './Balance'
 import Typography from './Typography'
+import { NEW_CARD_SOL_PRICE } from '@/constant/env'
 
 interface CardListProps {
   cards: CardData[]
@@ -19,6 +20,7 @@ interface CardListProps {
   showInBattle?: boolean
   onCardPick?: (card: CardData) => void
   onPurchaseCard?: () => void
+  onRedeemCard?: (card: CardData) => void
 }
 
 const getElementCounts = (cards: CardData[]) => {
@@ -44,6 +46,7 @@ const CardList: React.FC<CardListProps> = ({
   pickedCards,
   showInBattle,
   onCardPick,
+  onRedeemCard,
 }) => {
   const { openModal } = useModal()
 
@@ -71,7 +74,7 @@ const CardList: React.FC<CardListProps> = ({
             <Button onClick={() => openModal('purchaseCard')}>
               <div className='flex items-center gap-1'>
                 + New Card
-                <SolanaBalance balance={0.1} />
+                <Balance balance={NEW_CARD_SOL_PRICE} />
               </div>
             </Button>
           </div>
@@ -113,6 +116,13 @@ const CardList: React.FC<CardListProps> = ({
                   <div className='bg-black rounded-full px-4 py-2 relative'>
                     <span className='text-yellow-400'>In Battle</span>
                   </div>
+                </div>
+              )}
+              {onRedeemCard && (
+                <div className='absolute top-0 right-0'>
+                  <Button size='S' onClick={() => onRedeemCard(card)}>
+                    Redeem
+                  </Button>
                 </div>
               )}
               <CardStats attack={card.attack} health={card.health} />
