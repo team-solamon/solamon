@@ -2,7 +2,7 @@ import * as anchor from "@coral-xyz/anchor"
 import { Program, BN } from "@coral-xyz/anchor"
 import { Solamon } from "../target/types/solamon"
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js"
-import { SolamonPrototype } from "../tests/helper"
+import { getConfigAccount, SolamonPrototype } from "../tests/helper"
 
 async function main() {
 	// Configure the client to use the local cluster
@@ -28,23 +28,26 @@ async function main() {
 	console.log(`Spawn Fee: ${spawnDeposit.toNumber() / LAMPORTS_PER_SOL} SOL`)
 	console.log(`Stake Token Mint: ${stakeTokenMint.toString()}`)
 
-	try {
-		// Call the initialize instruction
-		const tx = await program.methods
-			.initialize(admin, spawnDeposit)
-			.accounts({
-				signer: admin,
-				stakeTokenMint,
-			})
-			.signers([adminKeypair])
-			.rpc()
+	const configAccount = await getConfigAccount(program)
+	if (!configAccount) {
+		console.log("Initializing Solamon program...")
+		try {
+			// Call the initialize instruction
+			const tx = await program.methods
+				.initialize(admin, spawnDeposit)
+				.accounts({
+					signer: admin,
+					stakeTokenMint,
+				})
+				.signers([adminKeypair])
+				.rpc()
 
-		console.log("Initialization successful!")
-		console.log(`Transaction signature: ${tx}`)
-	} catch (error) {
-		console.error("Error initializing Solamon program:", error)
+			console.log("Initialization successful!")
+			console.log(`Transaction signature: ${tx}`)
+		} catch (error) {
+			console.error("Error initializing Solamon program:", error)
+		}
 	}
-
 	try {
 		const solamonPrototype: SolamonPrototype[] = [
 			{
