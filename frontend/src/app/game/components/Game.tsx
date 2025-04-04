@@ -1,10 +1,10 @@
 'use client'
 
+import { useWallet } from '@solana/wallet-adapter-react'
+import { useConnection } from '@solana/wallet-adapter-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useMemo,useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
-import { getKeypairFromLocalStorage } from '@/lib/helper'
-import { getConnection } from '@/lib/helper'
 import { getProgram } from '@/lib/helper'
 import { ROUTES } from '@/lib/routes'
 import {
@@ -32,9 +32,9 @@ const Game: React.FC = () => {
   const searchParams = useSearchParams()
   const battleId = searchParams.get('battleId')
   const router = useRouter()
-  const program = getProgram()
-  const connection = getConnection()
-  const player = getKeypairFromLocalStorage()
+  const { connection } = useConnection()
+  const program = getProgram(connection)
+  const { publicKey } = useWallet()
   const [battleLogs, setBattleLogs] = useState<
     { message: string; color: string }[]
   >([])
@@ -52,14 +52,13 @@ const Game: React.FC = () => {
   }, [battleId])
 
   useEffect(() => {
-    if (!player) {
-      alert('Please create account first')
+    if (!publicKey) {
+      alert('Please connect wallet first')
       router.push('/')
       return
     }
 
-    const isPlayer1 =
-      battleAccount?.player1.toString() === player.publicKey.toString()
+    const isPlayer1 = battleAccount?.player1.toString() === publicKey.toString()
 
     if (battleAccount && battleActions) {
       const battleReplay: BattleReplay = {

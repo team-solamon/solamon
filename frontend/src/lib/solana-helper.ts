@@ -1,6 +1,5 @@
 import * as anchor from "@coral-xyz/anchor"
 import { BN, IdlTypes, Program } from "@coral-xyz/anchor"
-import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes"
 import {
 	ASSOCIATED_TOKEN_PROGRAM_ID,
 	createAssociatedTokenAccountInstruction,
@@ -23,6 +22,7 @@ import {
 } from "@solana/web3.js"
 
 import { Solamon } from "../target/types/solamon"
+import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes"
 
 export type SolamonPrototype = IdlTypes<Solamon>["solamonPrototype"]
 export type Element = IdlTypes<Solamon>["element"]

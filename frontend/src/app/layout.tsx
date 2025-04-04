@@ -61,11 +61,11 @@ export default function RootLayout({
     <html>
       <body>
         <LoadingProvider>
-          <BalanceProvider>
+          <ModalProvider>
             <WalletContextProvider>
-              <ModalProvider>{children}</ModalProvider>
+              <BalanceProvider>{children}</BalanceProvider>
             </WalletContextProvider>
-          </BalanceProvider>
+          </ModalProvider>
         </LoadingProvider>
       </body>
     </html>

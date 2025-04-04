@@ -1,10 +1,11 @@
 'use client'
 
-import { LAMPORTS_PER_SOL, sendAndConfirmTransaction } from '@solana/web3.js'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
-import { getConnection,getKeypairFromLocalStorage } from '@/lib/helper'
 import { getProgram } from '@/lib/helper'
 import { ROUTES } from '@/lib/routes'
 import {
@@ -26,9 +27,9 @@ const OpenBattlePage = () => {
   const [pickedCards, setPickedCards] = useState<CardData[]>([])
   const [myCards, setMyCards] = useState<CardData[]>([])
   const [loading, setLoading] = useState(false)
-  const connection = getConnection()
-  const program = getProgram()
-  const player = getKeypairFromLocalStorage()
+  const { connection } = useConnection()
+  const program = getProgram(connection)
+  const { publicKey, sendTransaction } = useWallet()
   const { fetchBalance } = useBalance()
 
   useEffect(() => {
@@ -36,11 +37,11 @@ const OpenBattlePage = () => {
   }, [])
 
   const fetchMyCards = async () => {
-    if (!player) {
+    if (!publicKey) {
       console.error('No player found')
       return
     }
-    const myAccount = await getUserAccount(program, player.publicKey)
+    const myAccount = await getUserAccount(program, publicKey)
     setMyCards(myAccount.solamons)
 
     if (myAccount.solamons.length < 3) {
@@ -66,7 +67,7 @@ const OpenBattlePage = () => {
       return
     }
 
-    if (!player) {
+    if (!publicKey) {
       console.error('No player found')
       return
     }
@@ -79,12 +80,13 @@ const OpenBattlePage = () => {
     const tx = await wrapSolAndOpenBattleTx(
       connection,
       program,
-      player.publicKey,
+      publicKey,
       BATLLE_STAKE,
       pickedCards.map((card) => card.id)
     )
 
-    const sig = await sendAndConfirmTransaction(getConnection(), tx, [player])
+    const txHash = await sendTransaction(tx, connection)
+    await connection.confirmTransaction(txHash)
 
     setPickedCards([])
     fetchMyCards()
@@ -92,7 +94,6 @@ const OpenBattlePage = () => {
     setLoading(false)
   }
 
-  console.log({ myCards })
   return (
     <div className='prepare-battle-page bg-black text-white min-h-screen p-4'>
       <Nav />

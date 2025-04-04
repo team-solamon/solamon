@@ -1,9 +1,10 @@
 'use client'
 
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
-import { getKeypairFromLocalStorage, getProgram } from '@/lib/helper'
+import { getProgram } from '@/lib/helper'
 import { CardData, getPendingBattleAccounts } from '@/lib/solana-helper'
 import { BattleAccount } from '@/lib/solana-helper'
 
@@ -20,7 +21,8 @@ const ChooseFighterPage = () => {
   const [pendingBattleAccounts, setPendingBattleAccounts] = useState<
     BattleAccount[]
   >([])
-  const program = getProgram()
+  const { connection } = useConnection()
+  const program = getProgram(connection)
   useEffect(() => {
     fetchPendingBattleAccounts()
   }, [])
@@ -28,9 +30,10 @@ const ChooseFighterPage = () => {
     const battleAccounts = await getPendingBattleAccounts(program)
     setPendingBattleAccounts(battleAccounts)
   }
-  const player = getKeypairFromLocalStorage()
+  const { publicKey } = useWallet()
+
   const isMyBattle = (battleAccount: BattleAccount) => {
-    return battleAccount.player1.equals(player?.publicKey)
+    return battleAccount.player1.equals(publicKey)
   }
 
   return (

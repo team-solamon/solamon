@@ -1,9 +1,9 @@
 'use client'
 
-import { LAMPORTS_PER_SOL } from '@solana/web3.js'
-import React, { createContext, useContext, useEffect,useState } from 'react'
-
-import { getConnection, getKeypairFromLocalStorage } from '@/lib/helper'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 
 interface BalanceContextType {
   balance: number | null
@@ -16,18 +16,22 @@ export const BalanceProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [balance, setBalance] = useState<number | null>(null)
+  const { connection } = useConnection()
+  const { publicKey } = useWallet()
 
   const fetchBalance = async () => {
-    const connection = getConnection()
-    const keypair = getKeypairFromLocalStorage()
-    if (!keypair?.publicKey) return
-    const balanceInLamports = await connection.getBalance(keypair.publicKey)
+    if (!publicKey) return
+    const balanceInLamports = await connection.getBalance(
+      publicKey || new PublicKey('')
+    )
     setBalance(balanceInLamports / LAMPORTS_PER_SOL)
   }
 
   useEffect(() => {
-    fetchBalance()
-  }, [])
+    if (publicKey) {
+      fetchBalance()
+    }
+  }, [publicKey])
 
   return (
     <BalanceContext.Provider value={{ balance, fetchBalance }}>

@@ -1,12 +1,10 @@
 'use client'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
-import {
-  getConnection,
-  getKeypairFromLocalStorage,
-  getProgram,
-} from '@/lib/helper'
+import { getProgram } from '@/lib/helper'
 import { ROUTES } from '@/lib/routes'
 import {
   CardData,
@@ -33,38 +31,37 @@ const SharedModal = () => {
   const [myCards, setMyCards] = useState<CardData[]>([])
   const { fetchBalance } = useBalance()
   const [spawnResult, setSpawnResult] = useState<CardData[]>([])
-  const connection = getConnection()
-  const program = getProgram()
-  const player = getKeypairFromLocalStorage()
+  const { connection } = useConnection()
+  const program = getProgram(connection)
+  const { publicKey, sendTransaction } = useWallet()
 
   const handlePurchase = async (amount: number) => {
-    if (!player) {
-      console.error('No player found')
-      return
+    try {
+      if (!publicKey) {
+        console.error('No player found')
+        return
+      }
+      showLoading('Spawning solamons...')
+      const tx = await spawnSolamonsTx(connection, program, publicKey, amount)
+      const txSig = await sendTransaction(tx, connection)
+      await connection.confirmTransaction(txSig)
+      const spawnResult = await showSpawnResult(connection, txSig)
+      setSpawnResult(spawnResult)
+      closeModal('purchaseCard')
+      openModal('newCard')
+    } catch (error) {
+      console.error(error)
     }
-    showLoading('Spawning solamons...')
-    const tx = await spawnSolamonsTx(
-      connection,
-      program,
-      player.publicKey,
-      amount
-    )
-    const txSig = await connection.sendTransaction(tx, [player])
-    await connection.confirmTransaction(txSig)
-    const spawnResult = await showSpawnResult(connection, txSig)
-    setSpawnResult(spawnResult)
-    hideLoading()
     fetchBalance()
-    closeModal('purchaseCard')
-    openModal('newCard')
+    hideLoading()
   }
 
   const fetchMyCards = async () => {
-    if (!player) {
+    if (!publicKey) {
       console.error('No player found')
       return
     }
-    const myAccount = await getUserAccount(program, player.publicKey)
+    const myAccount = await getUserAccount(program, publicKey)
     setMyCards(myAccount.solamons)
   }
 

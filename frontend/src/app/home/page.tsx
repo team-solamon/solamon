@@ -1,14 +1,11 @@
 'use client'
 
-import { sendAndConfirmTransaction } from '@solana/web3.js'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
-import {
-  getConnection,
-  getKeypairFromLocalStorage,
-  getProgram,
-} from '@/lib/helper'
+import { getProgram } from '@/lib/helper'
 import { ROUTES } from '@/lib/routes'
 import {
   BattleAccount,
@@ -16,7 +13,6 @@ import {
   cancelBattleAndUnwrapSolTx,
   CardData,
   getBattleAccountsByUser,
-  getConfigAccount,
   getUserAccount,
 } from '@/lib/solana-helper'
 
@@ -49,9 +45,9 @@ const HomePage = () => {
   const [myCards, setMyCards] = useState<CardData[]>([])
   const [myBattles, setMyBattles] = useState<BattleAccount[]>([])
   const { showLoading, hideLoading } = useLoading()
-  const connection = getConnection()
-  const program = getProgram()
-  const player = getKeypairFromLocalStorage()
+  const { connection } = useConnection()
+  const program = getProgram(connection)
+  const { publicKey, sendTransaction } = useWallet()
 
   useEffect(() => {
     fetchMyCards()
@@ -59,20 +55,20 @@ const HomePage = () => {
   }, [])
 
   const fetchMyCards = async () => {
-    if (!player) {
+    if (!publicKey) {
       console.error('No player found')
       return
     }
-    const myAccount = await getUserAccount(program, player.publicKey)
+    const myAccount = await getUserAccount(program, publicKey)
     setMyCards(myAccount.solamons)
   }
 
   const fetchMyBattles = async () => {
-    if (!player) {
+    if (!publicKey) {
       console.error('No player found')
       return
     }
-    const myBattles = await getBattleAccountsByUser(program, player.publicKey)
+    const myBattles = await getBattleAccountsByUser(program, publicKey)
     setMyBattles([
       ...myBattles.player1BattleAccounts,
       ...myBattles.player2BattleAccounts,
@@ -80,9 +76,7 @@ const HomePage = () => {
   }
 
   const handleCancelBattle = async (battleId: number) => {
-    const config = await getConfigAccount(program)
-
-    if (!player) {
+    if (!publicKey) {
       console.error('No player found')
       return
     }
@@ -90,11 +84,12 @@ const HomePage = () => {
     const tx = await cancelBattleAndUnwrapSolTx(
       connection,
       program,
-      player.publicKey,
+      publicKey,
       battleId
     )
     try {
-      await sendAndConfirmTransaction(getConnection(), tx, [player])
+      const txHash = await sendTransaction(tx, connection)
+      await connection.confirmTransaction(txHash)
     } catch (error) {
       console.error(error)
     }
@@ -162,8 +157,7 @@ const HomePage = () => {
                         </h4>
                         <CardStack
                           cards={
-                            player?.publicKey ==
-                            battleAccount.player1.toBase58()
+                            publicKey == battleAccount.player1.toBase58()
                               ? battleAccount.player1Solamons
                               : battleAccount.player2Solamons
                           }

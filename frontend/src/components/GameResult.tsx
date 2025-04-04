@@ -1,12 +1,8 @@
-import { sendAndConfirmTransaction } from '@solana/web3.js'
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
-import {
-  getConnection,
-  getKeypairFromLocalStorage,
-  getProgram,
-} from '@/lib/helper'
+import { getProgram } from '@/lib/helper'
 import { getWinnerFromBattleAccount } from '@/lib/helper'
 import { ROUTES } from '@/lib/routes'
 import { BattleAccount, claimBattleAndUnwrapSolTx } from '@/lib/solana-helper'
@@ -34,26 +30,29 @@ const GameResult: React.FC<GameResultProps> = ({
 }) => {
   const { openModal } = useModal()
   const router = useRouter()
-  const player = getKeypairFromLocalStorage()
+  const { publicKey, sendTransaction } = useWallet()
   const winner = getWinnerFromBattleAccount(battleAccount)
-  const isPlayerWinner = winner === player?.publicKey?.toBase58()
+  const isPlayerWinner = winner === publicKey?.toBase58()
   const claimable =
     isPlayerWinner && battleAccount.claimTimestamp.toNumber() == 0
   const { showLoading, hideLoading } = useLoading()
   const { fetchBalance } = useBalance()
+  const { connection } = useConnection()
+  const program = getProgram(connection)
 
   const handleClaim = async () => {
-    if (!player) return
+    if (!publicKey) return
 
     showLoading('Claiming reward...')
     try {
       const tx = await claimBattleAndUnwrapSolTx(
-        getConnection(),
-        getProgram(),
-        player.publicKey,
+        connection,
+        program,
+        publicKey,
         battleAccount.battleId
       )
-      await sendAndConfirmTransaction(getConnection(), tx, [player])
+      const txHash = await sendTransaction(tx, connection)
+      await connection.confirmTransaction(txHash)
     } catch (error) {
       alert('Claim error: ' + error)
     }
