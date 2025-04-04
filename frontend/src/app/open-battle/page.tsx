@@ -2,17 +2,12 @@
 
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
 import { getProgram } from '@/lib/helper'
 import { ROUTES } from '@/lib/routes'
-import {
-  CardData,
-  getUserAccount,
-  wrapSolAndOpenBattleTx,
-} from '@/lib/solana-helper'
+import { CardData, getUserAccount, openBattleTx } from '@/lib/solana-helper'
 
 import CardList from '@/components/CardList'
 import Nav from '@/components/Nav'
@@ -21,6 +16,7 @@ import SharedModal from '@/components/SharedModal'
 import Typography from '@/components/Typography'
 
 import { useBalance } from '@/contexts/BalanceContext'
+import { BATLLE_STAKE } from '@/constant/env'
 
 const OpenBattlePage = () => {
   const router = useRouter()
@@ -74,11 +70,7 @@ const OpenBattlePage = () => {
 
     setLoading(true)
 
-    // @TODO: temporary
-    const BATLLE_STAKE = 0.1 * LAMPORTS_PER_SOL
-
-    const tx = await wrapSolAndOpenBattleTx(
-      connection,
+    const tx = await openBattleTx(
       program,
       publicKey,
       BATLLE_STAKE,

@@ -1,7 +1,12 @@
 import * as anchor from "@coral-xyz/anchor"
 import { BN, Program } from "@coral-xyz/anchor"
 import { Solamon } from "../target/types/solamon"
-import { Connection, LAMPORTS_PER_SOL, Transaction } from "@solana/web3.js"
+import {
+	Connection,
+	LAMPORTS_PER_SOL,
+	PublicKey,
+	Transaction,
+} from "@solana/web3.js"
 import { expect } from "chai"
 import {
 	getBattleAccount,
@@ -11,18 +16,24 @@ import {
 	getConfigAccount,
 	getConfigPDA,
 	getUserAccount,
-	getBattleLogs,
 	SolamonPrototype,
 	getSolamonPrototypeAccount,
-	getOrCreateNativeMintATA,
-	wrapSolAndOpenBattleTx,
-	wrapSolAndJoinBattleTx,
-	cancelBattleAndUnwrapSolTx,
-	claimBattleAndUnwrapSolTx,
-	BattleStatus,
+	joinBattleTx,
+	cancelBattleTx,
+	claimBattleTx,
 	showSpawnResult,
 	spawnSolamonsTx,
+	getAllUserAccounts,
+	openBattleTx,
+	burnSolamonTx,
 } from "./helper"
+import {
+	createAssociatedTokenAccount,
+	createMint,
+	getAssociatedTokenAddress,
+	getAssociatedTokenAddressSync,
+	mintTo,
+} from "@solana/spl-token"
 
 describe("solamon", () => {
 	// Configure the client to use the local cluster.
@@ -34,7 +45,9 @@ describe("solamon", () => {
 	const player = anchor.web3.Keypair.generate()
 	const player2 = anchor.web3.Keypair.generate()
 	const player3 = anchor.web3.Keypair.generate()
-	const battleStake = LAMPORTS_PER_SOL * 0.1
+	const battleStake = 100
+	const spawnDeposit = LAMPORTS_PER_SOL * 0.01
+	let stakeTokenMint: PublicKey
 
 	console.log({
 		player: player.publicKey.toBase58(),
@@ -51,21 +64,55 @@ describe("solamon", () => {
 			connection.requestAirdrop(player3.publicKey, LAMPORTS_PER_SOL),
 		])
 		await Promise.all(txs.map((tx) => connection.confirmTransaction(tx)))
+
+		// deploy stake token
+		// Create and deploy SLP token
+		const mint = await createMint(
+			connection,
+			admin,
+			admin.publicKey,
+			admin.publicKey,
+			9 // decimals
+		)
+
+		stakeTokenMint = mint
+		// Create ATAs for players
+		const [playerAta, player2Ata, player3Ata] = await Promise.all([
+			createAssociatedTokenAccount(
+				connection,
+				admin,
+				mint,
+				player.publicKey
+			),
+			createAssociatedTokenAccount(
+				connection,
+				admin,
+				mint,
+				player2.publicKey
+			),
+			createAssociatedTokenAccount(
+				connection,
+				admin,
+				mint,
+				player3.publicKey
+			),
+		])
+
+		// Mint initial tokens to players
+		await Promise.all([
+			mintTo(connection, admin, mint, playerAta, admin, 1000),
+			mintTo(connection, admin, mint, player2Ata, admin, 1000),
+			mintTo(connection, admin, mint, player3Ata, admin, 1000),
+		])
 	})
 
 	it("Is initialized", async () => {
 		// Derive the PDA for the config account
-		const spawnFee = LAMPORTS_PER_SOL * 0.01
-		const feePercentageInBasisPoints = 100
 		const tx = await program.methods
-			.initialize(
-				admin.publicKey,
-				admin.publicKey,
-				feePercentageInBasisPoints,
-				new BN(spawnFee)
-			)
+			.initialize(admin.publicKey, new BN(spawnDeposit))
 			.accounts({
 				signer: admin.publicKey,
+				stakeTokenMint: stakeTokenMint,
 			})
 			.signers([admin])
 			.rpc()
@@ -74,13 +121,14 @@ describe("solamon", () => {
 
 		const configAccount = await getConfigAccount(program)
 
-		expect(configAccount.feeAccount.toBase58()).to.equal(
-			admin.publicKey.toBase58()
-		)
 		expect(configAccount.admin.toBase58()).to.equal(
 			admin.publicKey.toBase58()
 		)
-		expect(configAccount.feePercentageInBasisPoints).to.equal(100)
+		expect(configAccount.spawnDeposit.toNumber()).to.equal(spawnDeposit)
+
+		expect(configAccount.stakeTokenMint.toBase58()).to.equal(
+			stakeTokenMint.toBase58()
+		)
 	})
 
 	it("Creates solamon prototype", async () => {
@@ -139,6 +187,10 @@ describe("solamon", () => {
 		// Spawn elements
 		const solamonCount = 5
 
+		const player1BalanceBefore = await connection.getBalance(
+			player.publicKey
+		)
+
 		const tx = await spawnSolamonsTx(
 			connection,
 			program,
@@ -152,34 +204,43 @@ describe("solamon", () => {
 
 		await showSpawnResult(connection, txSig)
 
+		const player1BalanceAfter = await connection.getBalance(
+			player.publicKey
+		)
+
+		expect(player1BalanceAfter).to.be.lessThan(
+			player1BalanceBefore - spawnDeposit * solamonCount
+		)
 		// Fetch the user account to verify elements were added
 		const userAccount = await getUserAccount(program, player.publicKey)
 		expect(userAccount.solamons.length).to.equal(solamonCount)
 
 		const solamonCount2 = 3
 
-		await program.methods
-			.spawnSolamons(solamonCount2)
-			.accounts({
-				player: player2.publicKey,
-				feeAccount: (await getConfigAccount(program)).feeAccount,
-			})
-			.signers([player2])
-			.rpc()
+		const tx2 = await spawnSolamonsTx(
+			connection,
+			program,
+			player2.publicKey,
+			solamonCount2
+		)
+		const txSig2 = await connection.sendTransaction(tx2, [player2])
+
+		await connection.confirmTransaction(txSig2)
 
 		const userAccount2 = await getUserAccount(program, player2.publicKey)
 		expect(userAccount2.solamons.length).to.equal(solamonCount2)
 
 		const solamonCount3 = 9
 
-		await program.methods
-			.spawnSolamons(solamonCount3)
-			.accounts({
-				player: player3.publicKey,
-				feeAccount: (await getConfigAccount(program)).feeAccount,
-			})
-			.signers([player3])
-			.rpc()
+		const tx3 = await spawnSolamonsTx(
+			connection,
+			program,
+			player3.publicKey,
+			solamonCount3
+		)
+		const txSig3 = await connection.sendTransaction(tx3, [player3])
+
+		await connection.confirmTransaction(txSig3)
 
 		const userAccount3 = await getUserAccount(program, player3.publicKey)
 		expect(userAccount3.solamons.length).to.equal(solamonCount3)
@@ -189,20 +250,29 @@ describe("solamon", () => {
 		// Fetch the user account to get solamons
 		const userAccount = await getUserAccount(program, player.publicKey)
 
+		let configAccount = await getConfigAccount(program)
+
+		const balanceBefore = await connection.getTokenAccountBalance(
+			getAssociatedTokenAddressSync(
+				configAccount.stakeTokenMint,
+				getConfigPDA(program),
+				true
+			)
+		)
+
 		// Get the first 3 solamon IDs
 		const solamonIds = userAccount.solamons
 			.map((solamon) => solamon.id)
 			.slice(0, 3)
 
-		const openBattleTx = await wrapSolAndOpenBattleTx(
-			connection,
+		const tx = await openBattleTx(
 			program,
 			player.publicKey,
 			battleStake,
 			solamonIds
 		)
 
-		const txSig = await connection.sendTransaction(openBattleTx, [player])
+		const txSig = await connection.sendTransaction(tx, [player])
 
 		await connection.confirmTransaction(txSig)
 
@@ -214,7 +284,21 @@ describe("solamon", () => {
 		expect(battleAccount.player1Solamons.length).to.equal(3)
 		expect(battleAccount.player2Solamons.length).to.equal(0)
 
-		const configAccount = await getConfigAccount(program)
+		configAccount = await getConfigAccount(program)
+
+		const balanceAfter = await connection.getTokenAccountBalance(
+			getAssociatedTokenAddressSync(
+				configAccount.stakeTokenMint,
+				getConfigPDA(program),
+				true
+			)
+		)
+
+		expect(balanceAfter.value.amount).to.equal(
+			new BN(balanceBefore.value.amount)
+				.add(new BN(battleStake))
+				.toString()
+		)
 
 		expect(configAccount.battleCount.toNumber()).to.equal(1)
 		expect(configAccount.availableBattleIds.length).to.equal(1)
@@ -222,24 +306,19 @@ describe("solamon", () => {
 
 		const userAccountAfter = await getUserAccount(program, player.publicKey)
 		expect(userAccountAfter.battleCount.toNumber()).to.equal(1)
-
-		const { tokenAccount: configAccountATA } =
-			await getOrCreateNativeMintATA(
-				connection,
-				getConfigPDA(program),
-				getConfigPDA(program)
-			)
-
-		const stakeBalance = await connection.getTokenAccountBalance(
-			configAccountATA
-		)
-
-		expect(stakeBalance.value.amount).to.equal(battleStake.toString())
 	})
 
 	it("Player 2 joins battle", async () => {
 		// Fetch the user account to get solamons
 		const userAccount = await getUserAccount(program, player2.publicKey)
+		const configAccount = await getConfigAccount(program)
+		const userTokenBalanceBefore = await connection.getTokenAccountBalance(
+			getAssociatedTokenAddressSync(
+				configAccount.stakeTokenMint,
+				player2.publicKey,
+				true
+			)
+		)
 
 		// Get the first 3 solamon IDs
 		const solamonIds = userAccount.solamons
@@ -248,55 +327,66 @@ describe("solamon", () => {
 
 		const battleId = 0 // Example battle ID
 
-		const joinBattleTx = await wrapSolAndJoinBattleTx(
-			connection,
+		const tx = await joinBattleTx(
 			program,
 			player2.publicKey,
 			battleId,
 			solamonIds
 		)
-		const txSig = await connection.sendTransaction(joinBattleTx, [player2])
+		const txSig = await connection.sendTransaction(tx, [player2])
 
 		await connection.confirmTransaction(txSig)
 
-		const battleLogs = await getBattleLogs(
-			connection,
-			getBattleAccountPDA(program, battleId)
+		const userTokenBalanceAfter = await connection.getTokenAccountBalance(
+			getAssociatedTokenAddressSync(
+				configAccount.stakeTokenMint,
+				player2.publicKey,
+				true
+			)
 		)
 
-		expect(battleLogs.length).to.be.greaterThan(0)
-
-		const battleAccountsByUser = await getBattleAccountsByUser(
-			program,
-			player2.publicKey
+		expect(userTokenBalanceAfter.value.amount).to.equal(
+			new BN(userTokenBalanceBefore.value.amount)
+				.sub(new BN(battleStake))
+				.toString()
 		)
 	})
 
 	it("Winner claims battle", async () => {
 		const battleId = 0
 		const battleAccount = await getBattleAccount(program, battleId)
+		const configAccount = await getConfigAccount(program)
 		const winner =
 			JSON.stringify(battleAccount.battleStatus) ===
 			JSON.stringify({ player1Wins: {} })
 				? player
 				: player2
 
-		const winnerBalanceBefore = await connection.getBalance(
-			winner.publicKey
+		const winnerBalanceBefore = await connection.getTokenAccountBalance(
+			getAssociatedTokenAddressSync(
+				configAccount.stakeTokenMint,
+				winner.publicKey,
+				true
+			)
 		)
 
-		const claimBattleTx = await claimBattleAndUnwrapSolTx(
-			connection,
-			program,
-			winner.publicKey,
-			battleId
-		)
+		const tx = await claimBattleTx(program, winner.publicKey, battleId)
 
-		const txSig = await connection.sendTransaction(claimBattleTx, [winner])
+		const txSig = await connection.sendTransaction(tx, [winner])
 		await connection.confirmTransaction(txSig)
 
-		const winnerBalanceAfter = await connection.getBalance(winner.publicKey)
-		expect(winnerBalanceAfter).to.be.greaterThan(winnerBalanceBefore)
+		const winnerBalanceAfter = await connection.getTokenAccountBalance(
+			getAssociatedTokenAddressSync(
+				configAccount.stakeTokenMint,
+				winner.publicKey,
+				true
+			)
+		)
+		expect(winnerBalanceAfter.value.amount).to.be.equal(
+			new BN(winnerBalanceBefore.value.amount)
+				.add(new BN(battleStake * 2))
+				.toString()
+		)
 	})
 
 	it("Player 3 opens multiple battles", async () => {
@@ -317,16 +407,13 @@ describe("solamon", () => {
 				.map((solamon) => solamon.id)
 				.slice(0 + i * 3, 3 + i * 3)
 
-			const openBattleTx = await wrapSolAndOpenBattleTx(
-				connection,
+			const tx = await openBattleTx(
 				program,
 				player3.publicKey,
 				battleStake,
 				solamonIds
 			)
-			const txSig = await connection.sendTransaction(openBattleTx, [
-				player3,
-			])
+			const txSig = await connection.sendTransaction(tx, [player3])
 			await connection.confirmTransaction(txSig)
 		}
 
@@ -361,7 +448,14 @@ describe("solamon", () => {
 	})
 
 	it("Player 3 cancels one battle", async () => {
-		const balanceBefore = await connection.getBalance(player3.publicKey)
+		const configAccount = await getConfigAccount(program)
+		const balanceBefore = await connection.getTokenAccountBalance(
+			getAssociatedTokenAddressSync(
+				configAccount.stakeTokenMint,
+				player3.publicKey,
+				true
+			)
+		)
 
 		const battleAccountsByUser = await getBattleAccountsByUser(
 			program,
@@ -370,20 +464,65 @@ describe("solamon", () => {
 
 		const battleAccount = battleAccountsByUser.player1BattleAccounts[0]
 
-		const cancelBattleTx = await cancelBattleAndUnwrapSolTx(
-			connection,
+		const tx = await cancelBattleTx(
 			program,
 			player3.publicKey,
 			battleAccount.account.battleId.toNumber()
 		)
 
-		const txSig = await connection.sendTransaction(cancelBattleTx, [
-			player3,
-		])
+		const txSig = await connection.sendTransaction(tx, [player3])
 		await connection.confirmTransaction(txSig)
 
-		const balanceAfter = await connection.getBalance(player3.publicKey)
+		const balanceAfter = await connection.getTokenAccountBalance(
+			getAssociatedTokenAddressSync(
+				configAccount.stakeTokenMint,
+				player3.publicKey,
+				true
+			)
+		)
 
-		expect(balanceAfter).to.be.greaterThan(balanceBefore)
+		expect(balanceAfter.value.amount).to.be.equal(
+			new BN(balanceBefore.value.amount)
+				.add(new BN(battleStake))
+				.toString()
+		)
+	})
+
+	it("Can get all user accounts", async () => {
+		const userAccounts = await getAllUserAccounts(program)
+		expect(userAccounts.length).to.be.greaterThan(0)
+	})
+
+	it("Player 3 burns one solamon", async () => {
+		const userAccountBefore = await getUserAccount(
+			program,
+			player3.publicKey
+		)
+		const balanceBefore = await connection.getBalance(player3.publicKey)
+
+		console.log(userAccountBefore.solamons)
+		console.log({ balanceBefore })
+		const tx = await burnSolamonTx(
+			connection,
+			program,
+			player3.publicKey,
+			userAccountBefore.solamons[3].id
+		)
+		const txSig = await connection.sendTransaction(tx, [player3])
+		await connection.confirmTransaction(txSig)
+
+		const userAccountAfter = await getUserAccount(
+			program,
+			player3.publicKey
+		)
+		expect(userAccountAfter.solamons.length).to.equal(
+			userAccountBefore.solamons.length - 1
+		)
+
+		const balanceAfter = await connection.getBalance(player3.publicKey)
+		console.log(userAccountAfter.solamons)
+		console.log({ balanceAfter })
+
+		expect(Number(balanceAfter)).to.be.greaterThan(Number(balanceBefore))
 	})
 })

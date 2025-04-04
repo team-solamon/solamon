@@ -14,6 +14,227 @@ export type Solamon = {
   },
   "instructions": [
     {
+      "name": "burnSolamon",
+      "discriminator": [
+        5,
+        82,
+        203,
+        175,
+        105,
+        86,
+        215,
+        38
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "userAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "configAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "depositAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "configAccount"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  155,
+                  136,
+                  87,
+                  254,
+                  171,
+                  129,
+                  132,
+                  251,
+                  104,
+                  127,
+                  99,
+                  70,
+                  24,
+                  192,
+                  53,
+                  218,
+                  196,
+                  57,
+                  220,
+                  26,
+                  235,
+                  59,
+                  85,
+                  152,
+                  160,
+                  240,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "userTokenAccount",
+          "writable": true
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associatedTokenProgram",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "solamonId",
+          "type": "u16"
+        }
+      ]
+    },
+    {
       "name": "cancelBattle",
       "discriminator": [
         234,
@@ -27,7 +248,7 @@ export type Solamon = {
       ],
       "accounts": [
         {
-          "name": "player",
+          "name": "user",
           "writable": true,
           "signer": true
         },
@@ -114,13 +335,13 @@ export type Solamon = {
               },
               {
                 "kind": "account",
-                "path": "player"
+                "path": "user"
               }
             ]
           }
         },
         {
-          "name": "playerTokenAccount",
+          "name": "userTokenAccount",
           "writable": true
         },
         {
@@ -171,7 +392,8 @@ export type Solamon = {
               },
               {
                 "kind": "account",
-                "path": "mint"
+                "path": "config_account.stake_token_mint",
+                "account": "configAccount"
               }
             ],
             "program": {
@@ -246,7 +468,7 @@ export type Solamon = {
       ],
       "accounts": [
         {
-          "name": "player",
+          "name": "user",
           "writable": true,
           "signer": true
         },
@@ -310,11 +532,7 @@ export type Solamon = {
           }
         },
         {
-          "name": "feeTokenAccount",
-          "writable": true
-        },
-        {
-          "name": "playerTokenAccount",
+          "name": "userTokenAccount",
           "writable": true
         },
         {
@@ -365,7 +583,8 @@ export type Solamon = {
               },
               {
                 "kind": "account",
-                "path": "mint"
+                "path": "config_account.stake_token_mint",
+                "account": "configAccount"
               }
             ],
             "program": {
@@ -406,10 +625,6 @@ export type Solamon = {
               ]
             }
           }
-        },
-        {
-          "name": "mint",
-          "address": "So11111111111111111111111111111111111111112"
         },
         {
           "name": "tokenProgram",
@@ -577,7 +792,7 @@ export type Solamon = {
           "address": "So11111111111111111111111111111111111111112"
         },
         {
-          "name": "battleStakeAccount",
+          "name": "depositAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -667,6 +882,100 @@ export type Solamon = {
           }
         },
         {
+          "name": "stakeTokenMint",
+          "writable": true
+        },
+        {
+          "name": "battleStakeAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "configAccount"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "stakeTokenMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
           "name": "associatedTokenProgram",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
@@ -681,19 +990,11 @@ export type Solamon = {
       ],
       "args": [
         {
-          "name": "feeAccount",
-          "type": "pubkey"
-        },
-        {
           "name": "admin",
           "type": "pubkey"
         },
         {
-          "name": "feePercentageInBasisPoints",
-          "type": "u16"
-        },
-        {
-          "name": "spawnFee",
+          "name": "spawnDeposit",
           "type": "u64"
         }
       ]
@@ -712,7 +1013,7 @@ export type Solamon = {
       ],
       "accounts": [
         {
-          "name": "player",
+          "name": "user",
           "writable": true,
           "signer": true
         },
@@ -799,7 +1100,7 @@ export type Solamon = {
               },
               {
                 "kind": "account",
-                "path": "player"
+                "path": "user"
               }
             ]
           }
@@ -835,7 +1136,7 @@ export type Solamon = {
           }
         },
         {
-          "name": "playerTokenAccount",
+          "name": "userTokenAccount",
           "writable": true
         },
         {
@@ -886,7 +1187,8 @@ export type Solamon = {
               },
               {
                 "kind": "account",
-                "path": "mint"
+                "path": "config_account.stake_token_mint",
+                "account": "configAccount"
               }
             ],
             "program": {
@@ -929,10 +1231,6 @@ export type Solamon = {
           }
         },
         {
-          "name": "mint",
-          "address": "So11111111111111111111111111111111111111112"
-        },
-        {
           "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
@@ -968,7 +1266,7 @@ export type Solamon = {
       ],
       "accounts": [
         {
-          "name": "player",
+          "name": "user",
           "writable": true,
           "signer": true
         },
@@ -1023,7 +1321,7 @@ export type Solamon = {
               },
               {
                 "kind": "account",
-                "path": "player"
+                "path": "user"
               }
             ]
           }
@@ -1061,7 +1359,7 @@ export type Solamon = {
           }
         },
         {
-          "name": "playerTokenAccount",
+          "name": "userTokenAccount",
           "writable": true
         },
         {
@@ -1112,7 +1410,8 @@ export type Solamon = {
               },
               {
                 "kind": "account",
-                "path": "mint"
+                "path": "config_account.stake_token_mint",
+                "account": "configAccount"
               }
             ],
             "program": {
@@ -1153,10 +1452,6 @@ export type Solamon = {
               ]
             }
           }
-        },
-        {
-          "name": "mint",
-          "address": "So11111111111111111111111111111111111111112"
         },
         {
           "name": "tokenProgram",
@@ -1198,7 +1493,7 @@ export type Solamon = {
       ],
       "accounts": [
         {
-          "name": "player",
+          "name": "user",
           "writable": true,
           "signer": true
         },
@@ -1226,7 +1521,7 @@ export type Solamon = {
               },
               {
                 "kind": "account",
-                "path": "player"
+                "path": "user"
               }
             ]
           }
@@ -1259,7 +1554,130 @@ export type Solamon = {
           }
         },
         {
-          "name": "feeAccount",
+          "name": "depositAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "configAccount"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  155,
+                  136,
+                  87,
+                  254,
+                  171,
+                  129,
+                  132,
+                  251,
+                  104,
+                  127,
+                  99,
+                  70,
+                  24,
+                  192,
+                  53,
+                  218,
+                  196,
+                  57,
+                  220,
+                  26,
+                  235,
+                  59,
+                  85,
+                  152,
+                  160,
+                  240,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "userTokenAccount",
           "writable": true
         },
         {
@@ -1299,6 +1717,14 @@ export type Solamon = {
               }
             ]
           }
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associatedTokenProgram",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "systemProgram",
@@ -1505,7 +1931,11 @@ export type Solamon = {
             "type": "u8"
           },
           {
-            "name": "feeAccount",
+            "name": "stakeTokenMint",
+            "type": "pubkey"
+          },
+          {
+            "name": "depositAccount",
             "type": "pubkey"
           },
           {
@@ -1521,12 +1951,8 @@ export type Solamon = {
             "type": "pubkey"
           },
           {
-            "name": "spawnFee",
+            "name": "spawnDeposit",
             "type": "u64"
-          },
-          {
-            "name": "feePercentageInBasisPoints",
-            "type": "u16"
           },
           {
             "name": "availableBattleIds",
@@ -1664,6 +2090,18 @@ export type Solamon = {
             "type": "u8"
           },
           {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "points",
+            "type": "u16"
+          },
+          {
+            "name": "battleCount",
+            "type": "u64"
+          },
+          {
             "name": "solamons",
             "type": {
               "vec": {
@@ -1672,10 +2110,6 @@ export type Solamon = {
                 }
               }
             }
-          },
-          {
-            "name": "battleCount",
-            "type": "u64"
           }
         ]
       }

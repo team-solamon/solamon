@@ -1,4 +1,5 @@
 import { stringToElement } from '@/lib/solana-helper'
+import { PublicKey } from '@solana/web3.js'
 
 export const isProd = process.env.NODE_ENV === 'production'
 export const isLocal = process.env.NODE_ENV === 'development'
@@ -7,10 +8,16 @@ export const showLogger = isLocal
   ? true
   : process.env.NEXT_PUBLIC_SHOW_LOGGER === 'true'
 
-export const NEW_CARD_SOL_PRICE = 0.1
-export const FIGHT_SOL_PRICE = 0.1
+export const NEW_CARD_SOL_PRICE = 0.05
+export const FIGHT_SOL_PRICE = 100
 
-export const WINNER_SOL_REWARD = 0.2
+export const WINNER_SOL_REWARD = 200
+
+export const zBTC_MINT = new PublicKey(
+  'zBTCug3er3tLyffELcvDNrKkCymbPWysGcWihESYfLg'
+)
+
+export const BATLLE_STAKE = 100 // 100 zBTC(Satoshi)
 
 interface CardWithProbabilities {
   species: number
