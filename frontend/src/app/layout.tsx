@@ -50,6 +50,8 @@ export const metadata: Metadata = {
 import { ModalProvider } from '@/contexts/ModalContext'
 import { LoadingProvider } from '@/contexts/LoadingContext'
 import { BalanceProvider } from '@/contexts/BalanceContext'
+import WalletContextProvider from '@/contexts/WalletContext'
+
 export default function RootLayout({
   children,
 }: {
@@ -57,32 +59,12 @@ export default function RootLayout({
 }) {
   return (
     <html>
-      <a
-        target='_blank'
-        href='https://jam.pieter.com'
-        style={{
-          fontFamily: 'system-ui, sans-serif',
-          position: 'fixed',
-          bottom: '-1px',
-          right: '-1px',
-          padding: '7px',
-          fontSize: '14px',
-          fontWeight: 'bold',
-          background: '#fff',
-          color: '#000',
-          textDecoration: 'none',
-          borderTopLeftRadius: '12px',
-          zIndex: '10000',
-          border: '1px solid #fff',
-        }}
-      >
-        🕹️ Vibe Jam 2025
-      </a>
-
       <body>
         <LoadingProvider>
           <BalanceProvider>
-            <ModalProvider>{children}</ModalProvider>
+            <WalletContextProvider>
+              <ModalProvider>{children}</ModalProvider>
+            </WalletContextProvider>
           </BalanceProvider>
         </LoadingProvider>
       </body>
