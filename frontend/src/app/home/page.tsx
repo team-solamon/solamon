@@ -31,6 +31,7 @@ import SolanaBalance from '@/components/SolanaBalance'
 import { NEW_CARD_SOL_PRICE } from '@/constant/env'
 import SharedModal from '@/components/SharedModal'
 import { useBalance } from '@/contexts/BalanceContext'
+import StoryModal from '@/components/modals/StoryModal'
 
 const HomePage = () => {
   const router = useRouter()
@@ -240,6 +241,7 @@ const HomePage = () => {
         showReplay={true}
         onClaim={fetchMyBattles}
       />
+      <StoryModal selectedBattle={selectedBattle} />
       <SharedModal />
     </div>
   )

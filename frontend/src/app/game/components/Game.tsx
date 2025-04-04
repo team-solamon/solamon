@@ -21,6 +21,7 @@ import { AttackEvent, BattleReplay } from '@/data/replay'
 import ResultModal from '@/components/modals/ResultModal'
 import { ROUTES } from '@/lib/routes'
 import { useModal } from '@/contexts/ModalContext'
+import StoryModal from '@/components/modals/StoryModal'
 
 const Game: React.FC = () => {
   const searchParams = useSearchParams()
@@ -164,6 +165,7 @@ const Game: React.FC = () => {
           router.push(ROUTES.HOME)
         }}
       />
+      <StoryModal selectedBattle={battleAccount} />
     </div>
   )
 }
