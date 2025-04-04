@@ -1,8 +1,9 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect } from 'react'
-import { getConnection, getKeypairFromLocalStorage } from '@/lib/helper'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
+import React, { createContext, useContext, useEffect,useState } from 'react'
+
+import { getConnection, getKeypairFromLocalStorage } from '@/lib/helper'
 
 interface BalanceContextType {
   balance: number | null

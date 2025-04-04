@@ -1,14 +1,17 @@
 'use client'
 
 import React from 'react'
-import Modal from '../Modal'
-import GameResult from '../GameResult'
-import { useModal } from '@/contexts/ModalContext'
-import { BattleAccount } from '@/lib/solana-helper'
+
 import {
   getKeypairFromLocalStorage,
   getWinnerFromBattleAccount,
 } from '@/lib/helper'
+import { BattleAccount } from '@/lib/solana-helper'
+
+import { useModal } from '@/contexts/ModalContext'
+
+import GameResult from '../GameResult'
+import Modal from '../Modal'
 
 interface ResultModalProps {
   selectedBattle: BattleAccount
@@ -28,8 +31,7 @@ const ResultModal: React.FC<ResultModalProps> = ({
 
   return (
     <>
-      {
-        <Modal
+      <Modal
           isOpen={modals['result']}
           onClose={() => closeModal('result')}
           title={isPlayerWinner ? 'Win' : 'Lose'}
@@ -42,7 +44,6 @@ const ResultModal: React.FC<ResultModalProps> = ({
             battleAccount={selectedBattle}
           />
         </Modal>
-      }
     </>
   )
 }

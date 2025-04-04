@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import React, { useEffect } from 'react'
+
 import {
   getConnection,
   getKeypairFromLocalStorage,
   trimAddress,
 } from '@/lib/helper'
-import { LAMPORTS_PER_SOL } from '@solana/web3.js'
-import { useModal } from '@/contexts/ModalContext'
-import Typography from './Typography'
-import SolanaBalance from './SolanaBalance'
-import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/lib/routes'
 import { getExplorerUrl } from '@/lib/url-helper'
-import { useLoading } from '@/contexts/LoadingContext'
+
 import { useBalance } from '@/contexts/BalanceContext'
+import { useLoading } from '@/contexts/LoadingContext'
+import { useModal } from '@/contexts/ModalContext'
+
+import SolanaBalance from './SolanaBalance'
+import Typography from './Typography'
 
 const YellowButton: React.FC<{
   onClick: () => void

@@ -1,11 +1,13 @@
 import * as Phaser from 'phaser'
 
-import { DefeatedVisual } from './DefeatedVisual'
-import { HealthBar } from './HealthBar'
-import { getCardColor, getCardColorString, getElementEmoji } from '@/data/card'
-import { FloatingText } from './FloatingText'
-import { AttackEvent } from '../data/replay'
 import { CardData, Element } from '@/lib/solana-helper'
+
+import { getCardColor, getCardColorString, getElementEmoji } from '@/data/card'
+
+import { DefeatedVisual } from './DefeatedVisual'
+import { FloatingText } from './FloatingText'
+import { HealthBar } from './HealthBar'
+import { AttackEvent } from '../data/replay'
 
 export class Card extends Phaser.GameObjects.Container {
   public name: string

@@ -1,37 +1,41 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { sendAndConfirmTransaction } from '@solana/web3.js'
 import { useRouter } from 'next/navigation'
-import CardStack from '@/components/CardStack'
-import Nav from '@/components/Nav'
-import Button from '../../components/Button'
-import { useModal } from '@/contexts/ModalContext'
-import { ROUTES } from '@/lib/routes'
-import CardDetailsModal from '@/components/modals/CardDetailsModal'
-import ResultModal from '@/components/modals/ResultModal'
-import {
-  CardData,
-  getBattleAccountsByUser,
-  getUserAccount,
-  BattleAccount,
-  battleStatusToString,
-  cancelBattleAndUnwrapSolTx,
-  getConfigAccount,
-} from '@/lib/solana-helper'
+import React, { useEffect, useState } from 'react'
+
 import {
   getConnection,
   getKeypairFromLocalStorage,
   getProgram,
 } from '@/lib/helper'
-import { useLoading } from '@/contexts/LoadingContext'
-import Typography from '@/components/Typography'
+import { ROUTES } from '@/lib/routes'
+import {
+  BattleAccount,
+  battleStatusToString,
+  cancelBattleAndUnwrapSolTx,
+  CardData,
+  getBattleAccountsByUser,
+  getConfigAccount,
+  getUserAccount,
+} from '@/lib/solana-helper'
+
 import CardList from '@/components/CardList'
-import { sendAndConfirmTransaction } from '@solana/web3.js'
-import SolanaBalance from '@/components/SolanaBalance'
-import { NEW_CARD_SOL_PRICE } from '@/constant/env'
-import SharedModal from '@/components/SharedModal'
-import { useBalance } from '@/contexts/BalanceContext'
+import CardStack from '@/components/CardStack'
+import CardDetailsModal from '@/components/modals/CardDetailsModal'
+import ResultModal from '@/components/modals/ResultModal'
 import StoryModal from '@/components/modals/StoryModal'
+import Nav from '@/components/Nav'
+import SharedModal from '@/components/SharedModal'
+import SolanaBalance from '@/components/SolanaBalance'
+import Typography from '@/components/Typography'
+
+import { NEW_CARD_SOL_PRICE } from '@/constant/env'
+import { useBalance } from '@/contexts/BalanceContext'
+import { useLoading } from '@/contexts/LoadingContext'
+import { useModal } from '@/contexts/ModalContext'
+
+import Button from '../../components/Button'
 
 const HomePage = () => {
   const router = useRouter()

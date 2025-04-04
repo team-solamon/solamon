@@ -1,9 +1,12 @@
 import React from 'react'
-import Card from '@/components/Card'
-import Button from '@/components/Button'
+
 import { CardData } from '@/lib/solana-helper'
-import Typography from './Typography'
+
+import Button from '@/components/Button'
+import Card from '@/components/Card'
+
 import CardStats from './CardStats'
+import Typography from './Typography'
 
 interface PickedCardsProps {
   pickedCards: CardData[]

@@ -1,22 +1,24 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { LAMPORTS_PER_SOL, sendAndConfirmTransaction } from '@solana/web3.js'
 import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
+
+import { getConnection,getKeypairFromLocalStorage } from '@/lib/helper'
+import { getProgram } from '@/lib/helper'
+import { ROUTES } from '@/lib/routes'
 import {
   CardData,
   getUserAccount,
   wrapSolAndOpenBattleTx,
 } from '@/lib/solana-helper'
+
+import CardList from '@/components/CardList'
 import Nav from '@/components/Nav'
 import PickedCards from '@/components/PickedCards'
-import CardList from '@/components/CardList'
-import { getKeypairFromLocalStorage, getConnection } from '@/lib/helper'
-import { getProgram } from '@/lib/helper'
-import Typography from '@/components/Typography'
-import { LAMPORTS_PER_SOL, sendAndConfirmTransaction } from '@solana/web3.js'
-import { ROUTES } from '@/lib/routes'
 import SharedModal from '@/components/SharedModal'
-import { ModalProvider } from '@/contexts/ModalContext'
+import Typography from '@/components/Typography'
+
 import { useBalance } from '@/contexts/BalanceContext'
 
 const OpenBattlePage = () => {

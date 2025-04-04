@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "node scripts/copy-contract-files.mjs && next dev",
     "build": "node scripts/copy-contract-files.mjs && next build",
-    "start": "node scripts/copy-contract-files.mjs && next start"
+    "start": "node scripts/copy-contract-files.mjs && next start",
+    "lint": "eslint . --fix"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.31.0",

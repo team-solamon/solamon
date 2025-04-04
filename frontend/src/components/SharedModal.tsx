@@ -1,26 +1,29 @@
 'use client'
-import { useLoading } from '@/contexts/LoadingContext'
-import NewCardModal from './modals/NewCardModal'
-import PurchaseCardModal from './modals/PurchaseCardModal'
-import ViewAllCardsModal from './modals/ViewAllCardsModal'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
+
+import {
+  getConnection,
+  getKeypairFromLocalStorage,
+  getProgram,
+} from '@/lib/helper'
+import { ROUTES } from '@/lib/routes'
 import {
   CardData,
   getUserAccount,
   showSpawnResult,
   spawnSolamonsTx,
 } from '@/lib/solana-helper'
-import {
-  getConnection,
-  getKeypairFromLocalStorage,
-  getProgram,
-} from '@/lib/helper'
-import { useModal } from '@/contexts/ModalContext'
-import TutorialModal from './modals/TutorialModal'
-import CardGuideModal from './modals/CardGuideModal'
-import { ROUTES } from '@/lib/routes'
+
 import { useBalance } from '@/contexts/BalanceContext'
+import { useLoading } from '@/contexts/LoadingContext'
+import { useModal } from '@/contexts/ModalContext'
+
+import CardGuideModal from './modals/CardGuideModal'
+import NewCardModal from './modals/NewCardModal'
+import PurchaseCardModal from './modals/PurchaseCardModal'
+import TutorialModal from './modals/TutorialModal'
+import ViewAllCardsModal from './modals/ViewAllCardsModal'
 
 const SharedModal = () => {
   const router = useRouter()

@@ -1,12 +1,14 @@
 'use client'
 
 import React, { useState } from 'react'
-import Modal from '../Modal'
-import Button from '../Button'
-import { useModal } from '@/contexts/ModalContext'
-import Typography from '../Typography'
-import SolanaBalance from '../SolanaBalance'
+
 import { NEW_CARD_SOL_PRICE } from '@/constant/env'
+import { useModal } from '@/contexts/ModalContext'
+
+import Button from '../Button'
+import Modal from '../Modal'
+import SolanaBalance from '../SolanaBalance'
+import Typography from '../Typography'
 
 interface PurchaseCardModalProps {
   onPurchase: (amount: number) => void

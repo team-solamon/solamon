@@ -2,13 +2,13 @@
 
 import React from 'react'
 
-import Modal from '../Modal'
+import { CARD_SPECIES_PROBABILITIES } from '@/constant/env'
 import { useModal } from '@/contexts/ModalContext'
+
 import Button from '../Button'
-import { stringToElement } from '@/lib/solana-helper'
 import Card from '../Card'
 import CardElementProbabilities from '../CardElementProbabilities'
-import { CARD_SPECIES_PROBABILITIES } from '@/constant/env'
+import Modal from '../Modal'
 
 interface TutorialModalProps {
   onNewCard: () => void

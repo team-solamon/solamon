@@ -1,27 +1,32 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useMemo,useState } from 'react'
+
+import { getKeypairFromLocalStorage } from '@/lib/helper'
+import { getConnection } from '@/lib/helper'
+import { getProgram } from '@/lib/helper'
+import { ROUTES } from '@/lib/routes'
+import {
+  BattleAccount,
+  getBattleAccount,
+  getBattleAccountPDA,
+  getBattleActions,
+  ParsedBattleAction,
+} from '@/lib/solana-helper'
+
+import { AttackEvent, BattleReplay } from '@/data/replay'
+
+import ResultModal from '@/components/modals/ResultModal'
+import StoryModal from '@/components/modals/StoryModal'
 import PhaserGame from '@/components/PhaserGame'
+
+import { useModal } from '@/contexts/ModalContext'
+
 import GameLogs from './GameLogs'
 import ScoreDisplay from './ScoreDisplay'
 import { CardBattleScene } from '../scenes/CardBattleScene'
 import { EventBridge } from '../utils/EventBridge'
-import {
-  BattleAccount,
-  ParsedBattleAction,
-  getBattleAccount,
-  getBattleAccountPDA,
-  getBattleActions,
-} from '@/lib/solana-helper'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { getKeypairFromLocalStorage } from '@/lib/helper'
-import { getConnection } from '@/lib/helper'
-import { getProgram } from '@/lib/helper'
-import { AttackEvent, BattleReplay } from '@/data/replay'
-import ResultModal from '@/components/modals/ResultModal'
-import { ROUTES } from '@/lib/routes'
-import { useModal } from '@/contexts/ModalContext'
-import StoryModal from '@/components/modals/StoryModal'
 
 const Game: React.FC = () => {
   const searchParams = useSearchParams()

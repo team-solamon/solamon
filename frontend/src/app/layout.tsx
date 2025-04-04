@@ -47,9 +47,9 @@ export const metadata: Metadata = {
   // ],
 }
 
-import { ModalProvider } from '@/contexts/ModalContext'
-import { LoadingProvider } from '@/contexts/LoadingContext'
 import { BalanceProvider } from '@/contexts/BalanceContext'
+import { LoadingProvider } from '@/contexts/LoadingContext'
+import { ModalProvider } from '@/contexts/ModalContext'
 import WalletContextProvider from '@/contexts/WalletContext'
 
 export default function RootLayout({

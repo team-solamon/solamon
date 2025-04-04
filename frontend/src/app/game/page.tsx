@@ -1,7 +1,8 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
+import { useRouter } from 'next/navigation'
+
 import { ROUTES } from '@/lib/routes'
 
 // Dynamically import the Game component with SSR disabled

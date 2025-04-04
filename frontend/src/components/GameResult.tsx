@@ -1,20 +1,23 @@
-import React from 'react'
+import { sendAndConfirmTransaction } from '@solana/web3.js'
 import { useRouter } from 'next/navigation'
-import CardStack from './CardStack'
-import Button from './Button'
-import { ROUTES } from '@/lib/routes'
-import { BattleAccount, claimBattleAndUnwrapSolTx } from '@/lib/solana-helper'
+import React from 'react'
+
 import {
   getConnection,
   getKeypairFromLocalStorage,
   getProgram,
 } from '@/lib/helper'
 import { getWinnerFromBattleAccount } from '@/lib/helper'
-import Typography from './Typography'
-import { sendAndConfirmTransaction } from '@solana/web3.js'
-import { useLoading } from '@/contexts/LoadingContext'
+import { ROUTES } from '@/lib/routes'
+import { BattleAccount, claimBattleAndUnwrapSolTx } from '@/lib/solana-helper'
+
 import { useBalance } from '@/contexts/BalanceContext'
+import { useLoading } from '@/contexts/LoadingContext'
 import { useModal } from '@/contexts/ModalContext'
+
+import Button from './Button'
+import CardStack from './CardStack'
+import Typography from './Typography'
 
 interface GameResultProps {
   battleAccount: BattleAccount

@@ -1,8 +1,9 @@
 import { Program } from '@coral-xyz/anchor'
-import { Idl } from '@coral-xyz/anchor'
-import solamon from '@/target/idl/solamon.json'
 import { clusterApiUrl, Connection, Keypair } from '@solana/web3.js'
+
+import solamon from '@/target/idl/solamon.json'
 import { Solamon } from '@/target/types/solamon'
+
 import { BattleAccount } from './solana-helper'
 
 export function getFromLocalStorage(key: string): string | null {

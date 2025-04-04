@@ -1,14 +1,16 @@
 import * as Phaser from 'phaser'
 
+import { loadAllCardAssets } from '@/lib/phaser-utils'
+import { stringToElement } from '@/lib/solana-helper'
+
+import { getCardColor } from '@/data/card'
+import { BattleAction, BattleReplay } from '@/data/replay'
+
 import { BackgroundContainer } from '../gameObjects/Background'
-import { Card } from '../../../gameObjects/Card'
 import { GameResult } from '../gameObjects/GameResult'
 import { performSingleAttack } from '../utils/BattleAnimations'
 import { EventBridge } from '../utils/EventBridge'
-import { BattleAction, BattleReplay } from '@/data/replay'
-import { loadAllCardAssets } from '@/lib/phaser-utils'
-import { getCardColor } from '@/data/card'
-import { stringToElement } from '@/lib/solana-helper'
+import { Card } from '../../../gameObjects/Card'
 
 export class CardBattleScene extends Phaser.Scene {
   private playerCards: Card[] = []

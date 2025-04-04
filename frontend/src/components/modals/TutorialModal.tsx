@@ -1,9 +1,11 @@
 'use client'
 
-import React from 'react'
 import dynamic from 'next/dynamic'
-import Modal from '../Modal'
+import React from 'react'
+
 import { useModal } from '@/contexts/ModalContext'
+
+import Modal from '../Modal'
 
 const Tutorial = dynamic(() => import('../Tutorial'), {
   ssr: false,

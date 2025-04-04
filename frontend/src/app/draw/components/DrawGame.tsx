@@ -1,10 +1,14 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import PhaserGame from '@/components/PhaserGame'
-import { DrawScene } from '@/app/draw/scenes/DrawScene'
-import { EventBridge } from '../utils/EventBridge'
+
 import { CardData } from '@/lib/solana-helper'
+
+import PhaserGame from '@/components/PhaserGame'
+
+import { DrawScene } from '@/app/draw/scenes/DrawScene'
+
+import { EventBridge } from '../utils/EventBridge'
 
 interface DrawGameProps {
   onClose?: () => void

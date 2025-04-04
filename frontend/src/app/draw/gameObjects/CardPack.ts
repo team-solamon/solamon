@@ -1,5 +1,6 @@
-import { Card } from '@/gameObjects/Card'
 import * as Phaser from 'phaser'
+
+import { Card } from '@/gameObjects/Card'
 
 export class CardPack extends Phaser.GameObjects.Container {
   private card: Card

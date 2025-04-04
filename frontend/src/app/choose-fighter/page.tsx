@@ -1,16 +1,19 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Card from '@/components/Card'
-import Button from '@/components/Button'
-import Nav from '@/components/Nav'
+import React, { useEffect, useState } from 'react'
+
+import { getKeypairFromLocalStorage, getProgram } from '@/lib/helper'
 import { CardData, getPendingBattleAccounts } from '@/lib/solana-helper'
 import { BattleAccount } from '@/lib/solana-helper'
-import { getKeypairFromLocalStorage, getProgram } from '@/lib/helper'
-import SolanaBalance from '@/components/SolanaBalance'
-import { FIGHT_SOL_PRICE } from '@/constant/env'
+
+import Button from '@/components/Button'
+import Card from '@/components/Card'
+import Nav from '@/components/Nav'
 import SharedModal from '@/components/SharedModal'
+import SolanaBalance from '@/components/SolanaBalance'
+
+import { FIGHT_SOL_PRICE } from '@/constant/env'
 
 const ChooseFighterPage = () => {
   const router = useRouter()

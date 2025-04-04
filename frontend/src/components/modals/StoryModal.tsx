@@ -1,22 +1,25 @@
 'use client'
 
+import { createClient } from '@supabase/supabase-js'
 import React, { useEffect, useState } from 'react'
-import Modal from '../Modal'
-import { useModal } from '@/contexts/ModalContext'
-import {
-  BattleAccount,
-  ParsedBattleAction,
-  getBattleAccountPDA,
-  getBattleActions,
-} from '@/lib/solana-helper'
+
 import {
   getConnection,
   getKeypairFromLocalStorage,
   getProgram,
   getWinnerFromBattleAccount,
 } from '@/lib/helper'
+import {
+  BattleAccount,
+  getBattleAccountPDA,
+  getBattleActions,
+  ParsedBattleAction,
+} from '@/lib/solana-helper'
+
+import { useModal } from '@/contexts/ModalContext'
+
+import Modal from '../Modal'
 import Typography from '../Typography'
-import { createClient } from '@supabase/supabase-js'
 
 interface StoryModalProps {
   selectedBattle: BattleAccount
@@ -146,11 +149,10 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
 
   return (
     <>
-      {
-        <Modal
+      <Modal
           isOpen={modals['story']}
           onClose={() => closeModal('story')}
-          title={'Battle Story'}
+          title="Battle Story"
           maxWidth='800px'
           maxHeight='800px'
         >
@@ -209,7 +211,6 @@ const StoryModal: React.FC<StoryModalProps> = ({ selectedBattle }) => {
             </div>
           )}
         </Modal>
-      }
     </>
   )
 }

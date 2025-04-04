@@ -1,23 +1,14 @@
 'use client'
 
+import { useWallet } from '@solana/wallet-adapter-react'
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
-import { useState, useEffect } from 'react'
-import { useLoading } from '@/contexts/LoadingContext'
+import { useEffect,useState } from 'react'
 
-import {
-  setKeypairToLocalStorage,
-  getKeypairFromLocalStorage,
-  getConnection,
-  trimAddress,
-} from '@/lib/helper'
-
-import Button from '@/components/Button'
 import { ROUTES } from '@/lib/routes'
-import Typography from '@/components/Typography'
-import { getExplorerUrl } from '@/lib/url-helper'
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
-import { useWallet } from '@solana/wallet-adapter-react'
+
+import { useLoading } from '@/contexts/LoadingContext'
 
 export default function HomePage() {
   const { publicKey, sendTransaction } = useWallet()

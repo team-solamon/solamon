@@ -1,11 +1,16 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { Keypair, sendAndConfirmTransaction } from '@solana/web3.js'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Nav from '@/components/Nav'
-import PickedCards from '@/components/PickedCards'
-import CardList from '@/components/CardList'
-import Card from '@/components/Card'
+import React, { useEffect, useState } from 'react'
+
+import {
+  getConnection,
+  getKeypairFromLocalStorage,
+  getProgram,
+  trimAddress,
+} from '@/lib/helper'
+import { ROUTES } from '@/lib/routes'
 import {
   BattleAccount,
   CardData,
@@ -13,19 +18,17 @@ import {
   getUserAccount,
   wrapSolAndJoinBattleTx,
 } from '@/lib/solana-helper'
-import {
-  getConnection,
-  getKeypairFromLocalStorage,
-  getProgram,
-  trimAddress,
-} from '@/lib/helper'
-import { Keypair, sendAndConfirmTransaction } from '@solana/web3.js'
-import { useLoading } from '@/contexts/LoadingContext'
-import { ROUTES } from '@/lib/routes'
+
+import Card from '@/components/Card'
+import CardList from '@/components/CardList'
 import CardStats from '@/components/CardStats'
-import Typography from '@/components/Typography'
+import Nav from '@/components/Nav'
+import PickedCards from '@/components/PickedCards'
 import SharedModal from '@/components/SharedModal'
+import Typography from '@/components/Typography'
+
 import { useBalance } from '@/contexts/BalanceContext'
+import { useLoading } from '@/contexts/LoadingContext'
 
 const PrepareBattlePage = () => {
   const searchParams = useSearchParams()
