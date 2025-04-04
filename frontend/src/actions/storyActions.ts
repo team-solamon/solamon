@@ -198,21 +198,36 @@ async function uploadImageToStorage(
   battleId: string
 ): Promise<string> {
   try {
-    const response = await fetch(imageUrl)
+    console.log('Attempting to fetch image from URL:', imageUrl)
+
+    const response = await fetch(imageUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Node.js) Solamon/1.0',
+      },
+    })
+
     if (!response.ok) {
       throw new Error(
         `Failed to fetch image: ${response.status} ${response.statusText}`
       )
     }
 
-    const imageBlob = await response.blob()
+    console.log(
+      'Image fetched successfully, content-type:',
+      response.headers.get('content-type')
+    )
+
+    const arrayBuffer = await response.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
 
     const timestamp = Date.now()
     const filename = `battle_${battleId}_${timestamp}.png`
 
+    console.log('Uploading to Supabase Storage:', filename)
+
     const { data, error } = await supabase.storage
       .from('images')
-      .upload(filename, imageBlob, {
+      .upload(filename, buffer, {
         contentType: 'image/png',
         cacheControl: '3600',
       })
@@ -226,7 +241,10 @@ async function uploadImageToStorage(
       .from('images')
       .getPublicUrl(filename)
 
-    console.log('Image successfully uploaded to Supabase Storage')
+    console.log(
+      'Image successfully uploaded to Supabase Storage:',
+      publicUrlData.publicUrl
+    )
     return publicUrlData.publicUrl
   } catch (error) {
     console.error('Error in image upload process:', error)
