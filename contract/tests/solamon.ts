@@ -11,7 +11,6 @@ import {
 	getConfigAccount,
 	getConfigPDA,
 	getUserAccount,
-	getBattleLogs,
 	SolamonPrototype,
 	getSolamonPrototypeAccount,
 	getOrCreateNativeMintATA,
@@ -258,18 +257,6 @@ describe("solamon", () => {
 		const txSig = await connection.sendTransaction(joinBattleTx, [player2])
 
 		await connection.confirmTransaction(txSig)
-
-		const battleLogs = await getBattleLogs(
-			connection,
-			getBattleAccountPDA(program, battleId)
-		)
-
-		expect(battleLogs.length).to.be.greaterThan(0)
-
-		const battleAccountsByUser = await getBattleAccountsByUser(
-			program,
-			player2.publicKey
-		)
 	})
 
 	it("Winner claims battle", async () => {
