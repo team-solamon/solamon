@@ -306,52 +306,24 @@ async function generateNewImage(
 
     console.log('Generating image')
 
-    try {
-      console.log('Starting OpenAI image API request...')
-      const imageResponse = (await Promise.race([
-        openai.images.generate({
-          prompt: enhancedImagePrompt,
-          n: 1,
-          size: '256x256',
-        }),
-        new Promise((_, reject) =>
-          setTimeout(
-            () =>
-              reject(
-                new Error('OpenAI image generation timed out after 30 seconds')
-              ),
-            30000
-          )
-        ),
-      ])) as any
+    const imageResponse = await openai.images.generate({
+      prompt: enhancedImagePrompt,
+      n: 1,
+      size: '256x256',
+    })
 
-      console.log('OpenAI image API request completed successfully')
+    const tempImageUrl = imageResponse.data[0]?.url
 
-      const tempImageUrl = imageResponse.data[0]?.url
-
-      if (!tempImageUrl) {
-        console.log('Image generation failed: No image URL returned')
-        return ''
-      }
-
-      console.log('Image URL received, beginning storage upload...')
-      const permanentImageUrl = await uploadImageToStorage(
-        tempImageUrl,
-        battleId
-      )
-      console.log('Image generated and uploaded to Storage successfully')
-      return permanentImageUrl
-    } catch (apiError: any) {
-      console.error(
-        'OpenAI image generation API error:',
-        apiError.message || apiError
-      )
-      console.error('Error details:', JSON.stringify(apiError, null, 2))
+    if (!tempImageUrl) {
+      console.log('Image generation failed: No image URL returned')
       return ''
     }
-  } catch (error: any) {
-    console.error('Error in image generation process:', error.message || error)
-    console.error('Error stack:', error.stack)
+
+    const permanentImageUrl = await uploadImageToStorage(tempImageUrl, battleId)
+    console.log('Image generated and uploaded to Storage successfully')
+    return permanentImageUrl
+  } catch (error) {
+    console.error('Error in image generation process:', error)
     return ''
   }
 }
