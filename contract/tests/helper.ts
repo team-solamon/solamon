@@ -328,7 +328,7 @@ export function wrapSOLInstruction(
 	amount: number
 ): TransactionInstruction[] {
 	const ixs: TransactionInstruction[] = []
-	const ata = getAssociatedTokenAddressSync(NATIVE_MINT, recipient)
+	const ata = getAssociatedTokenAddressSync(NATIVE_MINT, recipient, true)
 	ixs.push(
 		SystemProgram.transfer({
 			fromPubkey: recipient,
@@ -351,33 +351,74 @@ export function unwrapSolIx(
 export async function spawnSolamonsTx(
 	connection: Connection,
 	program: Program<Solamon>,
-	player: PublicKey,
+	user: PublicKey,
 	numberToSpawn: number
 ) {
 	const spawnSolamonsTx = new Transaction()
-	const feeAccount = (await getConfigAccount(program)).feeAccount
 
-	const { tx: feeTokenCreateATATx } = await getOrCreateNativeMintATA(
-		connection,
-		player,
-		feeAccount
+	const configAccount = await getConfigAccount(program)
+
+	const { tokenAccount: userTokenAccount, tx: userTokenAccountTx } =
+		await getOrCreateNativeMintATA(connection, user, user)
+
+	if (userTokenAccountTx) {
+		spawnSolamonsTx.add(userTokenAccountTx)
+	}
+
+	const wrapSolIxs = wrapSOLInstruction(
+		user,
+		configAccount.spawnDeposit.mul(new BN(numberToSpawn)).toNumber()
 	)
 
-	if (feeTokenCreateATATx) {
-		spawnSolamonsTx.add(feeTokenCreateATATx)
-	}
+	spawnSolamonsTx.add(...wrapSolIxs)
 
 	const spawnSolamons = await program.methods
 		.spawnSolamons(numberToSpawn)
 		.accounts({
-			player: player,
-			feeAccount: feeAccount,
+			user: user,
+			userTokenAccount,
 		})
 		.transaction()
 
 	spawnSolamonsTx.add(spawnSolamons)
 
 	return spawnSolamonsTx
+}
+
+export async function burnSolamonTx(
+	connection: Connection,
+	program: Program<Solamon>,
+	user: PublicKey,
+	solamonId: number
+) {
+	const burnSolamonTx = new Transaction()
+
+	const { tokenAccount: userTokenAccount, tx: userTokenAccountTx } =
+		await getOrCreateTokenAccountTx(
+			connection,
+			new PublicKey(NATIVE_MINT),
+			user,
+			user
+		)
+
+	if (userTokenAccountTx) {
+		burnSolamonTx.add(userTokenAccountTx)
+	}
+
+	const burnSolamon = await program.methods
+		.burnSolamon(solamonId)
+		.accounts({
+			user: user,
+			userTokenAccount,
+		})
+		.transaction()
+
+	burnSolamonTx.add(burnSolamon)
+
+	const unwrapSolIxs = unwrapSolIx(userTokenAccount, user, user)
+	burnSolamonTx.add(unwrapSolIxs)
+
+	return burnSolamonTx
 }
 
 export async function showSpawnResult(
@@ -495,33 +536,25 @@ export function parseSolamonLog(logString: string): CardData {
 	}
 }
 
-export async function wrapSolAndOpenBattleTx(
-	connection: Connection,
+export async function openBattleTx(
 	program: Program<Solamon>,
-	player: PublicKey,
+	user: PublicKey,
 	battleStake: number,
 	solamonIds: number[]
 ) {
 	const openBattleTx = new Transaction()
 
-	const { tokenAccount, tx } = await getOrCreateNativeMintATA(
-		connection,
-		player,
-		player
+	const configAccount = await getConfigAccount(program)
+	const userTokenAccount = getAssociatedTokenAddressSync(
+		configAccount.stakeTokenMint,
+		user
 	)
-
-	if (tx) {
-		openBattleTx.add(tx)
-	}
-
-	const wrapSolIxs = wrapSOLInstruction(player, battleStake)
-	openBattleTx.add(...wrapSolIxs)
 
 	const openBattle = await program.methods
 		.openBattle(solamonIds, new BN(battleStake))
 		.accounts({
-			player: player,
-			playerTokenAccount: tokenAccount,
+			user: user,
+			userTokenAccount: userTokenAccount,
 		})
 		.transaction()
 
@@ -530,41 +563,32 @@ export async function wrapSolAndOpenBattleTx(
 	return openBattleTx
 }
 
-export async function wrapSolAndJoinBattleTx(
-	connection: Connection,
+export async function joinBattleTx(
 	program: Program<Solamon>,
-	player: PublicKey,
+	user: PublicKey,
 	battleId: number,
 	solamonIds: number[]
 ) {
 	const joinBattleTx = new Transaction()
 	joinBattleTx.add(
-		ComputeBudgetProgram.setComputeUnitLimit({ units: 500_000 })
+		ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 })
 	)
 
-	const battleAccount = await getBattleAccount(program, battleId)
-
-	const { tokenAccount: playerATA, tx: playerCreateATATx } =
-		await getOrCreateNativeMintATA(connection, player, player)
-
-	if (playerCreateATATx) {
-		joinBattleTx.add(playerCreateATATx)
-	}
-
-	const wrapSolIxs = wrapSOLInstruction(
-		player,
-		battleAccount.battleStake.toNumber()
+	const configAccount = await getConfigAccount(program)
+	console.log(configAccount.stakeTokenMint)
+	const userTokenAccount = getAssociatedTokenAddressSync(
+		configAccount.stakeTokenMint,
+		user
 	)
-	joinBattleTx.add(...wrapSolIxs)
 
 	const joinBattle = await program.methods
 		.joinBattle(solamonIds)
 		.accountsPartial({
-			player,
+			user,
 			configAccount: getConfigPDA(program),
 			battleAccount: getBattleAccountPDA(program, battleId),
-			userAccount: getUserAccountPDA(program, player),
-			playerTokenAccount: playerATA,
+			userAccount: getUserAccountPDA(program, user),
+			userTokenAccount: userTokenAccount,
 		})
 		.transaction()
 
@@ -572,79 +596,56 @@ export async function wrapSolAndJoinBattleTx(
 	return joinBattleTx
 }
 
-export async function cancelBattleAndUnwrapSolTx(
-	connection: Connection,
+export async function cancelBattleTx(
 	program: Program<Solamon>,
-	player: PublicKey,
+	user: PublicKey,
 	battleId: number
 ) {
 	const cancelBattleTx = new Transaction()
 
-	const { tokenAccount: playerATA, tx: playerCreateATATx } =
-		await getOrCreateNativeMintATA(connection, player, player)
-
-	if (playerCreateATATx) {
-		cancelBattleTx.add(playerCreateATATx)
-	}
+	const configAccount = await getConfigAccount(program)
+	const userTokenAccount = getAssociatedTokenAddressSync(
+		configAccount.stakeTokenMint,
+		user
+	)
 
 	const cancelBattle = await program.methods
 		.cancelBattle()
 		.accountsPartial({
-			player,
+			user,
 			battleAccount: getBattleAccountPDA(program, battleId),
-			playerTokenAccount: playerATA,
+			userTokenAccount: userTokenAccount,
 		})
 		.transaction()
 
 	cancelBattleTx.add(cancelBattle)
 
-	const unwrapSolIxs = unwrapSolIx(playerATA, player, player)
-	cancelBattleTx.add(unwrapSolIxs)
-
 	return cancelBattleTx
 }
 
-export async function claimBattleAndUnwrapSolTx(
-	connection: Connection,
+export async function claimBattleTx(
 	program: Program<Solamon>,
-	player: PublicKey,
+	user: PublicKey,
 	battleId: number
 ) {
 	const claimBattleTx = new Transaction()
 
-	const { tokenAccount: playerATA, tx: playerCreateATATx } =
-		await getOrCreateNativeMintATA(connection, player, player)
-
 	const configAccount = await getConfigAccount(program)
-	const { tokenAccount: feeTokenAccount, tx: feeTokenCreateATATx } =
-		await getOrCreateNativeMintATA(
-			connection,
-			player,
-			configAccount.feeAccount
-		)
-
-	if (playerCreateATATx) {
-		claimBattleTx.add(playerCreateATATx)
-	}
-
-	if (feeTokenCreateATATx) {
-		claimBattleTx.add(feeTokenCreateATATx)
-	}
+	const userTokenAccount = getAssociatedTokenAddressSync(
+		configAccount.stakeTokenMint,
+		user
+	)
 
 	const claimBattle = await program.methods
 		.claimBattle()
 		.accountsPartial({
-			player,
+			user,
 			battleAccount: getBattleAccountPDA(program, battleId),
-			feeTokenAccount: feeTokenAccount,
-			playerTokenAccount: playerATA,
+			userTokenAccount: userTokenAccount,
 		})
 		.transaction()
 
 	claimBattleTx.add(claimBattle)
-
-	const unwrapSolIxs = unwrapSolIx(playerATA, player, player)
-	claimBattleTx.add(unwrapSolIxs)
 
 	return claimBattleTx
 }

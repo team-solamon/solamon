@@ -19,6 +19,16 @@ pub struct Initialize<'info> {
         associated_token::mint = mint,
         associated_token::authority = config_account,
     )]
+    pub deposit_account: Account<'info, TokenAccount>,
+
+    #[account(mut)]
+    pub stake_token_mint: Account<'info, Mint>,
+
+    #[account(init,
+        payer = signer,
+        associated_token::mint = stake_token_mint,
+        associated_token::authority = config_account,
+    )]
     pub battle_stake_account: Account<'info, TokenAccount>,
 
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -29,24 +39,24 @@ pub struct Initialize<'info> {
 #[account]
 pub struct ConfigAccount {
     pub bump: u8,
-    pub fee_account: Pubkey,
+    pub stake_token_mint: Pubkey,
+    pub deposit_account: Pubkey,
     pub battle_count: u64,
     pub solamon_count: u16,
     pub admin: Pubkey,
-    pub spawn_fee: u64,
-    pub fee_percentage_in_basis_points: u16,
+    pub spawn_deposit: u64,
     pub available_battle_ids: Vec<u64>,
 }
 
 impl Space for ConfigAccount {
     const INIT_SPACE: usize = 8 // discriminator
         + 1 // bump
-        + 32 // fee_account
+        + 32 // stake_token_mint
+        + 32 // deposit_account
         + 8 // battle_count
         + 2 // solamon_count
         + 32 // admin
-        + 8 // spawn_fee
-        + 2 // fee_percentage_in_basis_points
+        + 8 // spawn_deposit
         + 8 * 100; // available_battle_ids (max 100 battles)
 }
 
@@ -96,12 +106,13 @@ impl Space for SolamonPrototype {
 #[derive(Accounts)]
 pub struct SpawnSolamons<'info> {
     #[account(mut)]
-    pub player: Signer<'info>,
+    pub user: Signer<'info>,
+
     #[account(
         init_if_needed,
-        payer = player,
+        payer = user,
         space = UserAccount::INIT_SPACE,
-        seeds = [USER_ACCOUNT, player.key().as_ref()],
+        seeds = [USER_ACCOUNT, user.key().as_ref()],
         bump,
     )]
     pub user_account: Account<'info, UserAccount>,
@@ -109,16 +120,23 @@ pub struct SpawnSolamons<'info> {
     #[account(mut, seeds = [CONFIG_ACCOUNT], bump = config_account.bump)]
     pub config_account: Account<'info, ConfigAccount>,
 
-    #[account(
-        mut,
-        address = config_account.fee_account,
+    #[account(mut,
+        associated_token::mint = NATIVE_MINT,
+        associated_token::authority = config_account,
     )]
-    /// CHECK: This is the fee account
-    pub fee_account: AccountInfo<'info>,
+    pub deposit_account: Account<'info, TokenAccount>,
+
+    #[account(mut,
+        token::mint = NATIVE_MINT,
+        token::authority = user
+    )]
+    pub user_token_account: Account<'info, TokenAccount>,
 
     #[account(mut, seeds = [SOLAMON_PROTOTYPE_ACCOUNT], bump = solamon_prototype_account.bump)]
     pub solamon_prototype_account: Account<'info, SolamonPrototypeAccount>,
 
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
 }
 
@@ -167,17 +185,17 @@ pub enum Element {
 #[derive(Accounts)]
 pub struct OpenBattle<'info> {
     #[account(mut)]
-    pub player: Signer<'info>,
+    pub user: Signer<'info>,
 
     #[account(mut, seeds = [CONFIG_ACCOUNT], bump = config_account.bump)]
     pub config_account: Account<'info, ConfigAccount>,
 
-    #[account(mut, seeds = [USER_ACCOUNT, player.key().as_ref()], bump = user_account.bump)]
+    #[account(mut, seeds = [USER_ACCOUNT, user.key().as_ref()], bump = user_account.bump)]
     pub user_account: Account<'info, UserAccount>,
 
     #[account(
         init_if_needed,
-        payer = player,
+        payer = user,
         space = BattleAccount::INIT_SPACE,
         seeds = [BATTLE_ACCOUNT, &config_account.battle_count.to_le_bytes()],
         bump,
@@ -186,20 +204,17 @@ pub struct OpenBattle<'info> {
 
     #[account(
         mut,
-        token::mint = mint,
-        token::authority = player
+        token::mint = config_account.stake_token_mint,
+        token::authority = user
     )]
-    pub player_token_account: Account<'info, TokenAccount>,
+    pub user_token_account: Account<'info, TokenAccount>,
 
     #[account(
         mut,
-        associated_token::mint = mint,
+        associated_token::mint = config_account.stake_token_mint,
         associated_token::authority = config_account
     )]
     pub battle_stake_account: Account<'info, TokenAccount>,
-
-    #[account(address = NATIVE_MINT)]
-    pub mint: Account<'info, Mint>,
 
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -244,7 +259,7 @@ pub enum BattleStatus {
 #[derive(Accounts)]
 pub struct JoinBattle<'info> {
     #[account(mut)]
-    pub player: Signer<'info>,
+    pub user: Signer<'info>,
 
     #[account(mut, seeds = [CONFIG_ACCOUNT], bump = config_account.bump)]
     pub config_account: Account<'info, ConfigAccount>,
@@ -252,7 +267,7 @@ pub struct JoinBattle<'info> {
     #[account(mut, seeds = [BATTLE_ACCOUNT, &battle_account.battle_id.to_le_bytes()], bump = battle_account.bump)]
     pub battle_account: Account<'info, BattleAccount>,
 
-    #[account(mut, seeds = [USER_ACCOUNT, player.key().as_ref()], bump = user_account.bump)]
+    #[account(mut, seeds = [USER_ACCOUNT, user.key().as_ref()], bump = user_account.bump)]
     pub user_account: Account<'info, UserAccount>,
 
     #[account(mut, seeds = [USER_ACCOUNT, battle_account.player_1.as_ref()], bump = opponent_user_account.bump)]
@@ -260,20 +275,17 @@ pub struct JoinBattle<'info> {
 
     #[account(
         mut,
-        token::mint = mint,
-        token::authority = player
+        token::mint = config_account.stake_token_mint,
+        token::authority = user
     )]
-    pub player_token_account: Account<'info, TokenAccount>,
+    pub user_token_account: Account<'info, TokenAccount>,
 
     #[account(
         mut,
-        associated_token::mint = mint,
+        associated_token::mint = config_account.stake_token_mint,
         associated_token::authority = config_account
     )]
     pub battle_stake_account: Account<'info, TokenAccount>,
-
-    #[account(address = NATIVE_MINT)]
-    pub mint: Account<'info, Mint>,
 
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -283,7 +295,7 @@ pub struct JoinBattle<'info> {
 #[derive(Accounts)]
 pub struct CancelBattle<'info> {
     #[account(mut)]
-    pub player: Signer<'info>,
+    pub user: Signer<'info>,
 
     #[account(mut, seeds = [CONFIG_ACCOUNT], bump = config_account.bump)]
     pub config_account: Account<'info, ConfigAccount>,
@@ -291,19 +303,19 @@ pub struct CancelBattle<'info> {
     #[account(mut, seeds = [BATTLE_ACCOUNT, &battle_account.battle_id.to_le_bytes()], bump = battle_account.bump)]
     pub battle_account: Account<'info, BattleAccount>,
 
-    #[account(mut, seeds = [USER_ACCOUNT, player.key().as_ref()], bump = user_account.bump)]
+    #[account(mut, seeds = [USER_ACCOUNT, user.key().as_ref()], bump = user_account.bump)]
     pub user_account: Account<'info, UserAccount>,
 
     #[account(
         mut,
-        token::mint = mint,
-        token::authority = player
+        token::mint = config_account.stake_token_mint,
+        token::authority = user
     )]
-    pub player_token_account: Account<'info, TokenAccount>,
+    pub user_token_account: Account<'info, TokenAccount>,
 
     #[account(
         mut,
-        associated_token::mint = mint,
+        associated_token::mint = config_account.stake_token_mint,
         associated_token::authority = config_account
     )]
     pub battle_stake_account: Account<'info, TokenAccount>,
@@ -319,36 +331,55 @@ pub struct CancelBattle<'info> {
 #[derive(Accounts)]
 pub struct ClaimBattle<'info> {
     #[account(mut)]
-    pub player: Signer<'info>,
+    pub user: Signer<'info>,
 
     #[account(mut, seeds = [CONFIG_ACCOUNT], bump = config_account.bump)]
     pub config_account: Account<'info, ConfigAccount>,
+
     #[account(mut, seeds = [BATTLE_ACCOUNT, &battle_account.battle_id.to_le_bytes()], bump = battle_account.bump)]
     pub battle_account: Account<'info, BattleAccount>,
 
     #[account(
         mut,
-        token::mint = mint,
-        token::authority = config_account.fee_account
+        token::mint = config_account.stake_token_mint,
+        token::authority = user
     )]
-    pub fee_token_account: Account<'info, TokenAccount>,
+    pub user_token_account: Account<'info, TokenAccount>,
 
     #[account(
         mut,
-        token::mint = mint,
-        token::authority = player
-    )]
-    pub player_token_account: Account<'info, TokenAccount>,
-
-    #[account(
-        mut,
-        associated_token::mint = mint,
+        associated_token::mint = config_account.stake_token_mint,
         associated_token::authority = config_account
     )]
     pub battle_stake_account: Account<'info, TokenAccount>,
 
-    #[account(address = NATIVE_MINT)]
-    pub mint: Account<'info, Mint>,
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct BurnSolamon<'info> {
+    #[account(mut)]
+    pub user: Signer<'info>,
+
+    #[account(mut, seeds = [USER_ACCOUNT, user.key().as_ref()], bump = user_account.bump)]
+    pub user_account: Account<'info, UserAccount>,
+
+    #[account(mut, seeds = [CONFIG_ACCOUNT], bump = config_account.bump)]
+    pub config_account: Account<'info, ConfigAccount>,
+
+    #[account(mut,
+        associated_token::mint = NATIVE_MINT,
+        associated_token::authority = config_account,
+    )]
+    pub deposit_account: Account<'info, TokenAccount>,
+
+    #[account(mut,
+        token::mint = NATIVE_MINT,
+        token::authority = user
+    )]
+    pub user_token_account: Account<'info, TokenAccount>,
 
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,

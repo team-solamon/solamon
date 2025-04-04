@@ -17,19 +17,12 @@ use state::*;
 pub mod solamon {
     use super::*;
 
-    pub fn initialize(
-        ctx: Context<Initialize>,
-        fee_account: Pubkey,
-        admin: Pubkey,
-        fee_percentage_in_basis_points: u16,
-        spawn_fee: u64,
-    ) -> Result<()> {
+    pub fn initialize(ctx: Context<Initialize>, admin: Pubkey, spawn_deposit: u64) -> Result<()> {
         let config_account = &mut ctx.accounts.config_account;
         config_account.bump = ctx.bumps.config_account;
-        config_account.fee_account = fee_account.key();
+        config_account.stake_token_mint = ctx.accounts.stake_token_mint.key();
         config_account.admin = admin;
-        config_account.fee_percentage_in_basis_points = fee_percentage_in_basis_points;
-        config_account.spawn_fee = spawn_fee;
+        config_account.spawn_deposit = spawn_deposit;
         Ok(())
     }
 
@@ -46,12 +39,11 @@ pub mod solamon {
     }
 
     // @TODO: add & update solamon prototype logic
-
     pub fn spawn_solamons(ctx: Context<SpawnSolamons>, count: u8) -> Result<()> {
         let user_account = &mut ctx.accounts.user_account;
         let config_account = &mut ctx.accounts.config_account;
         user_account.bump = ctx.bumps.user_account;
-        user_account.user = ctx.accounts.player.key();
+        user_account.user = ctx.accounts.user.key();
         let current_count = user_account.solamons.len();
         let solamon_prototype_account = &ctx.accounts.solamon_prototype_account;
 
@@ -60,19 +52,14 @@ pub mod solamon {
             SolamonError::MaxElementsReached
         );
 
-        let ix = anchor_lang::solana_program::system_instruction::transfer(
-            &ctx.accounts.player.key(),
-            &ctx.accounts.fee_account.key(),
-            config_account.spawn_fee * count as u64,
-        );
-        anchor_lang::solana_program::program::invoke(
-            &ix,
-            &[
-                ctx.accounts.player.to_account_info(),
-                ctx.accounts.fee_account.to_account_info(),
-                ctx.accounts.system_program.to_account_info(),
-            ],
+        transfer_token(
+            &ctx.accounts.user_token_account.to_account_info(),
+            &ctx.accounts.deposit_account.to_account_info(),
+            &ctx.accounts.user.to_account_info(),
+            &ctx.accounts.token_program.to_account_info(),
+            config_account.spawn_deposit * count as u64,
         )?;
+
         for i in 0..count {
             let species: u8 = pseudorandom_u8(i as u64) % solamon_prototype_account.total_species;
             let solamon_prototype = &solamon_prototype_account.solamon_prototypes[species as usize];
@@ -115,7 +102,6 @@ pub mod solamon {
         Ok(())
     }
 
-    // TODO: Add fight money logic
     pub fn open_battle(
         ctx: Context<OpenBattle>,
         solamon_ids: Vec<u16>,
@@ -132,7 +118,7 @@ pub mod solamon {
 
         battle_account.bump = ctx.bumps.battle_account;
         battle_account.battle_id = battle_id;
-        battle_account.player_1 = ctx.accounts.player.key();
+        battle_account.player_1 = ctx.accounts.user.key();
         battle_account.player_1_solamons = solamon_ids
             .iter()
             .map(|id| {
@@ -155,9 +141,9 @@ pub mod solamon {
         battle_account.battle_stake = battle_stake;
 
         transfer_token(
-            &ctx.accounts.player_token_account.to_account_info(),
+            &ctx.accounts.user_token_account.to_account_info(),
             &ctx.accounts.battle_stake_account.to_account_info(),
-            &ctx.accounts.player.to_account_info(),
+            &ctx.accounts.user.to_account_info(),
             &ctx.accounts.token_program.to_account_info(),
             battle_stake,
         )?;
@@ -179,7 +165,7 @@ pub mod solamon {
             SolamonError::BattleNotAvailable
         );
         require!(
-            battle_account.player_1 == ctx.accounts.player.key(),
+            battle_account.player_1 == ctx.accounts.user.key(),
             SolamonError::InvalidBattleParticipant
         );
 
@@ -196,7 +182,7 @@ pub mod solamon {
         // return battle stake
         transfer_token_with_signer(
             &ctx.accounts.battle_stake_account.to_account_info(),
-            &ctx.accounts.player_token_account.to_account_info(),
+            &ctx.accounts.user_token_account.to_account_info(),
             &config_account.to_account_info(),
             &ctx.accounts.token_program.to_account_info(),
             battle_account.battle_stake,
@@ -230,7 +216,7 @@ pub mod solamon {
             SolamonError::BattleNotAvailable
         );
 
-        battle_account.player_2 = ctx.accounts.player.key();
+        battle_account.player_2 = ctx.accounts.user.key();
         battle_account.player_2_solamons = solamon_ids
             .iter()
             .map(|id| {
@@ -245,9 +231,9 @@ pub mod solamon {
             .collect();
 
         transfer_token(
-            &ctx.accounts.player_token_account.to_account_info(),
+            &ctx.accounts.user_token_account.to_account_info(),
             &ctx.accounts.battle_stake_account.to_account_info(),
-            &ctx.accounts.player.to_account_info(),
+            &ctx.accounts.user.to_account_info(),
             &ctx.accounts.token_program.to_account_info(),
             battle_account.battle_stake,
         )?;
@@ -299,7 +285,7 @@ pub mod solamon {
         };
 
         require!(
-            winner == ctx.accounts.player.key(),
+            winner == ctx.accounts.user.key(),
             SolamonError::InvalidBattleWinner
         );
 
@@ -309,11 +295,13 @@ pub mod solamon {
         );
 
         let claimable_amount = battle_account.battle_stake * 2;
-        let fee = claimable_amount * config_account.fee_percentage_in_basis_points as u64
-            / MAX_BASIS_POINTS as u64;
+
+        // @TODO: add fee logic
+        // let fee = claimable_amount * config_account.fee_percentage_in_basis_points as u64
+        //     / MAX_BASIS_POINTS as u64;
 
         msg!("Claimable amount: {}", claimable_amount);
-        msg!("Fee: {}", fee);
+        // msg!("Fee: {}", fee);
         msg!(
             "Current Balance of Battle Stake Account: {}",
             ctx.accounts.battle_stake_account.amount
@@ -322,30 +310,63 @@ pub mod solamon {
         // transfer prize money
         transfer_token_with_signer(
             &ctx.accounts.battle_stake_account.to_account_info(),
-            &ctx.accounts.player_token_account.to_account_info(),
+            &ctx.accounts.user_token_account.to_account_info(),
             &config_account.to_account_info(),
             &ctx.accounts.token_program.to_account_info(),
-            claimable_amount - fee,
+            claimable_amount,
             &[&[CONFIG_ACCOUNT.as_ref(), &[config_account.bump]]],
         )?;
 
-        msg!("Transferred prize money: {}", claimable_amount - fee);
+        msg!("Transferred prize money: {}", claimable_amount);
         msg!(
             "Current Balance of Battle Stake Account: {}",
             ctx.accounts.battle_stake_account.amount
         );
 
-        // transfer fee to fee account
+        // @TODO: add fee logic
+        // transfer_token_with_signer(
+        //     &ctx.accounts.battle_stake_account.to_account_info(),
+        //     &ctx.accounts.fee_token_account.to_account_info(),
+        //     &config_account.to_account_info(),
+        //     &ctx.accounts.token_program.to_account_info(),
+        //     fee,
+        //     &[&[CONFIG_ACCOUNT.as_ref(), &[config_account.bump]]],
+        // )?;
+
+        battle_account.claim_timestamp = Clock::get()?.unix_timestamp;
+        Ok(())
+    }
+
+    pub fn burn_solamon(ctx: Context<BurnSolamon>, solamon_id: u16) -> Result<()> {
+        let user_account = &mut ctx.accounts.user_account;
+        let config_account = &mut ctx.accounts.config_account;
+
+        // Verify all solamon IDs exist and are available
+        require!(
+            user_account
+                .solamons
+                .iter()
+                .any(|s| s.id == solamon_id && s.is_available),
+            SolamonError::InvalidSolamonIds
+        );
+
+        // Remove the solamons (filter out the ones we want to burn)
+        user_account
+            .solamons
+            .retain(|solamon| solamon.id != solamon_id);
+
+        let deposit_account_balance = ctx.accounts.deposit_account.amount;
+        msg!("Deposit account balance: {}", deposit_account_balance);
+        // transfer deposit to user
         transfer_token_with_signer(
-            &ctx.accounts.battle_stake_account.to_account_info(),
-            &ctx.accounts.fee_token_account.to_account_info(),
+            &ctx.accounts.deposit_account.to_account_info(),
+            &ctx.accounts.user_token_account.to_account_info(),
             &config_account.to_account_info(),
             &ctx.accounts.token_program.to_account_info(),
-            fee,
+            config_account.spawn_deposit,
             &[&[CONFIG_ACCOUNT.as_ref(), &[config_account.bump]]],
         )?;
 
-        battle_account.claim_timestamp = Clock::get()?.unix_timestamp;
         Ok(())
     }
 }
