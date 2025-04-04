@@ -164,12 +164,12 @@ async function generateNewStory(storyText: string): Promise<string> {
 
   const randomScenario = scenarios[Math.floor(Math.random() * scenarios.length)]
 
-  const prompt = `Craft a short, creative fantasy battle story inspired by a fictional battle log between two unnamed warriors. 
+  const prompt = `Craft a concise, creative fantasy battle story inspired by a fictional battle log between two unnamed warriors. 
     Use evocative titles like "The Shadowed Avenger" or "The Flame-bound Sentinel" to give them identity. 
     Set the scene in ${randomScenario}, describing the atmosphere and environment briefly to enhance the drama. 
     Focus on the flow of the duel, each warrior's strategy, emotional tension, and the outcome — whether it's victory, defeat, or a mysterious disappearance. 
     Keep it vivid and magical, but avoid graphic or excessively violent descriptions. 
-    Imply the action through dramatic tone and clever narration rather than explicit detail.
+    Ensure the story is strictly between 500 and 600 characters in length.
     
     Battle log:
     ${storyText}
@@ -184,7 +184,7 @@ async function generateNewStory(storyText: string): Promise<string> {
       },
     ],
     temperature: 1.0,
-    max_tokens: 1000,
+    max_tokens: 600,
   })
 
   const story =
