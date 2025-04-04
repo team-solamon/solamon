@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { CardData, stringToElement } from '@/lib/solana-helper'
 import { useRouter } from 'next/navigation'
+import React, { useEffect } from 'react'
+
+import { CardData, stringToElement } from '@/lib/solana-helper'
 
 const DrawGame = dynamic(() => import('@/app/draw/components/DrawGame'), {
   ssr: false,

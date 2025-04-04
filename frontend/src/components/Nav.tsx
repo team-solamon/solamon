@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from 'react'
-import {
-  getConnection,
-  getKeypairFromLocalStorage,
-  trimAddress,
-} from '@/lib/helper'
-import { LAMPORTS_PER_SOL } from '@solana/web3.js'
-import { useModal } from '@/contexts/ModalContext'
-import Typography from './Typography'
-import SolanaBalance from './SolanaBalance'
+'use client'
+
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { useRouter } from 'next/navigation'
+import React, { useEffect } from 'react'
+
+import { trimAddress } from '@/lib/helper'
 import { ROUTES } from '@/lib/routes'
 import { getExplorerUrl } from '@/lib/url-helper'
-import { useLoading } from '@/contexts/LoadingContext'
+
 import { useBalance } from '@/contexts/BalanceContext'
+import { useLoading } from '@/contexts/LoadingContext'
+import { useModal } from '@/contexts/ModalContext'
+
+import SolanaBalance from './SolanaBalance'
+import Typography from './Typography'
 
 const YellowButton: React.FC<{
   onClick: () => void
@@ -31,18 +32,20 @@ const YellowButton: React.FC<{
 const Nav: React.FC = () => {
   const { openModal } = useModal()
   const router = useRouter()
-  const keypair = getKeypairFromLocalStorage()
+  const { connected, publicKey } = useWallet()
   const { showLoading, hideLoading } = useLoading()
   const { balance, fetchBalance } = useBalance()
+  const { connection } = useConnection()
 
   const handleRequestAirdrop = async () => {
-    if (!keypair?.publicKey) return
-    const connection = getConnection()
     // Request airdrop
+    if (!publicKey) {
+      return
+    }
     try {
       showLoading('Requesting airdrop...')
       const airdropSignature = await connection.requestAirdrop(
-        keypair.publicKey,
+        publicKey,
         1e9 // 1 SOL in lamports
       )
       await connection.confirmTransaction(airdropSignature)
@@ -61,6 +64,14 @@ const Nav: React.FC = () => {
       localStorage.setItem('tutorialShown', 'true')
     }
   }, [])
+
+  useEffect(() => {
+    console.log({ connected })
+    if (!connected) {
+      // alert('Please connect your wallet first')
+      router.push(ROUTES.ROOT)
+    }
+  }, [connected])
 
   return (
     <header className='header flex flex-col lg:flex-row justify-between items-center mb-6 gap-4'>
@@ -93,11 +104,11 @@ const Nav: React.FC = () => {
       <div className='wallet-info text-right flex items-end order-3 lg:order-3'>
         <Typography variant='body-2' color='secondary' className='mr-4'>
           <a
-            href={`${getExplorerUrl(keypair?.publicKey.toBase58() || '')}`}
+            href={`${getExplorerUrl(publicKey?.toBase58() || '')}`}
             target='_blank'
             rel='noopener noreferrer'
           >
-            {trimAddress(keypair?.publicKey.toBase58())}
+            {trimAddress(publicKey?.toBase58())}
           </a>
         </Typography>
         <SolanaBalance balance={balance || 0} />

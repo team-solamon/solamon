@@ -1,7 +1,10 @@
 import React from 'react'
-import Typography from './Typography'
-import { getElementEmoji } from '@/data/card'
+
 import { Element } from '@/lib/solana-helper'
+
+import { getElementEmoji } from '@/data/card'
+
+import Typography from './Typography'
 
 interface ElementProbability {
   element: Element

@@ -1,11 +1,14 @@
 'use client'
 
-import React from 'react'
 import dynamic from 'next/dynamic'
-import Modal from '../Modal'
-import Button from '../Button'
-import { useModal } from '@/contexts/ModalContext'
+import React from 'react'
+
 import { CardData } from '@/lib/solana-helper'
+
+import { useModal } from '@/contexts/ModalContext'
+
+import Button from '../Button'
+import Modal from '../Modal'
 
 const DrawGame = dynamic(() => import('@/app/draw/components/DrawGame'), {
   ssr: false,

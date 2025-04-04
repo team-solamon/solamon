@@ -1,35 +1,40 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
+
+import { getProgram } from '@/lib/helper'
+import { ROUTES } from '@/lib/routes'
+import {
+  BattleAccount,
+  getBattleAccount,
+  getBattleAccountPDA,
+  getBattleActions,
+  ParsedBattleAction,
+} from '@/lib/solana-helper'
+
+import { AttackEvent, BattleReplay } from '@/data/replay'
+
+import ResultModal from '@/components/modals/ResultModal'
+import StoryModal from '@/components/modals/StoryModal'
 import PhaserGame from '@/components/PhaserGame'
+
+import { useModal } from '@/contexts/ModalContext'
+
 import GameLogs from './GameLogs'
 import ScoreDisplay from './ScoreDisplay'
 import { CardBattleScene } from '../scenes/CardBattleScene'
 import { EventBridge } from '../utils/EventBridge'
-import {
-  BattleAccount,
-  ParsedBattleAction,
-  getBattleAccount,
-  getBattleAccountPDA,
-  getBattleActions,
-} from '@/lib/solana-helper'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { getKeypairFromLocalStorage } from '@/lib/helper'
-import { getConnection } from '@/lib/helper'
-import { getProgram } from '@/lib/helper'
-import { AttackEvent, BattleReplay } from '@/data/replay'
-import ResultModal from '@/components/modals/ResultModal'
-import { ROUTES } from '@/lib/routes'
-import { useModal } from '@/contexts/ModalContext'
-import StoryModal from '@/components/modals/StoryModal'
 
 const Game: React.FC = () => {
   const searchParams = useSearchParams()
   const battleId = searchParams.get('battleId')
   const router = useRouter()
-  const program = getProgram()
-  const connection = getConnection()
-  const player = getKeypairFromLocalStorage()
+  const { connection } = useConnection()
+  const program = getProgram(connection)
+  const { publicKey } = useWallet()
   const [battleLogs, setBattleLogs] = useState<
     { message: string; color: string }[]
   >([])
@@ -47,14 +52,13 @@ const Game: React.FC = () => {
   }, [battleId])
 
   useEffect(() => {
-    if (!player) {
-      alert('Please create account first')
+    if (!publicKey) {
+      alert('Please connect wallet first')
       router.push('/')
       return
     }
 
-    const isPlayer1 =
-      battleAccount?.player1.toString() === player.publicKey.toString()
+    const isPlayer1 = battleAccount?.player1.toString() === publicKey.toString()
 
     if (battleAccount && battleActions) {
       const battleReplay: BattleReplay = {

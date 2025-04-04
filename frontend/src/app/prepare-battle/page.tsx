@@ -1,11 +1,12 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+import { PublicKey } from '@solana/web3.js'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Nav from '@/components/Nav'
-import PickedCards from '@/components/PickedCards'
-import CardList from '@/components/CardList'
-import Card from '@/components/Card'
+import React, { useEffect, useState } from 'react'
+
+import { getProgram, trimAddress } from '@/lib/helper'
+import { ROUTES } from '@/lib/routes'
 import {
   BattleAccount,
   CardData,
@@ -13,27 +14,24 @@ import {
   getUserAccount,
   wrapSolAndJoinBattleTx,
 } from '@/lib/solana-helper'
-import {
-  getConnection,
-  getKeypairFromLocalStorage,
-  getProgram,
-  trimAddress,
-} from '@/lib/helper'
-import { Keypair, sendAndConfirmTransaction } from '@solana/web3.js'
-import { useLoading } from '@/contexts/LoadingContext'
-import { ROUTES } from '@/lib/routes'
-import CardStats from '@/components/CardStats'
-import Typography from '@/components/Typography'
-import SharedModal from '@/components/SharedModal'
-import { useBalance } from '@/contexts/BalanceContext'
 
+import Card from '@/components/Card'
+import CardList from '@/components/CardList'
+import CardStats from '@/components/CardStats'
+import Nav from '@/components/Nav'
+import PickedCards from '@/components/PickedCards'
+import SharedModal from '@/components/SharedModal'
+import Typography from '@/components/Typography'
+
+import { useBalance } from '@/contexts/BalanceContext'
+import { useLoading } from '@/contexts/LoadingContext'
 const PrepareBattlePage = () => {
   const searchParams = useSearchParams()
   const battleId = searchParams.get('battleId')
   const router = useRouter()
-  const program = getProgram()
-  const connection = getConnection()
-  const player = getKeypairFromLocalStorage()
+  const { connection } = useConnection()
+  const program = getProgram(connection)
+  const { publicKey, sendTransaction } = useWallet()
   const [myCards, setMyCards] = useState<CardData[]>([])
   const [pickedCards, setPickedCards] = useState<CardData[]>([])
   const [loading, setLoading] = useState(false)
@@ -47,12 +45,12 @@ const PrepareBattlePage = () => {
       router.push('/choose-fighter')
       return
     }
-    if (!player) {
+    if (!publicKey) {
       router.push('/')
       return
     }
     fetchBattleAccount(battleId)
-    fetchMyCards(player)
+    fetchMyCards(publicKey)
   }, [battleId])
 
   const fetchBattleAccount = async (battleId: string) => {
@@ -60,8 +58,8 @@ const PrepareBattlePage = () => {
     setBattleAccount(battleAccount)
   }
 
-  const fetchMyCards = async (player: Keypair) => {
-    const myAccount = await getUserAccount(program, player.publicKey)
+  const fetchMyCards = async (publicKey: PublicKey) => {
+    const myAccount = await getUserAccount(program, publicKey)
     setMyCards(myAccount.solamons)
   }
 
@@ -82,7 +80,7 @@ const PrepareBattlePage = () => {
       console.log('Please pick 3 cards')
       return
     }
-    if (!player) {
+    if (!publicKey) {
       console.log('Please connect your wallet')
       return
     }
@@ -98,11 +96,12 @@ const PrepareBattlePage = () => {
       const tx = await wrapSolAndJoinBattleTx(
         connection,
         program,
-        player.publicKey,
+        publicKey,
         parseInt(battleId),
         pickedCards.map((card) => card.id)
       )
-      await sendAndConfirmTransaction(connection, tx, [player])
+      const txHash = await sendTransaction(tx, connection)
+      await connection.confirmTransaction(txHash)
       fetchBalance()
       router.push(`${ROUTES.GAME}?battleId=${battleId}`)
     } catch (error) {

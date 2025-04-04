@@ -1,6 +1,6 @@
 import React from 'react'
+
 import { getElementEmoji } from '@/data/card'
-import { CardData } from '@/lib/solana-helper'
 
 interface CardImageProps {
   species: number

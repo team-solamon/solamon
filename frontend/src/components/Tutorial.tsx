@@ -1,12 +1,16 @@
 import React, { useEffect, useMemo } from 'react'
-import Button from './Button'
+
+import { CardData, stringToElement } from '@/lib/solana-helper'
+
 import { BattleReplay } from '@/data/replay'
-import PhaserGame from './PhaserGame'
+
 import { CardBattleScene } from '@/app/game/scenes/CardBattleScene'
 import { EventBridge } from '@/app/game/utils/EventBridge'
-import { CardData, stringToElement } from '@/lib/solana-helper'
-import Typography from './Typography'
 import { FIGHT_SOL_PRICE, WINNER_SOL_REWARD } from '@/constant/env'
+
+import Button from './Button'
+import PhaserGame from './PhaserGame'
+import Typography from './Typography'
 
 const playerCardData: CardData[] = [
   {

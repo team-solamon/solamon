@@ -1,20 +1,19 @@
-import React from 'react'
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { useRouter } from 'next/navigation'
-import CardStack from './CardStack'
-import Button from './Button'
+import React from 'react'
+
+import { getProgram } from '@/lib/helper'
+import { getWinnerFromBattleAccount } from '@/lib/helper'
 import { ROUTES } from '@/lib/routes'
 import { BattleAccount, claimBattleAndUnwrapSolTx } from '@/lib/solana-helper'
-import {
-  getConnection,
-  getKeypairFromLocalStorage,
-  getProgram,
-} from '@/lib/helper'
-import { getWinnerFromBattleAccount } from '@/lib/helper'
-import Typography from './Typography'
-import { sendAndConfirmTransaction } from '@solana/web3.js'
-import { useLoading } from '@/contexts/LoadingContext'
+
 import { useBalance } from '@/contexts/BalanceContext'
+import { useLoading } from '@/contexts/LoadingContext'
 import { useModal } from '@/contexts/ModalContext'
+
+import Button from './Button'
+import CardStack from './CardStack'
+import Typography from './Typography'
 
 interface GameResultProps {
   battleAccount: BattleAccount
@@ -31,26 +30,29 @@ const GameResult: React.FC<GameResultProps> = ({
 }) => {
   const { openModal } = useModal()
   const router = useRouter()
-  const player = getKeypairFromLocalStorage()
+  const { publicKey, sendTransaction } = useWallet()
   const winner = getWinnerFromBattleAccount(battleAccount)
-  const isPlayerWinner = winner === player?.publicKey?.toBase58()
+  const isPlayerWinner = winner === publicKey?.toBase58()
   const claimable =
     isPlayerWinner && battleAccount.claimTimestamp.toNumber() == 0
   const { showLoading, hideLoading } = useLoading()
   const { fetchBalance } = useBalance()
+  const { connection } = useConnection()
+  const program = getProgram(connection)
 
   const handleClaim = async () => {
-    if (!player) return
+    if (!publicKey) return
 
     showLoading('Claiming reward...')
     try {
       const tx = await claimBattleAndUnwrapSolTx(
-        getConnection(),
-        getProgram(),
-        player.publicKey,
+        connection,
+        program,
+        publicKey,
         battleAccount.battleId
       )
-      await sendAndConfirmTransaction(getConnection(), tx, [player])
+      const txHash = await sendTransaction(tx, connection)
+      await connection.confirmTransaction(txHash)
     } catch (error) {
       alert('Claim error: ' + error)
     }

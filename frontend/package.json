@@ -5,11 +5,15 @@
   "scripts": {
     "dev": "node scripts/copy-contract-files.mjs && next dev",
     "build": "node scripts/copy-contract-files.mjs && next build",
-    "start": "node scripts/copy-contract-files.mjs && next start"
+    "start": "node scripts/copy-contract-files.mjs && next start",
+    "lint": "eslint . --fix"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.31.0",
     "@solana/spl-token": "^0.4.13",
+    "@solana/wallet-adapter-react": "^0.15.36",
+    "@solana/wallet-adapter-react-ui": "^0.9.36",
+    "@solana/wallet-adapter-wallets": "^0.19.33",
     "@solana/web3.js": "^1.98.0",
     "@supabase/supabase-js": "^2.49.4",
     "clsx": "^2.0.0",

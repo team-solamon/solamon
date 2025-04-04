@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import CardImage from './Card'
+import React, { useEffect,useState } from 'react'
+
 import { CardData } from '@/lib/solana-helper'
+
+import CardImage from './Card'
 
 const TRANSITION_DURATION = 300
 const ANIMATION_TIMEOUT = TRANSITION_DURATION

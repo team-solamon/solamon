@@ -1,10 +1,13 @@
 'use client'
 
 import React from 'react'
-import Modal from '../Modal'
-import Card from '../Card'
-import { useModal } from '@/contexts/ModalContext'
+
 import { CardData, elementToString } from '@/lib/solana-helper'
+
+import { useModal } from '@/contexts/ModalContext'
+
+import Card from '../Card'
+import Modal from '../Modal'
 
 interface CardDetailsModalProps {
   selectedCard: CardData | null

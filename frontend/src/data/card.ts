@@ -1,4 +1,4 @@
-import { Element, stringToElement, elementToString } from '@/lib/solana-helper'
+import { Element, elementToString,stringToElement } from '@/lib/solana-helper'
 
 export function getRandomElement(): Element {
   const elements = ['fire', 'water', 'earth', 'metal', 'wood']

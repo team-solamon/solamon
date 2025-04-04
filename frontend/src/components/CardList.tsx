@@ -1,12 +1,17 @@
 import React from 'react'
-import Card from '@/components/Card'
+
 import { CardData, elementToString, stringToElement } from '@/lib/solana-helper'
+
 import { getElementEmoji } from '@/data/card'
-import Typography from './Typography'
+
+import Card from '@/components/Card'
+
+import { useModal } from '@/contexts/ModalContext'
+
+import Button from './Button'
 import CardStats from './CardStats'
 import SolanaBalance from './SolanaBalance'
-import Button from './Button'
-import { useModal } from '@/contexts/ModalContext'
+import Typography from './Typography'
 
 interface CardListProps {
   cards: CardData[]

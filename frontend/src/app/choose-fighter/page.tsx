@@ -1,23 +1,28 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { useRouter } from 'next/navigation'
-import Card from '@/components/Card'
-import Button from '@/components/Button'
-import Nav from '@/components/Nav'
+import React, { useEffect, useState } from 'react'
+
+import { getProgram } from '@/lib/helper'
 import { CardData, getPendingBattleAccounts } from '@/lib/solana-helper'
 import { BattleAccount } from '@/lib/solana-helper'
-import { getKeypairFromLocalStorage, getProgram } from '@/lib/helper'
-import SolanaBalance from '@/components/SolanaBalance'
-import { FIGHT_SOL_PRICE } from '@/constant/env'
+
+import Button from '@/components/Button'
+import Card from '@/components/Card'
+import Nav from '@/components/Nav'
 import SharedModal from '@/components/SharedModal'
+import SolanaBalance from '@/components/SolanaBalance'
+
+import { FIGHT_SOL_PRICE } from '@/constant/env'
 
 const ChooseFighterPage = () => {
   const router = useRouter()
   const [pendingBattleAccounts, setPendingBattleAccounts] = useState<
     BattleAccount[]
   >([])
-  const program = getProgram()
+  const { connection } = useConnection()
+  const program = getProgram(connection)
   useEffect(() => {
     fetchPendingBattleAccounts()
   }, [])
@@ -25,9 +30,10 @@ const ChooseFighterPage = () => {
     const battleAccounts = await getPendingBattleAccounts(program)
     setPendingBattleAccounts(battleAccounts)
   }
-  const player = getKeypairFromLocalStorage()
+  const { publicKey } = useWallet()
+
   const isMyBattle = (battleAccount: BattleAccount) => {
-    return battleAccount.player1.equals(player?.publicKey)
+    return battleAccount.player1.equals(publicKey)
   }
 
   return (
