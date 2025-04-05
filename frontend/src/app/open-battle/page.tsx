@@ -17,6 +17,8 @@ import Typography from '@/components/Typography'
 
 import { useBalance } from '@/contexts/BalanceContext'
 import { BATLLE_STAKE } from '@/constant/env'
+import Button from '@/components/Button'
+import Balance from '@/components/Balance'
 
 const OpenBattlePage = () => {
   const router = useRouter()
@@ -107,10 +109,22 @@ const OpenBattlePage = () => {
       <PickedCards
         pickedCards={pickedCards}
         onCardRemove={handleCardRemove}
-        buttonLabel='Open Battle'
-        onButtonClick={handleOpenBattle}
-        loading={loading}
-        buttonDisabled={pickedCards.length < 3}
+        button={
+          <Button
+            disabled={
+              pickedCards.length < 3 ||
+              !zBTCBalance ||
+              zBTCBalance < BATLLE_STAKE
+            }
+            onClick={handleOpenBattle}
+            loading={loading}
+          >
+            <div className='flex items-center gap-2'>
+              Open Battle
+              <Balance balance={BATLLE_STAKE} icon='zbtc' />
+            </div>
+          </Button>
+        }
       />
 
       <CardList

@@ -22,6 +22,7 @@ import Nav from '@/components/Nav'
 import PickedCards from '@/components/PickedCards'
 import SharedModal from '@/components/SharedModal'
 import Typography from '@/components/Typography'
+import Button from '@/components/Button'
 
 import { useBalance } from '@/contexts/BalanceContext'
 import { useLoading } from '@/contexts/LoadingContext'
@@ -148,10 +149,15 @@ const PrepareBattlePage = () => {
       <PickedCards
         pickedCards={pickedCards}
         onCardRemove={handleCardRemove}
-        buttonLabel='Fight!'
-        onButtonClick={handleFight}
-        loading={loading}
-        buttonDisabled={pickedCards.length < 3}
+        button={
+          <Button
+            disabled={pickedCards.length < 3}
+            onClick={handleFight}
+            loading={loading}
+          >
+            Fight!
+          </Button>
+        }
       />
       <CardList
         cards={myCards}
