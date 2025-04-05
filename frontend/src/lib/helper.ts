@@ -1,5 +1,10 @@
 import { Program } from '@coral-xyz/anchor'
-import { Connection } from '@solana/web3.js'
+import {
+  Connection,
+  AddressLookupTableAccount,
+  PublicKey,
+  TransactionInstruction,
+} from '@solana/web3.js'
 
 import solamon from '@/target/idl/solamon.json'
 import { Solamon } from '@/target/types/solamon'
@@ -35,4 +40,39 @@ export const getWinnerFromBattleAccount = (battleAccount: BattleAccount) => {
 export const trimAddress = (address?: string) => {
   if (!address) return ''
   return address.slice(0, 4) + '...' + address.slice(-4)
+}
+
+export const deserializeInstruction = (instruction: any) => {
+  return new TransactionInstruction({
+    programId: new PublicKey(instruction.programId),
+    keys: instruction.accounts.map((key: any) => ({
+      pubkey: new PublicKey(key.pubkey),
+      isSigner: key.isSigner,
+      isWritable: key.isWritable,
+    })),
+    data: Buffer.from(instruction.data, 'base64'),
+  })
+}
+
+export const getAddressLookupTableAccounts = async (
+  connection: Connection,
+  keys: string[]
+): Promise<AddressLookupTableAccount[]> => {
+  const addressLookupTableAccountInfos =
+    await connection.getMultipleAccountsInfo(
+      keys.map((key) => new PublicKey(key))
+    )
+
+  return addressLookupTableAccountInfos.reduce((acc, accountInfo, index) => {
+    const addressLookupTableAddress = keys[index]
+    if (accountInfo) {
+      const addressLookupTableAccount = new AddressLookupTableAccount({
+        key: new PublicKey(addressLookupTableAddress),
+        state: AddressLookupTableAccount.deserialize(accountInfo.data),
+      })
+      acc.push(addressLookupTableAccount)
+    }
+
+    return acc
+  }, new Array<AddressLookupTableAccount>())
 }

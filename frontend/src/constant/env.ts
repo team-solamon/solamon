@@ -13,8 +13,16 @@ export const FIGHT_SOL_PRICE = 100
 
 export const WINNER_SOL_REWARD = 200
 
+export const WSOL_MINT = new PublicKey(
+  'So11111111111111111111111111111111111111112'
+)
+
 export const zBTC_MINT = new PublicKey(
   'zBTCug3er3tLyffELcvDNrKkCymbPWysGcWihESYfLg'
+)
+
+export const JITO_SOL_MINT = new PublicKey(
+  'J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn'
 )
 
 export const BATLLE_STAKE = 100 // 100 zBTC(Satoshi)

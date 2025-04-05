@@ -4,7 +4,11 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
-import { getProgram } from '@/lib/helper'
+import {
+  deserializeInstruction,
+  getAddressLookupTableAccounts,
+  getProgram,
+} from '@/lib/helper'
 import { ROUTES } from '@/lib/routes'
 import {
   CardData,
@@ -22,6 +26,15 @@ import NewCardModal from './modals/NewCardModal'
 import PurchaseCardModal from './modals/PurchaseCardModal'
 import TutorialModal from './modals/TutorialModal'
 import ViewAllCardsModal from './modals/ViewAllCardsModal'
+import { JITO_SOL_MINT, NEW_CARD_SOL_PRICE, WSOL_MINT } from '@/constant/env'
+import axios from 'axios'
+import {
+  AddressLookupTableAccount,
+  LAMPORTS_PER_SOL,
+  TransactionMessage,
+  VersionedTransaction,
+} from '@solana/web3.js'
+import { BN } from '@coral-xyz/anchor'
 
 const SharedModal = () => {
   const router = useRouter()
@@ -42,9 +55,71 @@ const SharedModal = () => {
         return
       }
       showLoading('Spawning solamons...')
-      const tx = await spawnSolamonsTx(connection, program, publicKey, amount)
-      const txSig = await sendTransaction(tx, connection)
+
+      const response = await axios.get(
+        `https://api.jup.ag/swap/v1/quote?inputMint=${WSOL_MINT.toBase58()}&outputMint=${JITO_SOL_MINT.toBase58()}&amount=${
+          NEW_CARD_SOL_PRICE * LAMPORTS_PER_SOL * amount
+        }&swapMode=ExactIn&maxAccounts=50`
+      )
+
+      const jitoSolPerCard = new BN(response.data.otherAmountThreshold).div(
+        new BN(amount)
+      )
+
+      const { data: instructions } = await axios.post(
+        'https://api.jup.ag/swap/v1/swap-instructions',
+        JSON.stringify({
+          quoteResponse: response.data,
+          userPublicKey: publicKey.toString(),
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      const {
+        tokenLedgerInstruction, // If you are using `useTokenLedger = true`.
+        computeBudgetInstructions, // The necessary instructions to setup the compute budget.
+        setupInstructions, // Setup missing ATA for the users.
+        swapInstruction: swapInstructionPayload, // The actual swap instruction.
+        cleanupInstruction, // Unwrap the SOL if `wrapAndUnwrapSol = true`.
+        addressLookupTableAddresses, // The lookup table addresses that you can use if you are using versioned transaction.
+      } = instructions
+
+      const addressLookupTableAccounts: AddressLookupTableAccount[] = []
+
+      addressLookupTableAccounts.push(
+        ...(await getAddressLookupTableAccounts(
+          connection,
+          addressLookupTableAddresses
+        ))
+      )
+      const blockhash = (await connection.getLatestBlockhash()).blockhash
+
+      const tx = await spawnSolamonsTx(
+        program,
+        publicKey,
+        amount,
+        jitoSolPerCard
+      )
+
+      const messageV0 = new TransactionMessage({
+        payerKey: publicKey,
+        recentBlockhash: blockhash,
+        instructions: [
+          ...setupInstructions.map(deserializeInstruction),
+          deserializeInstruction(swapInstructionPayload),
+          ...tx.instructions,
+        ],
+      }).compileToV0Message(addressLookupTableAccounts)
+
+      const transaction = new VersionedTransaction(messageV0)
+      const txSig = await sendTransaction(transaction, connection)
+
       await connection.confirmTransaction(txSig)
+
       const spawnResult = await showSpawnResult(connection, txSig)
       setSpawnResult(spawnResult)
       closeModal('purchaseCard')

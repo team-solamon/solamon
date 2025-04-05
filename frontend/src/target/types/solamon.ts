@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/solamon.json`.
  */
 export type Solamon = {
-  "address": "So1a3o9526u65W9nv8pZ3BeuiJa78FaFgfpWsTaZzGD",
+  "address": "So1aJNrHPRZU1Mr9iuUvDuSdQS4z916QujTZdkij5B8",
   "metadata": {
     "name": "solamon",
     "version": "0.1.0",
@@ -134,41 +134,9 @@ export type Solamon = {
                 ]
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  155,
-                  136,
-                  87,
-                  254,
-                  171,
-                  129,
-                  132,
-                  251,
-                  104,
-                  127,
-                  99,
-                  70,
-                  24,
-                  192,
-                  53,
-                  218,
-                  196,
-                  57,
-                  220,
-                  26,
-                  235,
-                  59,
-                  85,
-                  152,
-                  160,
-                  240,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1
-                ]
+                "kind": "account",
+                "path": "config_account.deposit_token_mint",
+                "account": "configAccount"
               }
             ],
             "program": {
@@ -788,8 +756,8 @@ export type Solamon = {
           }
         },
         {
-          "name": "mint",
-          "address": "So11111111111111111111111111111111111111112"
+          "name": "depositTokenMint",
+          "writable": true
         },
         {
           "name": "depositAccount",
@@ -839,7 +807,7 @@ export type Solamon = {
               },
               {
                 "kind": "account",
-                "path": "mint"
+                "path": "depositTokenMint"
               }
             ],
             "program": {
@@ -992,10 +960,6 @@ export type Solamon = {
         {
           "name": "admin",
           "type": "pubkey"
-        },
-        {
-          "name": "spawnDeposit",
-          "type": "u64"
         }
       ]
     },
@@ -1600,41 +1564,9 @@ export type Solamon = {
                 ]
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  155,
-                  136,
-                  87,
-                  254,
-                  171,
-                  129,
-                  132,
-                  251,
-                  104,
-                  127,
-                  99,
-                  70,
-                  24,
-                  192,
-                  53,
-                  218,
-                  196,
-                  57,
-                  220,
-                  26,
-                  235,
-                  59,
-                  85,
-                  152,
-                  160,
-                  240,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1
-                ]
+                "kind": "account",
+                "path": "config_account.deposit_token_mint",
+                "account": "configAccount"
               }
             ],
             "program": {
@@ -1735,6 +1667,10 @@ export type Solamon = {
         {
           "name": "count",
           "type": "u8"
+        },
+        {
+          "name": "depositPerSpawn",
+          "type": "u64"
         }
       ]
     }
@@ -1935,6 +1871,10 @@ export type Solamon = {
             "type": "pubkey"
           },
           {
+            "name": "depositTokenMint",
+            "type": "pubkey"
+          },
+          {
             "name": "depositAccount",
             "type": "pubkey"
           },
@@ -1949,10 +1889,6 @@ export type Solamon = {
           {
             "name": "admin",
             "type": "pubkey"
-          },
-          {
-            "name": "spawnDeposit",
-            "type": "u64"
           },
           {
             "name": "availableBattleIds",
@@ -2018,6 +1954,10 @@ export type Solamon = {
           {
             "name": "isAvailable",
             "type": "bool"
+          },
+          {
+            "name": "depositAmount",
+            "type": "u64"
           }
         ]
       }

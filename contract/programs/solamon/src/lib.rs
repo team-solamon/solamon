@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("So1a3o9526u65W9nv8pZ3BeuiJa78FaFgfpWsTaZzGD");
+declare_id!("So1aJNrHPRZU1Mr9iuUvDuSdQS4z916QujTZdkij5B8");
 
 mod errors;
 use errors::SolamonError;
@@ -17,12 +17,12 @@ use state::*;
 pub mod solamon {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>, admin: Pubkey, spawn_deposit: u64) -> Result<()> {
+    pub fn initialize(ctx: Context<Initialize>, admin: Pubkey) -> Result<()> {
         let config_account = &mut ctx.accounts.config_account;
         config_account.bump = ctx.bumps.config_account;
         config_account.stake_token_mint = ctx.accounts.stake_token_mint.key();
-        config_account.admin = admin;
-        config_account.spawn_deposit = spawn_deposit;
+        config_account.deposit_token_mint = ctx.accounts.deposit_token_mint.key();
+        config_account.admin = admin.key();
         Ok(())
     }
 
@@ -39,7 +39,11 @@ pub mod solamon {
     }
 
     // @TODO: add & update solamon prototype logic
-    pub fn spawn_solamons(ctx: Context<SpawnSolamons>, count: u8) -> Result<()> {
+    pub fn spawn_solamons(
+        ctx: Context<SpawnSolamons>,
+        count: u8,
+        deposit_per_spawn: u64,
+    ) -> Result<()> {
         let user_account = &mut ctx.accounts.user_account;
         let config_account = &mut ctx.accounts.config_account;
         user_account.bump = ctx.bumps.user_account;
@@ -57,7 +61,7 @@ pub mod solamon {
             &ctx.accounts.deposit_account.to_account_info(),
             &ctx.accounts.user.to_account_info(),
             &ctx.accounts.token_program.to_account_info(),
-            config_account.spawn_deposit * count as u64,
+            deposit_per_spawn * count as u64,
         )?;
 
         for i in 0..count {
@@ -93,6 +97,7 @@ pub mod solamon {
                 attack: attack,
                 health: health,
                 is_available: true,
+                deposit_amount: deposit_per_spawn,
             };
             // 'Program log: Solamon { id: 0, species: 0, element: Fire, attack: 55, health: 89 }',
             msg!("Spawned {:?}", solamon);
@@ -341,32 +346,27 @@ pub mod solamon {
         let user_account = &mut ctx.accounts.user_account;
         let config_account = &mut ctx.accounts.config_account;
 
-        // Verify all solamon IDs exist and are available
-        require!(
-            user_account
-                .solamons
-                .iter()
-                .any(|s| s.id == solamon_id && s.is_available),
-            SolamonError::InvalidSolamonIds
-        );
-
-        // Remove the solamons (filter out the ones we want to burn)
-        user_account
+        let solamon = user_account
             .solamons
-            .retain(|solamon| solamon.id != solamon_id);
+            .iter()
+            .find(|s| s.id == solamon_id && s.is_available)
+            .ok_or(SolamonError::InvalidSolamonIds)?;
 
-        let deposit_account_balance = ctx.accounts.deposit_account.amount;
-        msg!("Deposit account balance: {}", deposit_account_balance);
+        // @TODO: swap it to SOL + zBTC
         // transfer deposit to user
         transfer_token_with_signer(
             &ctx.accounts.deposit_account.to_account_info(),
             &ctx.accounts.user_token_account.to_account_info(),
             &config_account.to_account_info(),
             &ctx.accounts.token_program.to_account_info(),
-            config_account.spawn_deposit,
+            solamon.deposit_amount,
             &[&[CONFIG_ACCOUNT.as_ref(), &[config_account.bump]]],
         )?;
 
+        // Remove the solamons (filter out the ones we want to burn)
+        user_account
+            .solamons
+            .retain(|solamon| solamon.id != solamon_id);
         Ok(())
     }
 }

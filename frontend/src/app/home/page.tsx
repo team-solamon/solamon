@@ -5,7 +5,11 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
-import { getProgram } from '@/lib/helper'
+import {
+  deserializeInstruction,
+  getAddressLookupTableAccounts,
+  getProgram,
+} from '@/lib/helper'
 import { ROUTES } from '@/lib/routes'
 import {
   BattleAccount,
@@ -27,13 +31,20 @@ import SharedModal from '@/components/SharedModal'
 import Balance from '@/components/Balance'
 import Typography from '@/components/Typography'
 
-import { NEW_CARD_SOL_PRICE } from '@/constant/env'
+import { JITO_SOL_MINT, NEW_CARD_SOL_PRICE, WSOL_MINT } from '@/constant/env'
 import { useBalance } from '@/contexts/BalanceContext'
 import { useLoading } from '@/contexts/LoadingContext'
 import { useModal } from '@/contexts/ModalContext'
 
 import Button from '../../components/Button'
-
+import axios from 'axios'
+import {
+  AddressLookupTableAccount,
+  LAMPORTS_PER_SOL,
+  TransactionMessage,
+  VersionedTransaction,
+} from '@solana/web3.js'
+import { BN } from '@coral-xyz/anchor'
 const HomePage = () => {
   const router = useRouter()
 
@@ -100,9 +111,59 @@ const HomePage = () => {
       return
     }
     showLoading('Redeeming card...')
+
+    const response = await axios.get(
+      `https://api.jup.ag/swap/v1/quote?inputMint=${JITO_SOL_MINT.toBase58()}&outputMint=${WSOL_MINT.toBase58()}&amount=${card.depositAmount.toString()}&swapMode=ExactIn&maxAccounts=50`
+    )
+
+    const { data: instructions } = await axios.post(
+      'https://api.jup.ag/swap/v1/swap-instructions',
+      JSON.stringify({
+        quoteResponse: response.data,
+        userPublicKey: publicKey.toString(),
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    const {
+      tokenLedgerInstruction, // If you are using `useTokenLedger = true`.
+      computeBudgetInstructions, // The necessary instructions to setup the compute budget.
+      setupInstructions, // Setup missing ATA for the users.
+      swapInstruction: swapInstructionPayload, // The actual swap instruction.
+      cleanupInstruction, // Unwrap the SOL if `wrapAndUnwrapSol = true`.
+      addressLookupTableAddresses, // The lookup table addresses that you can use if you are using versioned transaction.
+    } = instructions
+
+    const addressLookupTableAccounts: AddressLookupTableAccount[] = []
+
+    addressLookupTableAccounts.push(
+      ...(await getAddressLookupTableAccounts(
+        connection,
+        addressLookupTableAddresses
+      ))
+    )
+
+    const blockhash = (await connection.getLatestBlockhash()).blockhash
     const tx = await burnSolamonTx(connection, program, publicKey, card.id)
-    const txHash = await sendTransaction(tx, connection)
-    await connection.confirmTransaction(txHash)
+
+    const messageV0 = new TransactionMessage({
+      payerKey: publicKey,
+      recentBlockhash: blockhash,
+      instructions: [
+        ...setupInstructions.map(deserializeInstruction),
+        ...tx.instructions,
+        deserializeInstruction(swapInstructionPayload),
+        deserializeInstruction(cleanupInstruction),
+      ],
+    }).compileToV0Message(addressLookupTableAccounts)
+
+    const transaction = new VersionedTransaction(messageV0)
+    const txSig = await sendTransaction(transaction, connection)
+    await connection.confirmTransaction(txSig)
     fetchBalance()
     fetchMyCards()
     hideLoading()
