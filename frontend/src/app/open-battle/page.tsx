@@ -26,7 +26,7 @@ const OpenBattlePage = () => {
   const { connection } = useConnection()
   const program = getProgram(connection)
   const { publicKey, sendTransaction } = useWallet()
-  const { fetchBalance } = useBalance()
+  const { fetchBalance, zBTCBalance } = useBalance()
 
   useEffect(() => {
     fetchMyCards()
@@ -65,6 +65,11 @@ const OpenBattlePage = () => {
 
     if (!publicKey) {
       console.error('No player found')
+      return
+    }
+
+    if (!zBTCBalance || zBTCBalance < BATLLE_STAKE) {
+      alert('Insufficient ZBTC balance')
       return
     }
 

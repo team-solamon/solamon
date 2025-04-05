@@ -25,6 +25,7 @@ import Typography from '@/components/Typography'
 
 import { useBalance } from '@/contexts/BalanceContext'
 import { useLoading } from '@/contexts/LoadingContext'
+import { BATLLE_STAKE } from '@/constant/env'
 const PrepareBattlePage = () => {
   const searchParams = useSearchParams()
   const battleId = searchParams.get('battleId')
@@ -37,7 +38,7 @@ const PrepareBattlePage = () => {
   const [loading, setLoading] = useState(false)
   const [battleAccount, setBattleAccount] = useState<BattleAccount | null>(null)
   const { showLoading, hideLoading } = useLoading()
-  const { fetchBalance } = useBalance()
+  const { fetchBalance, zBTCBalance } = useBalance()
 
   useEffect(() => {
     console.log({ battleId })
@@ -86,6 +87,11 @@ const PrepareBattlePage = () => {
     }
     if (!battleId) {
       console.log('Battle ID is not found')
+      return
+    }
+
+    if (!zBTCBalance || zBTCBalance < BATLLE_STAKE) {
+      alert('Insufficient ZBTC balance')
       return
     }
 
