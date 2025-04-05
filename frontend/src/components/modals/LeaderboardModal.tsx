@@ -6,10 +6,8 @@ import Modal from '../Modal'
 import { useModal } from '@/contexts/ModalContext'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { getAllUserAccounts, UserAccount } from '@/lib/solana-helper'
-import { getProgram, trimAddress } from '@/lib/helper'
-import { getExplorerUrl } from '@/lib/url-helper'
+import { getProgram } from '@/lib/helper'
 import Typography from '../Typography'
-import { Wallet } from 'lucide-react'
 import WalletAddress from '../WalletAddress'
 
 const LeaderboardModal: React.FC = () => {

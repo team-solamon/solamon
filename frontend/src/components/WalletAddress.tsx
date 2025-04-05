@@ -2,8 +2,7 @@
 
 import React from 'react'
 import Typography from './Typography'
-import { getExplorerUrl } from '@/lib/url-helper'
-import { trimAddress } from '@/lib/helper'
+import { getExplorerUrl, trimAddress } from '@/lib/helper'
 
 interface WalletAddressProps {
   publicKey: any

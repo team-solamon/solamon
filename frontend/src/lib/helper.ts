@@ -76,3 +76,7 @@ export const getAddressLookupTableAccounts = async (
     return acc
   }, new Array<AddressLookupTableAccount>())
 }
+
+export const getExplorerUrl = (publicKey: string) => {
+  return `https://solscan.io/account/${publicKey}`
+}
