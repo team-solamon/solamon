@@ -112,60 +112,64 @@ const HomePage = () => {
     }
     showLoading('Redeeming card...')
 
-    const response = await axios.get(
-      `https://api.jup.ag/swap/v1/quote?inputMint=${JITO_SOL_MINT.toBase58()}&outputMint=${WSOL_MINT.toBase58()}&amount=${card.depositAmount.toString()}&swapMode=ExactIn&maxAccounts=50`
-    )
+    try {
+      const response = await axios.get(
+        `https://api.jup.ag/swap/v1/quote?inputMint=${JITO_SOL_MINT.toBase58()}&outputMint=${WSOL_MINT.toBase58()}&amount=${card.depositAmount.toString()}&swapMode=ExactIn&maxAccounts=50`
+      )
 
-    const { data: instructions } = await axios.post(
-      'https://api.jup.ag/swap/v1/swap-instructions',
-      JSON.stringify({
-        quoteResponse: response.data,
-        userPublicKey: publicKey.toString(),
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
+      const { data: instructions } = await axios.post(
+        'https://api.jup.ag/swap/v1/swap-instructions',
+        JSON.stringify({
+          quoteResponse: response.data,
+          userPublicKey: publicKey.toString(),
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
 
-    const {
-      tokenLedgerInstruction, // If you are using `useTokenLedger = true`.
-      computeBudgetInstructions, // The necessary instructions to setup the compute budget.
-      setupInstructions, // Setup missing ATA for the users.
-      swapInstruction: swapInstructionPayload, // The actual swap instruction.
-      cleanupInstruction, // Unwrap the SOL if `wrapAndUnwrapSol = true`.
-      addressLookupTableAddresses, // The lookup table addresses that you can use if you are using versioned transaction.
-    } = instructions
+      const {
+        tokenLedgerInstruction, // If you are using `useTokenLedger = true`.
+        computeBudgetInstructions, // The necessary instructions to setup the compute budget.
+        setupInstructions, // Setup missing ATA for the users.
+        swapInstruction: swapInstructionPayload, // The actual swap instruction.
+        cleanupInstruction, // Unwrap the SOL if `wrapAndUnwrapSol = true`.
+        addressLookupTableAddresses, // The lookup table addresses that you can use if you are using versioned transaction.
+      } = instructions
 
-    const addressLookupTableAccounts: AddressLookupTableAccount[] = []
+      const addressLookupTableAccounts: AddressLookupTableAccount[] = []
 
-    addressLookupTableAccounts.push(
-      ...(await getAddressLookupTableAccounts(
-        connection,
-        addressLookupTableAddresses
-      ))
-    )
+      addressLookupTableAccounts.push(
+        ...(await getAddressLookupTableAccounts(
+          connection,
+          addressLookupTableAddresses
+        ))
+      )
 
-    const blockhash = (await connection.getLatestBlockhash()).blockhash
-    const tx = await burnSolamonTx(connection, program, publicKey, card.id)
+      const blockhash = (await connection.getLatestBlockhash()).blockhash
+      const tx = await burnSolamonTx(connection, program, publicKey, card.id)
 
-    const messageV0 = new TransactionMessage({
-      payerKey: publicKey,
-      recentBlockhash: blockhash,
-      instructions: [
-        ...setupInstructions.map(deserializeInstruction),
-        ...tx.instructions,
-        deserializeInstruction(swapInstructionPayload),
-        deserializeInstruction(cleanupInstruction),
-      ],
-    }).compileToV0Message(addressLookupTableAccounts)
+      const messageV0 = new TransactionMessage({
+        payerKey: publicKey,
+        recentBlockhash: blockhash,
+        instructions: [
+          ...setupInstructions.map(deserializeInstruction),
+          ...tx.instructions,
+          deserializeInstruction(swapInstructionPayload),
+          deserializeInstruction(cleanupInstruction),
+        ],
+      }).compileToV0Message(addressLookupTableAccounts)
 
-    const transaction = new VersionedTransaction(messageV0)
-    const txSig = await sendTransaction(transaction, connection)
-    await connection.confirmTransaction(txSig)
-    fetchBalance()
-    fetchMyCards()
+      const transaction = new VersionedTransaction(messageV0)
+      const txSig = await sendTransaction(transaction, connection)
+      await connection.confirmTransaction(txSig)
+      fetchBalance()
+      fetchMyCards()
+    } catch (error) {
+      console.error(error)
+    }
     hideLoading()
   }
 
