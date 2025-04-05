@@ -169,8 +169,10 @@ const HomePage = () => {
       fetchMyCards()
     } catch (error) {
       console.error(error)
+    } finally {
+      closeModal('cardDetails')
+      hideLoading()
     }
-    hideLoading()
   }
 
   return (
@@ -303,12 +305,26 @@ const HomePage = () => {
 
       <section className='my-card-section max-w-[1000px] mx-auto'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <CardList cards={myCards} onRedeemCard={handleRedeemCard} />
+          <CardList
+            cards={myCards}
+            onRedeemCard={handleRedeemCard}
+            onCardPick={(card) => {
+              setSelectedCard(card)
+              openModal('cardDetails')
+            }}
+          />
         </div>
       </section>
 
       {/* Modals */}
-      <CardDetailsModal selectedCard={selectedCard} />
+      <CardDetailsModal
+        selectedCard={selectedCard}
+        onUnstake={() => {
+          if (selectedCard) {
+            handleRedeemCard(selectedCard)
+          }
+        }}
+      />
       <ResultModal
         selectedBattle={selectedBattle}
         showReplay={true}

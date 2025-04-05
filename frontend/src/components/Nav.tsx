@@ -14,20 +14,7 @@ import { useModal } from '@/contexts/ModalContext'
 
 import Balance from './Balance'
 import Typography from './Typography'
-
-const YellowButton: React.FC<{
-  onClick: () => void
-  children: React.ReactNode
-}> = ({ onClick, children }) => {
-  return (
-    <div
-      className='ml-4 text-[rgba(255,212,0,1)] cursor-pointer border border-[rgba(255,212,0,1)] rounded-lg w-[110px] h-[32px] flex items-center justify-center'
-      onClick={onClick}
-    >
-      {children}
-    </div>
-  )
-}
+import YellowButton from './YellowButton'
 
 const Nav: React.FC = () => {
   const { openModal } = useModal()

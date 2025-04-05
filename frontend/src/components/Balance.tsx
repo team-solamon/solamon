@@ -1,10 +1,16 @@
 import React from 'react'
-import Typography from './Typography'
+import Typography, {
+  TypographyColor,
+  TypographyProps,
+  TypographyVariant,
+} from './Typography'
 
 interface BalanceProps {
   balance?: number | string
   className?: string
   icon?: 'sol' | 'zbtc'
+  variant?: TypographyVariant
+  color?: TypographyColor
 }
 
 const ICON_PATHS = {
@@ -21,6 +27,8 @@ const Balance: React.FC<BalanceProps> = ({
   balance = '0',
   className = '',
   icon = 'sol',
+  variant = 'body-2',
+  color = 'accent',
 }) => {
   const iconSrc = ICON_PATHS[icon]
   const suffix = CURRENCY_SUFFIXES[icon]
@@ -28,7 +36,7 @@ const Balance: React.FC<BalanceProps> = ({
   return (
     <div className={`flex items-center gap-1 ${className}`}>
       <img src={iconSrc} alt={icon} className='w-4 h-4' />
-      <Typography variant='body-2' color='accent'>
+      <Typography variant={variant} color={color}>
         {balance ? balance.toString().slice(0, 6) : '0'}
         {suffix ? ` ${suffix}` : ''}
       </Typography>

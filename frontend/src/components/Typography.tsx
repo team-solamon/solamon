@@ -2,19 +2,28 @@ import React from 'react'
 
 import { cn } from '@/lib/utils'
 
-type TypographyProps = {
-  variant:
-    | 'display-title-1'
-    | 'title-1'
-    | 'title-2'
-    | 'body-1'
-    | 'body-2'
-    | 'body-3'
-    | 'caption-1'
-    | 'caption-2'
-    | 'caption-3'
-    | 'caption-4'
-  color?: 'default' | 'primary' | 'secondary' | 'accent' | 'inverse'
+export type TypographyVariant =
+  | 'display-title-1'
+  | 'title-1'
+  | 'title-2'
+  | 'body-1'
+  | 'body-2'
+  | 'body-3'
+  | 'caption-1'
+  | 'caption-2'
+  | 'caption-3'
+  | 'caption-4'
+
+export type TypographyColor =
+  | 'default'
+  | 'primary'
+  | 'secondary'
+  | 'accent'
+  | 'inverse'
+
+export type TypographyProps = {
+  variant: TypographyVariant
+  color?: TypographyColor
   outline?: boolean
   children: React.ReactNode
   className?: string

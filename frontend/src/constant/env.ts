@@ -9,6 +9,7 @@ export const showLogger = isLocal
   : process.env.NEXT_PUBLIC_SHOW_LOGGER === 'true'
 
 export const NEW_CARD_SOL_PRICE = 0.05
+export const UNSTAKING_SOL_PRICE = 0.05
 export const FIGHT_SOL_PRICE = 100
 
 export const WINNER_SOL_REWARD = 200
