@@ -24,7 +24,7 @@ const PurchaseCardModal: React.FC<PurchaseCardModalProps> = ({
     <Modal
       isOpen={modals['purchaseCard']}
       onClose={() => closeModal('purchaseCard')}
-      title='+ New Card'
+      title='Stake and Draw Card'
       maxWidth='400px'
     >
       <div className='purchase-modal text-center flex flex-col items-center'>
@@ -58,6 +58,13 @@ const PurchaseCardModal: React.FC<PurchaseCardModalProps> = ({
             </select>
           </Typography>
         </div>
+        <Typography
+          variant='body-2'
+          className='text-center mb-4 text-[#00FFEA]'
+          color='accent'
+        >
+          Stake 0.05 SOL per card — earn zBTC while it’s staked!
+        </Typography>
 
         <div className='flex justify-center gap-4'>
           <Button
@@ -65,8 +72,8 @@ const PurchaseCardModal: React.FC<PurchaseCardModalProps> = ({
             disabled={cardAmount === 0}
           >
             <div className='flex items-center gap-1'>
-              + New Card
               <Balance balance={cardAmount * NEW_CARD_SOL_PRICE} />
+              Staking
             </div>
           </Button>
         </div>

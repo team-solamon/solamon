@@ -10,6 +10,8 @@ import { useModal } from '@/contexts/ModalContext'
 import Button from '../Button'
 import Card from '../Card'
 import Modal from '../Modal'
+import { FIGHT_SOL_PRICE } from '@/constant/env'
+import Balance from '../Balance'
 
 interface ViewAllCardsModalProps {
   currentCards: CardData[]
@@ -34,7 +36,7 @@ const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
         closeModal('viewAllCards')
         onClose()
       }}
-      title='+ New Cards'
+      title='Stake and Draw Cards'
       maxWidth='600px'
     >
       <div className='flex flex-wrap justify-center gap-4 p-2'>
@@ -57,7 +59,7 @@ const ViewAllCardsModal: React.FC<ViewAllCardsModalProps> = ({
           onClick={onOpenBattle}
           disabled={currentCards.length + drawableCards.length < 3}
         >
-          Open Battle
+          Open Battle <Balance balance={FIGHT_SOL_PRICE} />
         </Button>
       </div>
     </Modal>

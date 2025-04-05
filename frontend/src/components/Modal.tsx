@@ -58,7 +58,7 @@ const Modal: React.FC<ModalProps> = ({
         }}
       >
         <div className='bg-[#978578] px-4 py-3 flex justify-center items-center'>
-          <Typography variant='title-1'>{title}</Typography>
+          <Typography variant='title-2'>{title}</Typography>
           <button onClick={onClose} className='absolute right-4 text-black'>
             <svg
               xmlns='http://www.w3.org/2000/svg'

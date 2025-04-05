@@ -13,6 +13,7 @@ import Typography from '../Typography'
 import YellowButton from '../YellowButton'
 import { UNSTAKING_SOL_PRICE } from '@/constant/env'
 import Balance from '../Balance'
+import Button from '../Button'
 
 interface CardDetailsModalProps {
   selectedCard: CardData | null
@@ -44,6 +45,12 @@ const CardDetailsModal: React.FC<CardDetailsModalProps> = ({
               attack={selectedCard.attack}
               health={selectedCard.health}
             />
+          </div>
+          <div className='flex justify-center w-full mt-4'>
+            <Button size='S'>
+              <Balance balance={1200} icon='zbtc' variant='body-2' />
+              <Typography variant='body-2'>to claim</Typography>
+            </Button>
           </div>
           <div className='flex justify-center w-full mt-4'>
             <YellowButton onClick={onUnstake} width='150px' height='40px'>

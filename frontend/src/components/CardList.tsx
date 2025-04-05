@@ -73,7 +73,7 @@ const CardList: React.FC<CardListProps> = ({
           <div className='flex justify-center mt-4'>
             <Button onClick={() => openModal('purchaseCard')}>
               <div className='flex items-center gap-1'>
-                + New Card
+                Stake and Draw Card
                 <Balance balance={NEW_CARD_SOL_PRICE} />
               </div>
             </Button>
