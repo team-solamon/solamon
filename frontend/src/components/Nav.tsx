@@ -109,8 +109,10 @@ const Nav: React.FC = () => {
             }}
           />
         </div>
-        <Balance balance={balance || 0} icon='sol' />
-        <Balance balance={zBTCBalance || 0} icon='zbtc' />
+        <div className='flex items-center space-x-2'>
+          <Balance balance={balance || 0} icon='sol' />
+          <Balance balance={zBTCBalance || 0} icon='zbtc' />
+        </div>
         <YellowButton onClick={handleDisconnect}>
           <Typography variant='body-3'>disconnect</Typography>
         </YellowButton>
