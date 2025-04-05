@@ -206,7 +206,7 @@ const HomePage = () => {
                   Start one by opening a battle or choosing a rival from the
                   queue.
                 </Typography>
-                <div className='flex justify-center mt-4 gap-4'>
+                <div className='flex flex-col sm:flex-row justify-center mt-4 gap-4'>
                   <Button
                     onClick={() => router.push(ROUTES.OPEN_BATTLE)}
                     disabled={myCards.length < 3}

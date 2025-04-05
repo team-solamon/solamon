@@ -23,8 +23,8 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onNewCard }) => {
       isOpen={modals['tutorial']}
       onClose={() => closeModal('tutorial')}
       title='Tutorial'
-      maxWidth='600px'
-      maxHeight='800px'
+      maxWidth='800px'
+      maxHeight='1000px'
     >
       <Tutorial onNewCard={onNewCard} />
     </Modal>
