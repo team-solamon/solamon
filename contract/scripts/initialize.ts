@@ -22,6 +22,9 @@ async function main() {
 	const stakeTokenMint = new PublicKey(
 		"zBTCug3er3tLyffELcvDNrKkCymbPWysGcWihESYfLg" // zBTC
 	)
+	const depositTokenMint = new PublicKey(
+		"J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn" // SOL
+	)
 
 	console.log("Initializing Solamon program with the following parameters:")
 	console.log(`Admin: ${admin.toString()}`)
@@ -34,10 +37,11 @@ async function main() {
 		try {
 			// Call the initialize instruction
 			const tx = await program.methods
-				.initialize(admin, spawnDeposit)
+				.initialize(admin)
 				.accounts({
 					signer: admin,
 					stakeTokenMint,
+					depositTokenMint,
 				})
 				.signers([adminKeypair])
 				.rpc()

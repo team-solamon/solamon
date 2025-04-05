@@ -349,34 +349,25 @@ export function unwrapSolIx(
 }
 
 export async function spawnSolamonsTx(
-	connection: Connection,
 	program: Program<Solamon>,
 	user: PublicKey,
-	numberToSpawn: number
+	numberToSpawn: number,
+	depositPerSpawn: BN
 ) {
 	const spawnSolamonsTx = new Transaction()
 
 	const configAccount = await getConfigAccount(program)
 
-	const { tokenAccount: userTokenAccount, tx: userTokenAccountTx } =
-		await getOrCreateNativeMintATA(connection, user, user)
-
-	if (userTokenAccountTx) {
-		spawnSolamonsTx.add(userTokenAccountTx)
-	}
-
-	const wrapSolIxs = wrapSOLInstruction(
-		user,
-		configAccount.spawnDeposit.mul(new BN(numberToSpawn)).toNumber()
+	const userTokenAccount = getAssociatedTokenAddressSync(
+		configAccount.depositTokenMint,
+		user
 	)
 
-	spawnSolamonsTx.add(...wrapSolIxs)
-
 	const spawnSolamons = await program.methods
-		.spawnSolamons(numberToSpawn)
+		.spawnSolamons(numberToSpawn, depositPerSpawn)
 		.accounts({
 			user: user,
-			userTokenAccount,
+			userTokenAccount: userTokenAccount,
 		})
 		.transaction()
 
@@ -393,10 +384,12 @@ export async function burnSolamonTx(
 ) {
 	const burnSolamonTx = new Transaction()
 
+	const configAccount = await getConfigAccount(program)
+
 	const { tokenAccount: userTokenAccount, tx: userTokenAccountTx } =
 		await getOrCreateTokenAccountTx(
 			connection,
-			new PublicKey(NATIVE_MINT),
+			configAccount.depositTokenMint,
 			user,
 			user
 		)
@@ -414,9 +407,6 @@ export async function burnSolamonTx(
 		.transaction()
 
 	burnSolamonTx.add(burnSolamon)
-
-	const unwrapSolIxs = unwrapSolIx(userTokenAccount, user, user)
-	burnSolamonTx.add(unwrapSolIxs)
 
 	return burnSolamonTx
 }
@@ -492,11 +482,13 @@ export function battleStatusToString(battleStatus: BattleStatus): string {
 
 export function parseSolamonLog(logString: string): CardData {
 	// Handle the specific format from the logs
-	// Convert from "{ id: 0, species: 3, element: Metal, attack: 3, health: 12, is_available: true }"
+	// Convert from "{ id: 0, species: 3, element: Metal, attack: 3, health: 12, is_available: true, deposit_amount: 1000000000 }"
 	// to a proper JavaScript object
 
 	// Replace is_available with isAvailable to match our TypeScript conventions
-	const normalizedString = logString.replace("is_available", "isAvailable")
+	const normalizedString = logString
+		.replace("is_available", "isAvailable")
+		.replace("deposit_amount", "depositAmount")
 
 	// Extract values using regex
 	const idMatch = normalizedString.match(/id:\s*(\d+)/)
@@ -507,6 +499,7 @@ export function parseSolamonLog(logString: string): CardData {
 	const isAvailableMatch = normalizedString.match(
 		/isAvailable:\s*(true|false)/
 	)
+	const depositAmountMatch = normalizedString.match(/depositAmount:\s*(\d+)/)
 
 	if (!elementMatch) {
 		throw new Error(`Failed to parse element from log: ${logString}`)
@@ -533,6 +526,7 @@ export function parseSolamonLog(logString: string): CardData {
 		attack: parseInt(attackMatch[1]),
 		health: parseInt(healthMatch[1]),
 		isAvailable: isAvailableMatch[1] === "true",
+		depositAmount: new BN(depositAmountMatch[1]),
 	}
 }
 

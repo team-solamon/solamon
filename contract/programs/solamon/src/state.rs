@@ -11,12 +11,12 @@ pub struct Initialize<'info> {
     #[account(init, payer = signer, space = ConfigAccount::INIT_SPACE, seeds = [CONFIG_ACCOUNT], bump)]
     pub config_account: Account<'info, ConfigAccount>,
 
-    #[account(address = NATIVE_MINT)]
-    pub mint: Account<'info, Mint>,
+    #[account(mut)]
+    pub deposit_token_mint: Account<'info, Mint>,
 
     #[account(init,
         payer = signer,
-        associated_token::mint = mint,
+        associated_token::mint = deposit_token_mint,
         associated_token::authority = config_account,
     )]
     pub deposit_account: Account<'info, TokenAccount>,
@@ -40,11 +40,11 @@ pub struct Initialize<'info> {
 pub struct ConfigAccount {
     pub bump: u8,
     pub stake_token_mint: Pubkey,
+    pub deposit_token_mint: Pubkey,
     pub deposit_account: Pubkey,
     pub battle_count: u64,
     pub solamon_count: u16,
     pub admin: Pubkey,
-    pub spawn_deposit: u64,
     pub available_battle_ids: Vec<u64>,
 }
 
@@ -52,11 +52,11 @@ impl Space for ConfigAccount {
     const INIT_SPACE: usize = 8 // discriminator
         + 1 // bump
         + 32 // stake_token_mint
+        + 32 // deposit_token_mint
         + 32 // deposit_account
         + 8 // battle_count
         + 2 // solamon_count
         + 32 // admin
-        + 8 // spawn_deposit
         + 8 * 100; // available_battle_ids (max 100 battles)
 }
 
@@ -121,13 +121,13 @@ pub struct SpawnSolamons<'info> {
     pub config_account: Account<'info, ConfigAccount>,
 
     #[account(mut,
-        associated_token::mint = NATIVE_MINT,
+        associated_token::mint = config_account.deposit_token_mint,
         associated_token::authority = config_account,
     )]
     pub deposit_account: Account<'info, TokenAccount>,
 
     #[account(mut,
-        token::mint = NATIVE_MINT,
+        token::mint = config_account.deposit_token_mint,
         token::authority = user
     )]
     pub user_token_account: Account<'info, TokenAccount>,
@@ -161,16 +161,17 @@ impl Space for UserAccount {
 #[account]
 #[derive(Debug)]
 pub struct Solamon {
-    pub id: u16,            //2 bytes
-    pub species: u8,        //1 byte
-    pub element: Element,   //1 byte
-    pub attack: u8,         //1 byte
-    pub health: u8,         //1 byte
-    pub is_available: bool, //1 byte
+    pub id: u16,             //2 bytes
+    pub species: u8,         //1 byte
+    pub element: Element,    //1 byte
+    pub attack: u8,          //1 byte
+    pub health: u8,          //1 byte
+    pub is_available: bool,  //1 byte
+    pub deposit_amount: u64, //8 bytes
 }
 
 impl Space for Solamon {
-    const INIT_SPACE: usize = 2 + 1 + 1 + 1 + 1 + 1;
+    const INIT_SPACE: usize = 2 + 1 + 1 + 1 + 1 + 1 + 8;
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Debug)]
@@ -370,13 +371,13 @@ pub struct BurnSolamon<'info> {
     pub config_account: Account<'info, ConfigAccount>,
 
     #[account(mut,
-        associated_token::mint = NATIVE_MINT,
+        associated_token::mint = config_account.deposit_token_mint,
         associated_token::authority = config_account,
     )]
     pub deposit_account: Account<'info, TokenAccount>,
 
     #[account(mut,
-        token::mint = NATIVE_MINT,
+        token::mint = config_account.deposit_token_mint,
         token::authority = user
     )]
     pub user_token_account: Account<'info, TokenAccount>,

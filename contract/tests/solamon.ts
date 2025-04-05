@@ -46,17 +46,11 @@ describe("solamon", () => {
 	const player2 = anchor.web3.Keypair.generate()
 	const player3 = anchor.web3.Keypair.generate()
 	const battleStake = 100
-	const spawnDeposit = LAMPORTS_PER_SOL * 0.01
+	const spawnDeposit = LAMPORTS_PER_SOL * 0.05
 	let stakeTokenMint: PublicKey
+	let depositTokenMint: PublicKey
 
-	console.log({
-		player: player.publicKey.toBase58(),
-		player2: player2.publicKey.toBase58(),
-		player3: player3.publicKey.toBase58(),
-		admin: admin.publicKey.toBase58(),
-	})
-
-	beforeEach(async () => {
+	before(async () => {
 		const txs = await Promise.all([
 			connection.requestAirdrop(admin.publicKey, LAMPORTS_PER_SOL),
 			connection.requestAirdrop(player.publicKey, LAMPORTS_PER_SOL),
@@ -67,7 +61,7 @@ describe("solamon", () => {
 
 		// deploy stake token
 		// Create and deploy SLP token
-		const mint = await createMint(
+		stakeTokenMint = await createMint(
 			connection,
 			admin,
 			admin.publicKey,
@@ -75,56 +69,134 @@ describe("solamon", () => {
 			9 // decimals
 		)
 
-		stakeTokenMint = mint
+		depositTokenMint = await createMint(
+			connection,
+			admin,
+			admin.publicKey,
+			admin.publicKey,
+			9 // decimals
+		)
+
 		// Create ATAs for players
-		const [playerAta, player2Ata, player3Ata] = await Promise.all([
+		const [
+			playerStakeAta,
+			player2StakeAta,
+			player3StakeAta,
+			playerDepositAta,
+			player2DepositAta,
+			player3DepositAta,
+		] = await Promise.all([
 			createAssociatedTokenAccount(
 				connection,
 				admin,
-				mint,
+				stakeTokenMint,
 				player.publicKey
 			),
 			createAssociatedTokenAccount(
 				connection,
 				admin,
-				mint,
+				stakeTokenMint,
 				player2.publicKey
 			),
 			createAssociatedTokenAccount(
 				connection,
 				admin,
-				mint,
+				stakeTokenMint,
+				player3.publicKey
+			),
+			createAssociatedTokenAccount(
+				connection,
+				admin,
+				depositTokenMint,
+				player.publicKey
+			),
+			createAssociatedTokenAccount(
+				connection,
+				admin,
+				depositTokenMint,
+				player2.publicKey
+			),
+			createAssociatedTokenAccount(
+				connection,
+				admin,
+				depositTokenMint,
 				player3.publicKey
 			),
 		])
 
 		// Mint initial tokens to players
 		await Promise.all([
-			mintTo(connection, admin, mint, playerAta, admin, 1000),
-			mintTo(connection, admin, mint, player2Ata, admin, 1000),
-			mintTo(connection, admin, mint, player3Ata, admin, 1000),
+			mintTo(
+				connection,
+				admin,
+				stakeTokenMint,
+				playerStakeAta,
+				admin,
+				1000
+			),
+			mintTo(
+				connection,
+				admin,
+				stakeTokenMint,
+				player2StakeAta,
+				admin,
+				1000
+			),
+			mintTo(
+				connection,
+				admin,
+				stakeTokenMint,
+				player3StakeAta,
+				admin,
+				1000
+			),
+			mintTo(
+				connection,
+				admin,
+				depositTokenMint,
+				playerDepositAta,
+				admin,
+				LAMPORTS_PER_SOL
+			),
+			mintTo(
+				connection,
+				admin,
+				depositTokenMint,
+				player2DepositAta,
+				admin,
+				LAMPORTS_PER_SOL
+			),
+			mintTo(
+				connection,
+				admin,
+				depositTokenMint,
+				player3DepositAta,
+				admin,
+				LAMPORTS_PER_SOL
+			),
 		])
 	})
 
 	it("Is initialized", async () => {
 		// Derive the PDA for the config account
 		const tx = await program.methods
-			.initialize(admin.publicKey, new BN(spawnDeposit))
+			.initialize(admin.publicKey)
 			.accounts({
 				signer: admin.publicKey,
 				stakeTokenMint: stakeTokenMint,
+				depositTokenMint: depositTokenMint,
 			})
 			.signers([admin])
 			.rpc()
-
-		console.log("Your transaction signature", tx)
 
 		const configAccount = await getConfigAccount(program)
 
 		expect(configAccount.admin.toBase58()).to.equal(
 			admin.publicKey.toBase58()
 		)
-		expect(configAccount.spawnDeposit.toNumber()).to.equal(spawnDeposit)
+		expect(configAccount.depositTokenMint.toBase58()).to.equal(
+			depositTokenMint.toBase58()
+		)
 
 		expect(configAccount.stakeTokenMint.toBase58()).to.equal(
 			stakeTokenMint.toBase58()
@@ -187,15 +259,15 @@ describe("solamon", () => {
 		// Spawn elements
 		const solamonCount = 5
 
-		const player1BalanceBefore = await connection.getBalance(
-			player.publicKey
+		const player1BalanceBefore = await connection.getTokenAccountBalance(
+			getAssociatedTokenAddressSync(depositTokenMint, player.publicKey)
 		)
 
 		const tx = await spawnSolamonsTx(
-			connection,
 			program,
 			player.publicKey,
-			solamonCount
+			solamonCount,
+			new BN(spawnDeposit)
 		)
 
 		const txSig = await connection.sendTransaction(tx, [player])
@@ -204,12 +276,14 @@ describe("solamon", () => {
 
 		await showSpawnResult(connection, txSig)
 
-		const player1BalanceAfter = await connection.getBalance(
-			player.publicKey
+		const player1BalanceAfter = await connection.getTokenAccountBalance(
+			getAssociatedTokenAddressSync(depositTokenMint, player.publicKey)
 		)
 
-		expect(player1BalanceAfter).to.be.lessThan(
-			player1BalanceBefore - spawnDeposit * solamonCount
+		expect(Number(player1BalanceAfter.value.amount)).to.be.equal(
+			new BN(player1BalanceBefore.value.amount)
+				.sub(new BN(spawnDeposit * solamonCount))
+				.toNumber()
 		)
 		// Fetch the user account to verify elements were added
 		const userAccount = await getUserAccount(program, player.publicKey)
@@ -218,10 +292,10 @@ describe("solamon", () => {
 		const solamonCount2 = 3
 
 		const tx2 = await spawnSolamonsTx(
-			connection,
 			program,
 			player2.publicKey,
-			solamonCount2
+			solamonCount2,
+			new BN(spawnDeposit)
 		)
 		const txSig2 = await connection.sendTransaction(tx2, [player2])
 
@@ -233,10 +307,10 @@ describe("solamon", () => {
 		const solamonCount3 = 9
 
 		const tx3 = await spawnSolamonsTx(
-			connection,
 			program,
 			player3.publicKey,
-			solamonCount3
+			solamonCount3,
+			new BN(spawnDeposit)
 		)
 		const txSig3 = await connection.sendTransaction(tx3, [player3])
 
@@ -498,10 +572,10 @@ describe("solamon", () => {
 			program,
 			player3.publicKey
 		)
-		const balanceBefore = await connection.getBalance(player3.publicKey)
+		const balanceBefore = await connection.getTokenAccountBalance(
+			getAssociatedTokenAddressSync(depositTokenMint, player3.publicKey)
+		)
 
-		console.log(userAccountBefore.solamons)
-		console.log({ balanceBefore })
 		const tx = await burnSolamonTx(
 			connection,
 			program,
@@ -519,10 +593,12 @@ describe("solamon", () => {
 			userAccountBefore.solamons.length - 1
 		)
 
-		const balanceAfter = await connection.getBalance(player3.publicKey)
-		console.log(userAccountAfter.solamons)
-		console.log({ balanceAfter })
+		const balanceAfter = await connection.getTokenAccountBalance(
+			getAssociatedTokenAddressSync(depositTokenMint, player3.publicKey)
+		)
 
-		expect(Number(balanceAfter)).to.be.greaterThan(Number(balanceBefore))
+		expect(Number(balanceAfter.value.amount)).to.be.equal(
+			Number(balanceBefore.value.amount) + spawnDeposit
+		)
 	})
 })
