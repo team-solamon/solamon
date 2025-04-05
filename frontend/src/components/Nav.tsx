@@ -87,15 +87,28 @@ const Nav: React.FC = () => {
         </Typography>
       </div>
       <div className='wallet-info text-right flex items-end order-3 lg:order-3'>
-        <Typography variant='body-2' color='secondary' className='mr-4'>
-          <a
-            href={`${getExplorerUrl(publicKey?.toBase58() || '')}`}
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            {trimAddress(publicKey?.toBase58())}
-          </a>
-        </Typography>
+        <div className='flex items-center mr-4'>
+          <Typography variant='body-2' color='secondary'>
+            <a
+              href={`${getExplorerUrl(publicKey?.toBase58() || '')}`}
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              {trimAddress(publicKey?.toBase58())}
+            </a>
+          </Typography>
+          <img
+            src='/images/img_copy.png'
+            alt='Copy address'
+            className='ml-1 cursor-pointer'
+            onClick={() => {
+              if (publicKey) {
+                navigator.clipboard.writeText(publicKey.toBase58())
+                alert('Wallet address copied to clipboard!')
+              }
+            }}
+          />
+        </div>
         <Balance balance={balance || 0} icon='sol' />
         <Balance balance={zBTCBalance || 0} icon='zbtc' />
         <YellowButton onClick={handleDisconnect}>
