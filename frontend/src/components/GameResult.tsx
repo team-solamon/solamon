@@ -14,6 +14,9 @@ import { useModal } from '@/contexts/ModalContext'
 import Button from './Button'
 import CardStack from './CardStack'
 import Typography from './Typography'
+import Balance from './Balance'
+import { BATLLE_STAKE, BATTLE_WINNER_REWARD } from '@/constant/env'
+import { Type } from 'lucide-react'
 
 interface GameResultProps {
   battleAccount: BattleAccount
@@ -62,6 +65,20 @@ const GameResult: React.FC<GameResultProps> = ({
 
   return (
     <div className='flex flex-col items-center justify-center'>
+      <div>
+        <Typography variant='body-1' color='accent' outline={false}>
+          You’ve got {BATLLE_STAKE} points!
+        </Typography>
+      </div>
+      <div className='flex items-center justify-center gap-28 mb-4'>
+        <Typography variant='body-3' outline={false}>
+          You
+        </Typography>
+        <Typography variant='body-3' outline={false}>
+          Rival
+        </Typography>
+      </div>
+
       <div className='flex items-center justify-center gap-4'>
         <div
           className={`${
@@ -104,7 +121,9 @@ const GameResult: React.FC<GameResultProps> = ({
 
         {claimable ? (
           <div className='mt-2 flex flex-col items-center justify-center gap-2'>
-            <Button onClick={handleClaim}>Claim Reward 0.2 SOL</Button>
+            <Button onClick={handleClaim}>
+              <Balance balance={BATTLE_WINNER_REWARD} icon='zbtc' />
+            </Button>
           </div>
         ) : isPlayerWinner ? (
           <div className='mt-2'>

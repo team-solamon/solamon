@@ -27,6 +27,7 @@ export const JITO_SOL_MINT = new PublicKey(
 )
 
 export const BATLLE_STAKE = 100 // 100 zBTC(Satoshi)
+export const BATTLE_WINNER_REWARD = BATLLE_STAKE * 2
 
 interface CardWithProbabilities {
   species: number
