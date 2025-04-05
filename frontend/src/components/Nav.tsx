@@ -4,9 +4,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
 
-import { trimAddress } from '@/lib/helper'
 import { ROUTES } from '@/lib/routes'
-import { getExplorerUrl } from '@/lib/url-helper'
 
 import { useBalance } from '@/contexts/BalanceContext'
 import { useLoading } from '@/contexts/LoadingContext'
@@ -15,6 +13,7 @@ import { useModal } from '@/contexts/ModalContext'
 import Balance from './Balance'
 import Typography from './Typography'
 import YellowButton from './YellowButton'
+import WalletAddress from './WalletAddress'
 
 const Nav: React.FC = () => {
   const { openModal } = useModal()
@@ -74,28 +73,7 @@ const Nav: React.FC = () => {
         </Typography>
       </div>
       <div className='wallet-info text-right flex items-end order-3 lg:order-3'>
-        <div className='flex items-center mr-4'>
-          <Typography variant='body-2' color='secondary'>
-            <a
-              href={`${getExplorerUrl(publicKey?.toBase58() || '')}`}
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              {trimAddress(publicKey?.toBase58())}
-            </a>
-          </Typography>
-          <img
-            src='/images/img_copy.png'
-            alt='Copy address'
-            className='ml-1 cursor-pointer'
-            onClick={() => {
-              if (publicKey) {
-                navigator.clipboard.writeText(publicKey.toBase58())
-                alert('Wallet address copied to clipboard!')
-              }
-            }}
-          />
-        </div>
+        <WalletAddress publicKey={publicKey} />
         <div className='flex items-center space-x-2'>
           <Balance balance={balance || 0} icon='sol' />
           <Balance balance={zBTCBalance || 0} icon='zbtc' />

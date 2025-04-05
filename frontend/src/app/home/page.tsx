@@ -17,6 +17,7 @@ import {
   burnSolamonTx,
   cancelBattleTx,
   CardData,
+  getAllUserAccounts,
   getBattleAccountsByUser,
   getUserAccount,
 } from '@/lib/solana-helper'
@@ -40,11 +41,10 @@ import Button from '../../components/Button'
 import axios from 'axios'
 import {
   AddressLookupTableAccount,
-  LAMPORTS_PER_SOL,
   TransactionMessage,
   VersionedTransaction,
 } from '@solana/web3.js'
-import { BN } from '@coral-xyz/anchor'
+import LeaderboardModal from '@/components/modals/LeaderboardModal'
 const HomePage = () => {
   const router = useRouter()
 
@@ -178,7 +178,7 @@ const HomePage = () => {
   return (
     <div className='home-page bg-black text-white min-h-screen p-4'>
       <Nav />
-      <div className='action-buttons flex flex-col items-center sm:flex-row justify-center gap-4 mb-16'>
+      <div className='action-buttons flex flex-wrap justify-center gap-4 mb-16 mx-auto'>
         <Button onClick={() => openModal('purchaseCard')}>
           <div className='flex items-center gap-1'>
             + New Card
@@ -194,6 +194,7 @@ const HomePage = () => {
         <Button onClick={() => router.push(ROUTES.CHOOSE_FIGHTER)}>
           Choose Fighter
         </Button>
+        <Button onClick={() => openModal('leaderboard')}>Leaderboard</Button>
       </div>
 
       <section className='battle-section mb-8 max-w-[1000px] mx-auto'>
@@ -331,6 +332,7 @@ const HomePage = () => {
         onClaim={fetchMyBattles}
       />
       <StoryModal selectedBattle={selectedBattle} />
+      <LeaderboardModal />
       <SharedModal
         onCloseNewCard={() => {
           fetchMyCards()
