@@ -30,6 +30,7 @@ export type Element = IdlTypes<Solamon>["element"]
 export type BattleStatus = IdlTypes<Solamon>["battleStatus"]
 export type CardData = IdlTypes<Solamon>["solamon"]
 export type BattleAccount = IdlTypes<Solamon>["battleAccount"]
+export type UserAccount = IdlTypes<Solamon>["userAccount"]
 
 export const getConfigPDA = (program: Program<Solamon>) => {
 	const [configPDA, _bump] = anchor.web3.PublicKey.findProgramAddressSync(
