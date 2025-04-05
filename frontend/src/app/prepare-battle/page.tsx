@@ -22,10 +22,12 @@ import Nav from '@/components/Nav'
 import PickedCards from '@/components/PickedCards'
 import SharedModal from '@/components/SharedModal'
 import Typography from '@/components/Typography'
+import Button from '@/components/Button'
 
 import { useBalance } from '@/contexts/BalanceContext'
 import { useLoading } from '@/contexts/LoadingContext'
 import { BATLLE_STAKE } from '@/constant/env'
+import Balance from '@/components/Balance'
 const PrepareBattlePage = () => {
   const searchParams = useSearchParams()
   const battleId = searchParams.get('battleId')
@@ -148,10 +150,22 @@ const PrepareBattlePage = () => {
       <PickedCards
         pickedCards={pickedCards}
         onCardRemove={handleCardRemove}
-        buttonLabel='Fight!'
-        onButtonClick={handleFight}
-        loading={loading}
-        buttonDisabled={pickedCards.length < 3}
+        button={
+          <Button
+            disabled={
+              pickedCards.length < 3! ||
+              !zBTCBalance ||
+              zBTCBalance < BATLLE_STAKE
+            }
+            onClick={handleFight}
+            loading={loading}
+          >
+            <div className='flex items-center gap-2'>
+              Fight!
+              <Balance balance={BATLLE_STAKE} icon='zbtc' />
+            </div>
+          </Button>
+        }
       />
       <CardList
         cards={myCards}

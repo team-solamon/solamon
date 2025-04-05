@@ -169,8 +169,10 @@ const HomePage = () => {
       fetchMyCards()
     } catch (error) {
       console.error(error)
+    } finally {
+      closeModal('cardDetails')
+      hideLoading()
     }
-    hideLoading()
   }
 
   return (
@@ -206,7 +208,7 @@ const HomePage = () => {
                   Start one by opening a battle or choosing a rival from the
                   queue.
                 </Typography>
-                <div className='flex justify-center mt-4 gap-4'>
+                <div className='flex flex-col sm:flex-row justify-center mt-4 gap-4'>
                   <Button
                     onClick={() => router.push(ROUTES.OPEN_BATTLE)}
                     disabled={myCards.length < 3}
@@ -303,19 +305,40 @@ const HomePage = () => {
 
       <section className='my-card-section max-w-[1000px] mx-auto'>
         <div className='bg-[#978578] p-4 rounded-lg'>
-          <CardList cards={myCards} onRedeemCard={handleRedeemCard} />
+          <CardList
+            cards={myCards}
+            onRedeemCard={handleRedeemCard}
+            onCardPick={(card) => {
+              setSelectedCard(card)
+              openModal('cardDetails')
+            }}
+          />
         </div>
       </section>
 
       {/* Modals */}
-      <CardDetailsModal selectedCard={selectedCard} />
+      <CardDetailsModal
+        selectedCard={selectedCard}
+        onUnstake={() => {
+          if (selectedCard) {
+            handleRedeemCard(selectedCard)
+          }
+        }}
+      />
       <ResultModal
         selectedBattle={selectedBattle}
         showReplay={true}
         onClaim={fetchMyBattles}
       />
       <StoryModal selectedBattle={selectedBattle} />
-      <SharedModal />
+      <SharedModal
+        onCloseNewCard={() => {
+          fetchMyCards()
+        }}
+        onCloseViewAllCards={() => {
+          fetchMyCards()
+        }}
+      />
     </div>
   )
 }

@@ -2,7 +2,6 @@ import React from 'react'
 
 import { CardData } from '@/lib/solana-helper'
 
-import Button from '@/components/Button'
 import Card from '@/components/Card'
 
 import CardStats from './CardStats'
@@ -11,19 +10,13 @@ import Typography from './Typography'
 interface PickedCardsProps {
   pickedCards: CardData[]
   onCardRemove: (card: CardData) => void
-  buttonLabel: string
-  buttonDisabled: boolean
-  loading?: boolean
-  onButtonClick: () => void
+  button: React.ReactNode
 }
 
 const PickedCards: React.FC<PickedCardsProps> = ({
   pickedCards,
   onCardRemove,
-  buttonLabel,
-  buttonDisabled,
-  loading,
-  onButtonClick,
+  button,
 }) => {
   return (
     <section className='picked-section bg-[#978578] p-4 rounded-lg mb-8 max-w-[1000px] mx-auto'>
@@ -60,15 +53,7 @@ const PickedCards: React.FC<PickedCardsProps> = ({
           </div>
         ))}
       </div>
-      <div className='flex justify-center'>
-        <Button
-          disabled={buttonDisabled}
-          onClick={onButtonClick}
-          loading={loading}
-        >
-          {buttonLabel}
-        </Button>
-      </div>
+      <div className='flex justify-center'>{button}</div>
     </section>
   )
 }

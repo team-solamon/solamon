@@ -84,7 +84,7 @@ const CardList: React.FC<CardListProps> = ({
           {cards.map((card, index) => (
             <div
               key={index}
-              className='card bg-[rgba(202,193,185,1)]  p-2 rounded-lg flex flex-col items-center relative'
+              className='card bg-[rgba(202,193,185,1)] p-2 rounded-lg flex flex-col items-center relative hover:bg-[#FFD400] transition-colors'
               onClick={() => {
                 if (card.isAvailable) {
                   onCardPick && onCardPick(card)
@@ -118,13 +118,7 @@ const CardList: React.FC<CardListProps> = ({
                   </div>
                 </div>
               )}
-              {onRedeemCard && (
-                <div className='absolute top-0 right-0'>
-                  <Button size='S' onClick={() => onRedeemCard(card)}>
-                    Redeem
-                  </Button>
-                </div>
-              )}
+
               <CardStats attack={card.attack} health={card.health} />
             </div>
           ))}
