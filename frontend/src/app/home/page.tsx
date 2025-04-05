@@ -331,7 +331,14 @@ const HomePage = () => {
         onClaim={fetchMyBattles}
       />
       <StoryModal selectedBattle={selectedBattle} />
-      <SharedModal />
+      <SharedModal
+        onCloseNewCard={() => {
+          fetchMyCards()
+        }}
+        onCloseViewAllCards={() => {
+          fetchMyCards()
+        }}
+      />
     </div>
   )
 }

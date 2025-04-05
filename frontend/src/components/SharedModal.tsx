@@ -36,7 +36,17 @@ import {
 } from '@solana/web3.js'
 import { BN } from '@coral-xyz/anchor'
 
-const SharedModal = () => {
+interface SharedModalProps {
+  onPurchase?: () => void
+  onCloseNewCard?: () => void
+  onCloseViewAllCards?: () => void
+}
+
+const SharedModal: React.FC<SharedModalProps> = ({
+  onPurchase,
+  onCloseNewCard,
+  onCloseViewAllCards,
+}) => {
   const router = useRouter()
 
   const { showLoading, hideLoading } = useLoading()
@@ -124,6 +134,9 @@ const SharedModal = () => {
       setSpawnResult(spawnResult)
       closeModal('purchaseCard')
       openModal('newCard')
+      if (onPurchase) {
+        onPurchase()
+      }
     } catch (error) {
       console.error(error)
     }
@@ -138,6 +151,9 @@ const SharedModal = () => {
     }
     const myAccount = await getUserAccount(program, publicKey)
     setMyCards(myAccount.solamons)
+    if (onPurchase) {
+      onPurchase()
+    }
   }
 
   const handleViewAllCards = () => {
@@ -167,12 +183,22 @@ const SharedModal = () => {
       <NewCardModal
         drawableCards={spawnResult}
         onViewAll={handleViewAllCards}
-        onClose={fetchMyCards}
+        onClose={() => {
+          fetchMyCards()
+          if (onCloseNewCard) {
+            onCloseNewCard()
+          }
+        }}
       />
       <ViewAllCardsModal
         currentCards={myCards}
         drawableCards={spawnResult}
-        onClose={fetchMyCards}
+        onClose={() => {
+          fetchMyCards()
+          if (onCloseViewAllCards) {
+            onCloseViewAllCards()
+          }
+        }}
         onOpenBattle={handleOpenBattleFromModal}
       />
     </div>
