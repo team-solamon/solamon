@@ -54,7 +54,7 @@ const LeaderboardModal: React.FC = () => {
         <div className='h-[60vh] overflow-y-auto pr-2'>
           {allUserAccount ? (
             <div className='space-y-4'>
-              {allUserAccount.map((account, index: number) => (
+              {allUserAccount.map((account: any, index: number) => (
                 <div
                   key={index}
                   className='card bg-[rgba(202,193,185,1)] p-4 rounded-lg w-full'
