@@ -76,10 +76,7 @@ const ChooseFighterPage = () => {
                   )
                 }}
               >
-                <div className='flex items-center gap-1'>
-                  Choose Fighter
-                  <Balance balance={FIGHT_SOL_PRICE} />
-                </div>
+                <div className='flex items-center gap-1'>Choose Fighter</div>
               </Button>
             )}
           </div>
