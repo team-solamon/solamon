@@ -9,6 +9,7 @@ import { useModal } from '@/contexts/ModalContext'
 
 import Button from '../Button'
 import Modal from '../Modal'
+import Typography from '../Typography'
 
 const DrawGame = dynamic(() => import('@/app/draw/components/DrawGame'), {
   ssr: false,
@@ -34,7 +35,7 @@ const NewCardModal: React.FC<NewCardModalProps> = ({
         onClose()
         closeModal('newCard')
       }}
-      title='+ New Card'
+      title='Stake and Draw Card'
     >
       <div className='flex flex-col px-4'>
         <DrawGame drawableCards={drawableCards} />

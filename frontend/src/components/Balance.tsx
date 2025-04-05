@@ -37,7 +37,7 @@ const Balance: React.FC<BalanceProps> = ({
     <div className={`flex items-center gap-1 ${className}`}>
       <img src={iconSrc} alt={icon} className='w-4 h-4' />
       <Typography variant={variant} color={color}>
-        {balance ? balance.toString().slice(0, 6) : '0'}
+        {balance ? parseFloat(balance.toString().slice(0, 6)).toString() : '0'}
         {suffix ? ` ${suffix}` : ''}
       </Typography>
     </div>

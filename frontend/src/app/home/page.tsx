@@ -180,10 +180,7 @@ const HomePage = () => {
       <Nav />
       <div className='action-buttons flex flex-wrap justify-center gap-4 mb-16 mx-auto'>
         <Button onClick={() => openModal('purchaseCard')}>
-          <div className='flex items-center gap-1'>
-            + New Card
-            <Balance balance={NEW_CARD_SOL_PRICE} />
-          </div>
+          <div className='flex items-center gap-1'>Stake and Draw Card</div>
         </Button>
         <Button
           onClick={() => router.push(ROUTES.OPEN_BATTLE)}

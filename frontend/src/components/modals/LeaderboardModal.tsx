@@ -9,6 +9,7 @@ import { getAllUserAccounts, UserAccount } from '@/lib/solana-helper'
 import { getProgram } from '@/lib/helper'
 import Typography from '../Typography'
 import WalletAddress from '../WalletAddress'
+import Balance from '../Balance'
 
 const LeaderboardModal: React.FC = () => {
   const { modals, closeModal } = useModal()
@@ -50,6 +51,13 @@ const LeaderboardModal: React.FC = () => {
         maxHeight='80vh'
       >
         <div className='h-[60vh] overflow-y-auto pr-2'>
+          {/* total prize */}
+          <div className='flex items-center justify-center mb-4 gap-2'>
+            <Typography variant='body-2' color='primary'>
+              Total prize:
+            </Typography>
+            <Balance balance={123200} icon='zbtc' variant='body-2' />
+          </div>
           {allUserAccount ? (
             <div className='space-y-4'>
               {allUserAccount.map((account: any, index: number) => (
@@ -58,6 +66,12 @@ const LeaderboardModal: React.FC = () => {
                   className='card bg-[rgba(202,193,185,1)] p-4 rounded-lg w-full'
                 >
                   <div className='flex items-center mr-4'>
+                    {/* ranking */}
+                    <div className='flex items-center justify-center mr-10'>
+                      <Typography variant='body-2' color='accent'>
+                        {index + 1}
+                      </Typography>
+                    </div>
                     <WalletAddress publicKey={account.account.user} />
                     {publicKey &&
                       account.account.user.toString() ===
@@ -67,26 +81,14 @@ const LeaderboardModal: React.FC = () => {
                         </span>
                       )}
                   </div>
-                  <div className='grid grid-cols-3 gap-2 mt-2'>
-                    <Typography
-                      variant='body-2'
-                      color='inverse'
-                      outline={false}
-                    >
+                  <div className='grid grid-cols-3 gap-2 mt-2 ml-12'>
+                    <Typography variant='body-2' color='primary' outline={true}>
                       Points: {account.account.points}
                     </Typography>
-                    <Typography
-                      variant='body-2'
-                      color='inverse'
-                      outline={false}
-                    >
+                    <Typography variant='body-2' color='primary' outline={true}>
                       Battles: {account.account.battleCount.toString()}
                     </Typography>
-                    <Typography
-                      variant='body-2'
-                      color='inverse'
-                      outline={false}
-                    >
+                    <Typography variant='body-2' color='primary' outline={true}>
                       Solamons: {account.account.solamons.length}
                     </Typography>
                   </div>
