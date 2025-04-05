@@ -32,7 +32,7 @@ const ResultModal: React.FC<ResultModalProps> = ({
       <Modal
         isOpen={modals['result']}
         onClose={() => closeModal('result')}
-        title={isPlayerWinner ? 'Win' : 'Lose'}
+        title={isPlayerWinner ? '🥳 Win' : '🥹 Lose'}
         maxWidth='600px'
       >
         <GameResult
