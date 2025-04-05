@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("So1a3o9526u65W9nv8pZ3BeuiJa78FaFgfpWsTaZzGD");
+declare_id!("So1aJNrHPRZU1Mr9iuUvDuSdQS4z916QujTZdkij5B8");
 
 mod errors;
 use errors::SolamonError;

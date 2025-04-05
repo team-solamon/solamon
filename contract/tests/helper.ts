@@ -13,6 +13,7 @@ import {
 	TOKEN_PROGRAM_ID,
 } from "@solana/spl-token"
 import {
+	AddressLookupTableAccount,
 	ComputeBudgetProgram,
 	Connection,
 	PublicKey,
@@ -417,6 +418,7 @@ export async function showSpawnResult(
 ): Promise<CardData[]> {
 	const tx = await connection.getTransaction(txSig, {
 		commitment: "confirmed",
+		maxSupportedTransactionVersion: 0,
 	})
 	console.log("Spawn result")
 	const logs = (tx?.meta?.logMessages ?? [])
@@ -526,7 +528,7 @@ export function parseSolamonLog(logString: string): CardData {
 		attack: parseInt(attackMatch[1]),
 		health: parseInt(healthMatch[1]),
 		isAvailable: isAvailableMatch[1] === "true",
-		depositAmount: new BN(depositAmountMatch[1]),
+		depositAmount: new BN(depositAmountMatch?.[1]),
 	}
 }
 

@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-solamon = "So1a3o9526u65W9nv8pZ3BeuiJa78FaFgfpWsTaZzGD"
+solamon = "So1aJNrHPRZU1Mr9iuUvDuSdQS4z916QujTZdkij5B8"
 
 [registry]
 url = "https://api.apr.dev"

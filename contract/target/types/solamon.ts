@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/solamon.json`.
  */
 export type Solamon = {
-  "address": "So1a3o9526u65W9nv8pZ3BeuiJa78FaFgfpWsTaZzGD",
+  "address": "So1aJNrHPRZU1Mr9iuUvDuSdQS4z916QujTZdkij5B8",
   "metadata": {
     "name": "solamon",
     "version": "0.1.0",

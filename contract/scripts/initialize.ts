@@ -18,7 +18,6 @@ async function main() {
 
 	// Set up configuration parameters
 	const admin = adminPublicKey // Admin is the signer
-	const spawnDeposit = new BN(LAMPORTS_PER_SOL * 0.05) // 0.005 SOL per spawn
 	const stakeTokenMint = new PublicKey(
 		"zBTCug3er3tLyffELcvDNrKkCymbPWysGcWihESYfLg" // zBTC
 	)
@@ -28,10 +27,15 @@ async function main() {
 
 	console.log("Initializing Solamon program with the following parameters:")
 	console.log(`Admin: ${admin.toString()}`)
-	console.log(`Spawn Fee: ${spawnDeposit.toNumber() / LAMPORTS_PER_SOL} SOL`)
 	console.log(`Stake Token Mint: ${stakeTokenMint.toString()}`)
 
-	const configAccount = await getConfigAccount(program)
+	let configAccount
+	try {
+		configAccount = await getConfigAccount(program)
+	} catch (error) {
+		console.log("Config account not found, initializing...")
+	}
+
 	if (!configAccount) {
 		console.log("Initializing Solamon program...")
 		try {
